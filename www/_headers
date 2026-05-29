@@ -1,0 +1,21 @@
+# Service Worker - never cache
+/service-worker.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Manifest
+/manifest.json
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=86400
+
+# Icons - cache aggressively
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Favicon
+/favicon.png
+  Cache-Control: public, max-age=31536000, immutable
+
+# Vendor JS
+/www/vendor/*
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=86400

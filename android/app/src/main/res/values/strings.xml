@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NearNow</string>
+    <string name="title_activity_main">NearNow</string>
+    <string name="package_name">app.nearnow.mobile</string>
+    <string name="custom_url_scheme">app.nearnow.mobile</string>
+</resources>
