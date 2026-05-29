@@ -13,7 +13,10 @@ const staticEntries = [
   "service-worker.js",
   "icons",
   "netlify",
-  "vendor"
+  "vendor",
+  "styles.css",
+  "app.js",
+  "feeds.js"
 ];
 
 function rmIfExists(targetPath) {
