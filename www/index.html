@@ -49,6 +49,12 @@
 
       <section class="workspace" id="places" aria-label="NearNow workspace">
         <aside class="filters" aria-label="Discovery filters">
+          <div class="now-box location-box">
+            <p class="section-kicker">Location</p>
+            <strong id="location-name">Enter ZIP</strong>
+            <span id="location-detail">Real places and alerts load by ZIP code.</span>
+          </div>
+
           <div>
             <p class="section-kicker">Radius</p>
             <div class="segmented" role="group" aria-label="Search radius">
@@ -92,6 +98,18 @@
           <h2 id="plan-title">Build a tiny route</h2>
           <div class="timeline" id="timeline"></div>
         </section>
+      </section>
+
+      <section class="alerts-section" id="alerts" aria-labelledby="alerts-title">
+        <div class="feed-shell">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Local alerts</p>
+              <h2 id="alerts-title">Alerts near your ZIP</h2>
+            </div>
+          </div>
+          <div class="alert-list" id="alert-list"></div>
+        </div>
       </section>
 
       <section class="feed-section" id="feeds" aria-labelledby="feeds-title">

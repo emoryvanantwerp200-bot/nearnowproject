@@ -237,11 +237,16 @@ h2 {
   padding: clamp(28px, 5vw, 58px) clamp(16px, 4vw, 56px);
 }
 
-.feed-section {
+.feed-section,
+.alerts-section {
   padding: clamp(28px, 5vw, 58px) clamp(16px, 4vw, 56px);
   background: #eef5f4;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+}
+
+.alerts-section {
+  background: var(--paper);
 }
 
 .feed-section.is-locked .feed-grid,
@@ -406,6 +411,37 @@ h2 {
 }
 
 .preview-panel a {
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
+.alert-list {
+  display: grid;
+  gap: 12px;
+}
+
+.alert-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--warm);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.08);
+}
+
+.alert-card h3 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.alert-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.alert-card a {
   color: var(--accent-dark);
   font-weight: 800;
 }

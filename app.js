@@ -74,6 +74,9 @@ const state = {
   feedQuery: "",
   feedCategory: "All",
   zip: localStorage.getItem("nearnow:zip") || "",
+  location: null,
+  alerts: [],
+  livePlaces: [],
   saved: new Set(JSON.parse(localStorage.getItem("nearnow:saved") || "[]"))
 };
 
@@ -81,6 +84,9 @@ const placeList = document.querySelector("#place-list");
 const timeline = document.querySelector("#timeline");
 const openCount = document.querySelector("#open-count");
 const timeWindow = document.querySelector("#time-window");
+const locationName = document.querySelector("#location-name");
+const locationDetail = document.querySelector("#location-detail");
+const alertList = document.querySelector("#alert-list");
 const searchForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-input");
 const clearSaved = document.querySelector("#clear-saved");
@@ -132,6 +138,17 @@ function updateZipUi() {
     : "RSS feeds unlock after a valid 5-digit ZIP code.";
   zipStatus.classList.toggle("is-ready", ready);
   feedSection?.classList.toggle("is-locked", !ready);
+
+  if (locationName && locationDetail) {
+    locationName.textContent = state.location ? `${state.location.city}, ${state.location.state}` : ready ? `ZIP ${state.zip}` : "Enter ZIP";
+    locationDetail.textContent = state.location
+      ? `${state.livePlaces.length} real places · ${state.alerts.length} active alerts`
+      : "Real places and alerts load by ZIP code.";
+  }
+}
+
+function currentPlaces() {
+  return state.livePlaces.length ? state.livePlaces : places;
 }
 
 function persistSaved() {
@@ -141,7 +158,7 @@ function persistSaved() {
 function getFilteredPlaces() {
   const query = state.query.trim().toLowerCase();
 
-  return places.filter((place) => {
+  return currentPlaces().filter((place) => {
     const matchesRadius = place.distance <= state.radius;
     const matchesMood = state.mood === "all" || place.mood === state.mood;
     const matchesQuery = !query || [place.name, place.mood, place.detail].join(" ").toLowerCase().includes(query);
@@ -151,11 +168,13 @@ function getFilteredPlaces() {
 
 function renderPlaces() {
   const filtered = getFilteredPlaces();
-  openCount.textContent = `${filtered.length} ${filtered.length === 1 ? "place" : "places"} open`;
+  openCount.textContent = `${filtered.length} ${filtered.length === 1 ? "place" : "places"} ${state.livePlaces.length ? "nearby" : "open"}`;
   timeWindow.textContent = `Updated ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
 
   if (!filtered.length) {
-    placeList.innerHTML = '<div class="empty">No matches in this radius. Try widening the search or switching moods.</div>';
+    placeList.innerHTML = state.location
+      ? '<div class="empty">No real places matched this radius or mood. Try widening the search or switching moods.</div>'
+      : '<div class="empty">Enter your ZIP code above to load real nearby places.</div>';
     renderTimeline([]);
     return;
   }
@@ -171,8 +190,9 @@ function renderPlaces() {
           <p>${place.detail}</p>
           <div class="meta">
             <span>${place.distance.toFixed(1)} mi</span>
-            <span>${place.minutes} min walk</span>
+            <span>${place.minutes} min ${state.livePlaces.length ? "away" : "walk"}</span>
             <span>${place.mood}</span>
+            ${place.source ? `<span>${place.source}</span>` : ""}
           </div>
         </div>
         <button class="save-button ${saved ? "is-saved" : ""}" type="button" data-save="${place.id}">
@@ -183,6 +203,58 @@ function renderPlaces() {
   }).join("");
 
   renderTimeline(filtered);
+}
+
+function renderAlerts() {
+  if (!alertList) return;
+
+  if (!isValidZip(state.zip)) {
+    alertList.innerHTML = '<div class="empty">Enter your ZIP code to load local weather alerts.</div>';
+    return;
+  }
+
+  if (!state.alerts.length) {
+    alertList.innerHTML = '<div class="empty">No active National Weather Service alerts were found for this ZIP code.</div>';
+    return;
+  }
+
+  alertList.innerHTML = state.alerts.map((alert) => `
+    <article class="alert-card">
+      <span class="feed-pill">${alert.category} · ${alert.severity}</span>
+      <h3>${alert.title}</h3>
+      <p>${alert.area}</p>
+      ${alert.expires ? `<p>Expires ${new Date(alert.expires).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</p>` : ""}
+      ${alert.link ? `<a href="${alert.link}" target="_blank" rel="noreferrer">View alert</a>` : ""}
+    </article>
+  `).join("");
+}
+
+async function loadZipData(zip) {
+  zipStatus.textContent = "Loading real places and local alerts...";
+  zipStatus.classList.add("is-ready");
+
+  try {
+    const response = await fetch(`/api/zip-data?zip=${encodeURIComponent(zip)}`);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "Could not load ZIP data.");
+
+    state.location = payload.location;
+    state.alerts = payload.alerts || [];
+    state.livePlaces = payload.places || [];
+    updateZipUi();
+    renderPlaces();
+    renderAlerts();
+    renderFeedCategories();
+    renderFeeds();
+  } catch (error) {
+    state.location = null;
+    state.alerts = [];
+    state.livePlaces = [];
+    updateZipUi();
+    renderPlaces();
+    renderAlerts();
+    zipStatus.textContent = `${error.message} Showing feed personalization only.`;
+  }
 }
 
 function renderTimeline(filtered) {
@@ -455,6 +527,7 @@ zipForm?.addEventListener("submit", (event) => {
   localStorage.setItem("nearnow:zip", zip);
   renderFeedCategories();
   renderFeeds();
+  loadZipData(zip);
   document.querySelector("#feeds")?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
@@ -505,5 +578,9 @@ document.querySelectorAll("[data-agent-prompt]").forEach((button) => {
 
 renderPlaces();
 updateZipUi();
+renderAlerts();
 renderFeedCategories();
 renderFeeds();
+if (isValidZip(state.zip)) {
+  loadZipData(state.zip);
+}
