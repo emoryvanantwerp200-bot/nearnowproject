@@ -87,6 +87,11 @@ const timeWindow = document.querySelector("#time-window");
 const locationName = document.querySelector("#location-name");
 const locationDetail = document.querySelector("#location-detail");
 const alertList = document.querySelector("#alert-list");
+const mapCanvas = document.querySelector("#local-map");
+const mapCard = document.querySelector("#map-card");
+const mapReset = document.querySelector("#map-reset");
+const mapToggleAlerts = document.querySelector("#map-toggle-alerts");
+const mapTogglePlaces = document.querySelector("#map-toggle-places");
 const searchForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-input");
 const clearSaved = document.querySelector("#clear-saved");
@@ -103,6 +108,24 @@ const agentInput = document.querySelector("#agent-input");
 const agentResponse = document.querySelector("#agent-response");
 const agentSubmit = document.querySelector(".agent-submit");
 const feeds = Array.isArray(window.NEARNOW_FEEDS) ? window.NEARNOW_FEEDS : [];
+const mapState = {
+  ready: false,
+  showAlerts: true,
+  showPlaces: true,
+  scene: null,
+  camera: null,
+  renderer: null,
+  group: null,
+  raycaster: null,
+  pointer: null,
+  points: [],
+  yaw: -0.55,
+  pitch: 0.92,
+  distance: 15,
+  dragging: false,
+  lastX: 0,
+  lastY: 0
+};
 
 const zipRegions = [
   { min: 10000, max: 14999, state: "NY", metro: "New York" },
@@ -229,6 +252,222 @@ function renderAlerts() {
   `).join("");
 }
 
+function projectPoint(latitude, longitude) {
+  if (!state.location) return { x: 0, z: 0 };
+  const milesPerLat = 69;
+  const milesPerLon = 69 * Math.cos(state.location.latitude * Math.PI / 180);
+  return {
+    x: (longitude - state.location.longitude) * milesPerLon,
+    z: -(latitude - state.location.latitude) * milesPerLat
+  };
+}
+
+function updateMapCard(title, body) {
+  if (!mapCard) return;
+  mapCard.innerHTML = `<strong>${title}</strong><span>${body}</span>`;
+}
+
+function initMap() {
+  if (mapState.ready || !mapCanvas || !window.THREE) return;
+
+  const THREE = window.THREE;
+  mapState.scene = new THREE.Scene();
+  mapState.scene.background = new THREE.Color(0x0b1118);
+  mapState.camera = new THREE.PerspectiveCamera(52, 1, 0.1, 1000);
+  mapState.renderer = new THREE.WebGLRenderer({ canvas: mapCanvas, antialias: true });
+  mapState.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  mapState.group = new THREE.Group();
+  mapState.scene.add(mapState.group);
+  mapState.raycaster = new THREE.Raycaster();
+  mapState.pointer = new THREE.Vector2();
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.78);
+  const sun = new THREE.DirectionalLight(0xffffff, 1.15);
+  sun.position.set(6, 10, 4);
+  mapState.scene.add(ambient, sun);
+
+  const grid = new THREE.GridHelper(18, 18, 0x2dd4bf, 0x334155);
+  grid.material.opacity = 0.42;
+  grid.material.transparent = true;
+  mapState.group.add(grid);
+
+  mapCanvas.addEventListener("pointerdown", (event) => {
+    mapState.dragging = true;
+    mapState.lastX = event.clientX;
+    mapState.lastY = event.clientY;
+    mapCanvas.setPointerCapture(event.pointerId);
+  });
+
+  mapCanvas.addEventListener("pointermove", (event) => {
+    if (mapState.dragging) {
+      const dx = event.clientX - mapState.lastX;
+      const dy = event.clientY - mapState.lastY;
+      mapState.yaw -= dx * 0.008;
+      mapState.pitch = Math.max(0.35, Math.min(1.25, mapState.pitch + dy * 0.006));
+      mapState.lastX = event.clientX;
+      mapState.lastY = event.clientY;
+      updateCamera();
+      return;
+    }
+    pickMapPoint(event);
+  });
+
+  mapCanvas.addEventListener("pointerup", () => {
+    mapState.dragging = false;
+  });
+
+  mapCanvas.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    mapState.distance = Math.max(7, Math.min(26, mapState.distance + event.deltaY * 0.015));
+    updateCamera();
+  }, { passive: false });
+
+  window.addEventListener("resize", resizeMap);
+  mapState.ready = true;
+  resizeMap();
+  updateCamera();
+  renderMap();
+  animateMap();
+}
+
+function resizeMap() {
+  if (!mapState.ready) return;
+  const rect = mapCanvas.getBoundingClientRect();
+  mapState.camera.aspect = rect.width / Math.max(1, rect.height);
+  mapState.camera.updateProjectionMatrix();
+  mapState.renderer.setSize(rect.width, rect.height, false);
+}
+
+function updateCamera() {
+  if (!mapState.ready) return;
+  const r = mapState.distance;
+  mapState.camera.position.set(
+    Math.sin(mapState.yaw) * Math.cos(mapState.pitch) * r,
+    Math.sin(mapState.pitch) * r,
+    Math.cos(mapState.yaw) * Math.cos(mapState.pitch) * r
+  );
+  mapState.camera.lookAt(0, 0, 0);
+}
+
+function makeLabelSprite(text, color) {
+  const THREE = window.THREE;
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  canvas.width = 384;
+  canvas.height = 96;
+  context.fillStyle = "rgba(255,255,255,0.92)";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = color;
+  context.font = "700 32px sans-serif";
+  context.fillText(text.slice(0, 22), 18, 58);
+  const texture = new THREE.CanvasTexture(canvas);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+  sprite.scale.set(2.7, 0.68, 1);
+  return sprite;
+}
+
+function addMapMarker(item, type) {
+  const THREE = window.THREE;
+  const color = type === "alert" ? 0xf59e0b : 0x14b8a6;
+  const geometry = type === "alert"
+    ? new THREE.ConeGeometry(0.22, 0.72, 24)
+    : new THREE.SphereGeometry(0.2, 24, 16);
+  const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.18 });
+  const mesh = new THREE.Mesh(geometry, material);
+  const point = type === "alert"
+    ? { x: 0, z: 0 }
+    : projectPoint(item.latitude, item.longitude);
+  mesh.position.set(point.x, type === "alert" ? 0.8 : 0.28, point.z);
+  mesh.userData = { item, type };
+  mesh.visible = type === "alert" ? mapState.showAlerts : mapState.showPlaces;
+  mapState.group.add(mesh);
+  mapState.points.push(mesh);
+
+  const label = makeLabelSprite(type === "alert" ? item.severity || "Alert" : item.name, type === "alert" ? "#92400e" : "#134e4a");
+  label.position.set(point.x, type === "alert" ? 1.35 : 0.72, point.z);
+  label.userData = { item, type, isLabel: true };
+  label.visible = mesh.visible;
+  mapState.group.add(label);
+  mapState.points.push(label);
+}
+
+function renderMap() {
+  initMap();
+  if (!mapState.ready) return;
+
+  mapState.points.forEach((point) => mapState.group.remove(point));
+  mapState.points = [];
+
+  if (!state.location) {
+    updateMapCard("Enter a ZIP code", "Real places and alerts will appear on the 3D map.");
+    return;
+  }
+
+  state.livePlaces.slice(0, 18).forEach((place) => addMapMarker(place, "place"));
+  state.alerts.slice(0, 6).forEach((alert) => addMapMarker(alert, "alert"));
+  updateMapCard(`${state.location.city}, ${state.location.state}`, `${state.livePlaces.length} places and ${state.alerts.length} alerts loaded.`);
+}
+
+function animateMap() {
+  if (!mapState.ready) return;
+  requestAnimationFrame(animateMap);
+  mapState.points.forEach((point) => {
+    if (point.userData.type === "alert" && !point.userData.isLabel) {
+      point.rotation.y += 0.018;
+    }
+  });
+  mapState.renderer.render(mapState.scene, mapState.camera);
+}
+
+function pickMapPoint(event) {
+  if (!mapState.ready || !mapState.points.length) return;
+  const rect = mapCanvas.getBoundingClientRect();
+  mapState.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mapState.pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  mapState.raycaster.setFromCamera(mapState.pointer, mapState.camera);
+  const hit = mapState.raycaster.intersectObjects(mapState.points, false)[0];
+  if (!hit) return;
+  const { item, type } = hit.object.userData;
+  if (type === "alert") {
+    updateMapCard(item.title, `${item.severity} · ${item.area}`);
+  } else {
+    updateMapCard(item.name, `${item.distance} mi · ${item.detail}`);
+  }
+}
+
+function updateMapVisibility() {
+  mapState.points.forEach((point) => {
+    point.visible = point.userData.type === "alert" ? mapState.showAlerts : mapState.showPlaces;
+  });
+  mapToggleAlerts?.classList.toggle("is-muted", !mapState.showAlerts);
+  mapTogglePlaces?.classList.toggle("is-muted", !mapState.showPlaces);
+}
+
+function resetMapView() {
+  mapState.yaw = -0.55;
+  mapState.pitch = 0.92;
+  mapState.distance = 15;
+  updateCamera();
+}
+
+function scheduleMapInit() {
+  if (window.THREE) {
+    initMap();
+  } else {
+    window.addEventListener("load", initMap, { once: true });
+  }
+}
+
+mapReset?.addEventListener("click", resetMapView);
+mapToggleAlerts?.addEventListener("click", () => {
+  mapState.showAlerts = !mapState.showAlerts;
+  updateMapVisibility();
+});
+mapTogglePlaces?.addEventListener("click", () => {
+  mapState.showPlaces = !mapState.showPlaces;
+  updateMapVisibility();
+});
+
 async function loadZipData(zip) {
   zipStatus.textContent = "Loading real places and local alerts...";
   zipStatus.classList.add("is-ready");
@@ -244,6 +483,7 @@ async function loadZipData(zip) {
     updateZipUi();
     renderPlaces();
     renderAlerts();
+    renderMap();
     renderFeedCategories();
     renderFeeds();
   } catch (error) {
@@ -253,6 +493,7 @@ async function loadZipData(zip) {
     updateZipUi();
     renderPlaces();
     renderAlerts();
+    renderMap();
     zipStatus.textContent = `${error.message} Showing feed personalization only.`;
   }
 }
@@ -581,6 +822,7 @@ updateZipUi();
 renderAlerts();
 renderFeedCategories();
 renderFeeds();
+scheduleMapInit();
 if (isValidZip(state.zip)) {
   loadZipData(state.zip);
 }
