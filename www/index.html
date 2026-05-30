@@ -112,6 +112,27 @@
         </div>
       </section>
 
+      <section class="map-section" id="map" aria-labelledby="map-title">
+        <div class="map-head">
+          <div>
+            <p class="section-kicker">3D local view</p>
+            <h2 id="map-title">Places and alerts map</h2>
+          </div>
+          <div class="map-controls" aria-label="Map controls">
+            <button type="button" id="map-reset">Reset view</button>
+            <button type="button" id="map-toggle-alerts">Alerts</button>
+            <button type="button" id="map-toggle-places">Places</button>
+          </div>
+        </div>
+        <div class="map-stage">
+          <canvas id="local-map" aria-label="Interactive 3D map of nearby places and alerts"></canvas>
+          <div class="map-card" id="map-card">
+            <strong>Enter a ZIP code</strong>
+            <span>Real places and alerts will appear here.</span>
+          </div>
+        </div>
+      </section>
+
       <section class="feed-section" id="feeds" aria-labelledby="feeds-title">
         <div class="feed-shell">
           <div class="section-head">
@@ -160,6 +181,7 @@
     </footer>
 
     <script src="feeds.js" defer></script>
+    <script src="https://unpkg.com/three@0.164.1/build/three.min.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>

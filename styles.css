@@ -238,7 +238,8 @@ h2 {
 }
 
 .feed-section,
-.alerts-section {
+.alerts-section,
+.map-section {
   padding: clamp(28px, 5vw, 58px) clamp(16px, 4vw, 56px);
   background: #eef5f4;
   border-top: 1px solid var(--line);
@@ -247,6 +248,82 @@ h2 {
 
 .alerts-section {
   background: var(--paper);
+}
+
+.map-section {
+  background: #101820;
+  color: #fff;
+}
+
+.map-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  width: min(1320px, 100%);
+  margin: 0 auto 18px;
+}
+
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.map-controls button {
+  min-height: 38px;
+  padding: 0 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.map-controls button.is-muted {
+  opacity: 0.48;
+}
+
+.map-stage {
+  position: relative;
+  width: min(1320px, 100%);
+  height: clamp(420px, 62vh, 720px);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: #0b1118;
+}
+
+#local-map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+#local-map:active {
+  cursor: grabbing;
+}
+
+.map-card {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  display: grid;
+  gap: 4px;
+  width: min(340px, calc(100% - 36px));
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.map-card span {
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .feed-section.is-locked .feed-grid,
@@ -781,5 +858,14 @@ h2 {
 
   .feed-grid {
     grid-template-columns: 1fr;
+  }
+
+  .map-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .map-stage {
+    height: 520px;
   }
 }
