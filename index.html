@@ -26,14 +26,19 @@
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-media" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow">Live local discovery</p>
+          <p class="eyebrow">Mobile, Alabama · live local</p>
           <h1 id="page-title">NearNow</h1>
-          <p class="lede">Find worthwhile places, pop-ups, and open windows around you right now.</p>
+          <p class="lede">Local news, National Weather Service alerts, and real places around Mobile, Alabama — right now. Drop in any U.S. ZIP code to localize the feed.</p>
           <form class="zip-panel" id="zip-form">
             <label for="zip-input">Enter your ZIP code to localize feeds</label>
             <div class="zip-row">
               <input id="zip-input" name="zip" type="text" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="ZIP code" autocomplete="postal-code" required>
               <button type="submit">Use ZIP</button>
+            </div>
+            <div class="zip-quick" aria-label="Quick locations">
+              <button type="button" class="zip-chip" data-zip="36602">Mobile, AL</button>
+              <button type="button" class="zip-chip" data-zip="36526">Daphne, AL</button>
+              <button type="button" class="zip-chip" data-zip="36535">Foley, AL</button>
             </div>
             <p class="zip-status" id="zip-status">RSS feeds unlock after a valid 5-digit ZIP code.</p>
           </form>
@@ -138,7 +143,7 @@
           <div class="section-head">
             <div>
               <p class="section-kicker">RSS network</p>
-              <h2 id="feeds-title">US feeds from your workbook</h2>
+              <h2 id="feeds-title">Local &amp; national feeds for your ZIP</h2>
             </div>
             <div class="feed-search">
               <label for="feed-search-input">Search feeds</label>

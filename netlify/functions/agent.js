@@ -19,9 +19,21 @@ function fallbackAnswer(question, context) {
   const lower = question.toLowerCase();
   const places = Array.isArray(context?.places) ? context.places : [];
   const feeds = Array.isArray(context?.feeds) ? context.feeds : [];
+  const alerts = Array.isArray(context?.alerts) ? context.alerts : [];
   const saved = new Set(context?.filters?.savedPlaceIds || []);
+  const where = context?.location ? `${context.location.city}, ${context.location.state}` : "your area";
 
-  if (lower.includes("rss") || lower.includes("news") || lower.includes("source")) {
+  if (lower.includes("alert") || lower.includes("weather") || lower.includes("storm") || lower.includes("warning")) {
+    if (!alerts.length) {
+      return `There are no active National Weather Service alerts for ${where} right now. The Local alerts panel refreshes whenever you change your ZIP code.`;
+    }
+    return `${alerts.length} active alert${alerts.length > 1 ? "s" : ""} for ${where}: ${alerts
+      .slice(0, 3)
+      .map((alert) => `${alert.title} (${alert.severity})`)
+      .join("; ")}. See the Local alerts panel for full details.`;
+  }
+
+  if (lower.includes("rss") || lower.includes("news") || lower.includes("source") || lower.includes("feed")) {
     const readyFeeds = feeds.filter((feed) => feed.hasFeed).slice(0, 6);
     return `Try these RSS-ready sources first: ${readyFeeds.map((feed) => `${feed.source} (${feed.category})`).join(", ")}. Use Preview for readable headlines or Copy RSS for the raw feed URL.`;
   }
@@ -38,10 +50,10 @@ function fallbackAnswer(question, context) {
     .slice(0, 3);
 
   if (!routePlaces.length) {
-    return "I do not see a matching option yet. Widen the radius or switch the mood filter, then ask again.";
+    return `I do not see a matching place near ${where} yet. Widen the radius or switch the mood filter, then ask again.`;
   }
 
-  return `Start with ${routePlaces[0].name}: ${routePlaces[0].detail} ${routePlaces.length > 1 ? `Then add ${routePlaces.slice(1).map((place) => place.name).join(" and ")} for a simple route.` : ""}`;
+  return `Start with ${routePlaces[0].name}: ${routePlaces[0].detail} ${routePlaces.length > 1 ? `Then add ${routePlaces.slice(1).map((place) => place.name).join(" and ")} for a simple route around ${where}.` : ""}`;
 }
 
 async function callGateway(question, context) {
@@ -63,7 +75,7 @@ async function callGateway(question, context) {
       messages: [
         {
           role: "system",
-          content: "You are NearNow Agent, a concise local discovery assistant. Use the provided places, feeds, filters, and saved items. Recommend practical next actions. Do not invent live events outside the provided context."
+          content: "You are NearNow Agent, a concise local discovery assistant focused on Mobile, Alabama and whatever ZIP the user has loaded. Use the provided location, places, weather alerts, feeds, filters, and saved items. Recommend practical next actions and surface any active alerts when relevant. Do not invent live events, places, or alerts outside the provided context."
         },
         {
           role: "user",
