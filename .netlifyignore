@@ -1,0 +1,5 @@
+.netlify/
+work/
+outputs/
+.git/
+.gitignore
