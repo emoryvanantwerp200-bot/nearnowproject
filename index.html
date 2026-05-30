@@ -16,6 +16,7 @@
       <nav class="nav" aria-label="Primary">
         <a href="#places">Places</a>
         <a href="#feeds">Feeds</a>
+        <a href="#agent">Agent</a>
         <a href="#plan">Plan</a>
         <a href="#saved">Saved</a>
       </nav>
@@ -28,6 +29,14 @@
           <p class="eyebrow">Live local discovery</p>
           <h1 id="page-title">NearNow</h1>
           <p class="lede">Find worthwhile places, pop-ups, and open windows around you right now.</p>
+          <form class="zip-panel" id="zip-form">
+            <label for="zip-input">Enter your ZIP code to localize feeds</label>
+            <div class="zip-row">
+              <input id="zip-input" name="zip" type="text" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="ZIP code" autocomplete="postal-code" required>
+              <button type="submit">Use ZIP</button>
+            </div>
+            <p class="zip-status" id="zip-status">RSS feeds unlock after a valid 5-digit ZIP code.</p>
+          </form>
           <form class="search-panel" id="search-form">
             <label for="search-input">Search nearby</label>
             <div class="search-row">
@@ -100,6 +109,29 @@
           <div class="feed-categories" id="feed-categories" aria-label="Feed categories"></div>
           <div class="feed-grid" id="feed-grid"></div>
           <div class="feed-preview" id="feed-preview" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="agent-section" id="agent" aria-labelledby="agent-title">
+        <div class="agent-shell">
+          <div>
+            <p class="section-kicker">AI assistant</p>
+            <h2 id="agent-title">NearNow Agent</h2>
+            <p class="agent-copy">Ask for a quick route, a source recommendation, or a local-now summary.</p>
+            <div class="agent-prompts" aria-label="Suggested prompts">
+              <button type="button" data-agent-prompt="Plan a 2-stop evening route with food and music.">2-stop route</button>
+              <button type="button" data-agent-prompt="Which RSS sources should I preview for national news right now?">News sources</button>
+              <button type="button" data-agent-prompt="Find a quiet work option and explain why it fits.">Quiet work</button>
+            </div>
+          </div>
+          <form class="agent-panel" id="agent-form">
+            <label for="agent-input">Ask NearNow</label>
+            <textarea id="agent-input" rows="4" placeholder="What should I do near me right now?"></textarea>
+            <button class="agent-submit" type="submit">Ask agent</button>
+            <div class="agent-response" id="agent-response" aria-live="polite">
+              The agent is ready for a question.
+            </div>
+          </form>
         </div>
       </section>
     </main>
