@@ -201,7 +201,7 @@ function renderFeeds() {
         ${hasFeed ? `<code title="${feed.feedUrl}">${feed.feedUrl}</code>` : ""}
         <div class="feed-actions">
           <a href="${feed.homepageUrl}" target="_blank" rel="noreferrer">Website</a>
-          ${hasFeed ? `<a href="${feed.feedUrl}" target="_blank" rel="noreferrer">RSS</a>` : ""}
+          ${hasFeed ? `<button class="feed-action secondary" type="button" data-copy-feed="${feed.source}">Copy RSS</button>` : ""}
           <button class="feed-action" type="button" data-preview-feed="${feed.source}" ${hasFeed ? "" : "disabled"}>Preview</button>
         </div>
       </article>
@@ -246,6 +246,18 @@ async function previewFeed(source) {
     renderFeedPreview(feed, payload.items || [], payload.items?.length ? "" : "No items were returned by this feed.");
   } catch (error) {
     renderFeedPreview(feed, [], "Live previews run after the site is deployed on Netlify. The feed link is still ready to use.");
+  }
+}
+
+async function copyFeedUrl(source) {
+  const feed = feeds.find((item) => item.source === source);
+  if (!feed || !feed.feedUrl) return;
+
+  try {
+    await navigator.clipboard.writeText(feed.feedUrl);
+    renderFeedPreview(feed, [], "RSS URL copied to your clipboard.");
+  } catch {
+    renderFeedPreview(feed, [], `Copy this RSS URL: ${feed.feedUrl}`);
   }
 }
 
@@ -312,9 +324,16 @@ feedSearchInput?.addEventListener("input", () => {
 });
 
 feedGrid?.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-preview-feed]");
-  if (!button) return;
-  previewFeed(button.dataset.previewFeed);
+  const previewButton = event.target.closest("[data-preview-feed]");
+  if (previewButton) {
+    previewFeed(previewButton.dataset.previewFeed);
+    return;
+  }
+
+  const copyButton = event.target.closest("[data-copy-feed]");
+  if (copyButton) {
+    copyFeedUrl(copyButton.dataset.copyFeed);
+  }
 });
 
 renderPlaces();
