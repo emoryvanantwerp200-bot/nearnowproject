@@ -228,6 +228,30 @@ h2 {
   color: #99f6e4;
 }
 
+.zip-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.zip-chip {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.zip-chip:hover {
+  background: rgba(94, 234, 212, 0.22);
+  border-color: #5eead4;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(210px, 280px) minmax(0, 1fr) minmax(260px, 340px);

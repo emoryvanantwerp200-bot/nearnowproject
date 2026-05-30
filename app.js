@@ -67,13 +67,15 @@ const places = [
   }
 ];
 
+const DEFAULT_ZIP = "36602"; // Mobile, Alabama
+
 const state = {
   query: "",
   mood: "all",
   radius: 1,
   feedQuery: "",
   feedCategory: "All",
-  zip: localStorage.getItem("nearnow:zip") || "",
+  zip: localStorage.getItem("nearnow:zip") || DEFAULT_ZIP,
   location: null,
   alerts: [],
   livePlaces: [],
@@ -132,7 +134,9 @@ const zipRegions = [
   { min: 1500, max: 2799, state: "MA", metro: "Boston" },
   { min: 3000, max: 3899, state: "MA", metro: "Boston" },
   { min: 60000, max: 62999, state: "IL", metro: "Chicago" },
-  { min: 90000, max: 93599, state: "CA", metro: "Los Angeles" }
+  { min: 90000, max: 93599, state: "CA", metro: "Los Angeles" },
+  { min: 36500, max: 36699, state: "AL", metro: "Mobile" },
+  { min: 35000, max: 36999, state: "AL", metro: "Alabama" }
 ];
 
 function getZipLocation(zip) {
@@ -652,8 +656,12 @@ function setAgentResponse(message) {
 }
 
 function buildAgentContext() {
+  const activePlaces = currentPlaces();
   return {
-    places: places.map(({ id, name, mood, distance, minutes, status, detail }) => ({
+    location: state.location
+      ? { city: state.location.city, state: state.location.state, zip: state.zip }
+      : null,
+    places: activePlaces.map(({ id, name, mood, distance, minutes, status, detail }) => ({
       id,
       name,
       mood,
@@ -661,6 +669,12 @@ function buildAgentContext() {
       minutes,
       status,
       detail
+    })),
+    alerts: state.alerts.map(({ title, severity, area, expires }) => ({
+      title,
+      severity,
+      area,
+      expires
     })),
     feeds: feeds.map(({ category, source, feedUrl, note }) => ({
       category,
@@ -763,13 +777,25 @@ zipForm?.addEventListener("submit", (event) => {
     return;
   }
 
+  applyZip(zip);
+  document.querySelector("#feeds")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+function applyZip(zip) {
   state.zip = zip;
   state.feedCategory = "All";
+  zipInput.value = zip;
   localStorage.setItem("nearnow:zip", zip);
   renderFeedCategories();
   renderFeeds();
   loadZipData(zip);
-  document.querySelector("#feeds")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.querySelectorAll("[data-zip]").forEach((button) => {
+  button.addEventListener("click", () => {
+    applyZip(button.dataset.zip);
+    document.querySelector("#places")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 });
 
 clearSaved.addEventListener("click", () => {

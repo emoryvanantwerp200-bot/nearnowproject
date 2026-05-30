@@ -211,6 +211,42 @@ window.NEARNOW_FEEDS = [
   },
   {
     category: "Local News",
+    source: "WKRG News 5",
+    homepageUrl: "https://www.wkrg.com/",
+    feedUrl: "https://www.wkrg.com/feed/",
+    note: "CBS affiliate covering Mobile, Baldwin County, and the Gulf Coast.",
+    regions: ["AL"],
+    metros: ["Mobile"]
+  },
+  {
+    category: "Local News",
+    source: "FOX10 News (WALA)",
+    homepageUrl: "https://www.fox10tv.com/",
+    feedUrl: "https://www.fox10tv.com/arc/outboundfeeds/rss/?outputType=xml",
+    note: "Mobile's FOX affiliate: breaking news, weather, and local stories.",
+    regions: ["AL"],
+    metros: ["Mobile"]
+  },
+  {
+    category: "Local News",
+    source: "AL.com",
+    homepageUrl: "https://www.al.com/mobile/",
+    feedUrl: "https://www.al.com/arc/outboundfeeds/rss/?outputType=xml",
+    note: "Statewide Alabama newsroom with strong Mobile and Gulf Coast coverage.",
+    regions: ["AL"],
+    metros: ["Mobile", "Alabama"]
+  },
+  {
+    category: "Local News",
+    source: "Alabama Political Reporter",
+    homepageUrl: "https://www.alreporter.com/",
+    feedUrl: "https://www.alreporter.com/feed/",
+    note: "Independent statewide reporting on Alabama politics and policy.",
+    regions: ["AL"],
+    metros: ["Mobile", "Alabama"]
+  },
+  {
+    category: "Local News",
     source: "Boston.com",
     homepageUrl: "https://www.boston.com/",
     feedUrl: "https://www.boston.com/feed/",
