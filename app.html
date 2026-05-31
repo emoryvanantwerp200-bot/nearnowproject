@@ -86,6 +86,11 @@
 
   .brand span { color: var(--accent); }
 
+  .brand-home {
+    text-decoration: none;
+    color: inherit;
+  }
+
   .status-row {
     display: inline-flex;
     gap: 8px;
@@ -976,8 +981,9 @@
 
   <div class="app-shell" id="app" data-tab="mix">
     <header class="topbar">
-      <h1 class="brand">Near<span>Now</span> Circle</h1>
+      <a class="brand-home" href="/" aria-label="NearNow home"><h1 class="brand">Near<span>Now</span> Circle</h1></a>
       <div style="display:flex;align-items:center;gap:14px;">
+        <a class="btn btn-soft" href="/" style="font-size:0.72rem;text-decoration:none;">← Home</a>
         <div class="status-row"><span class="dot"></span> <span id="statusText">Loading...</span></div>
         <button class="btn btn-soft" id="authBtn" style="font-size:0.72rem;">Sign In</button>
       </div>
