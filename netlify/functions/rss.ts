@@ -30,6 +30,8 @@ const allowedFeeds = new Set([
   "https://www.govinfo.gov/rss",
   "https://www.dol.gov/rss/releases.xml",
   "https://statesnewsroom.com/feed/",
+  "https://mynbc15.com/news/local.rss",
+  "https://www.al.com/arc/outboundfeeds/rss/category/news/mobile/?outputType=xml",
   "https://www.boston.com/feed/",
   "https://ktla.com/feed/",
   "https://wgntv.com/feed/",

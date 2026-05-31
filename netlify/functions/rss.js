@@ -29,6 +29,8 @@ const allowedFeeds = new Set([
   "https://www.dol.gov/rss/releases.xml",
   "https://statesnewsroom.com/feed/",
   "https://www.wkrg.com/feed/",
+  "https://mynbc15.com/news/local.rss",
+  "https://www.al.com/arc/outboundfeeds/rss/category/news/mobile/?outputType=xml",
   "https://www.fox10tv.com/arc/outboundfeeds/rss/?outputType=xml",
   "https://www.al.com/arc/outboundfeeds/rss/?outputType=xml",
   "https://www.alreporter.com/feed/",
