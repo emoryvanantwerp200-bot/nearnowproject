@@ -238,6 +238,24 @@ window.NEARNOW_FEEDS = [
   },
   {
     category: "Local News",
+    source: "NBC 15 (WPMI)",
+    homepageUrl: "https://mynbc15.com/",
+    feedUrl: "https://mynbc15.com/news/local.rss",
+    note: "Mobile's NBC affiliate: local news, weather, and Gulf Coast coverage.",
+    regions: ["AL"],
+    metros: ["Mobile"]
+  },
+  {
+    category: "Local News",
+    source: "AL.com — Mobile",
+    homepageUrl: "https://www.al.com/mobile/",
+    feedUrl: "https://www.al.com/arc/outboundfeeds/rss/category/news/mobile/?outputType=xml",
+    note: "AL.com's dedicated Mobile section for city and Gulf Coast news.",
+    regions: ["AL"],
+    metros: ["Mobile"]
+  },
+  {
+    category: "Local News",
     source: "Alabama Political Reporter",
     homepageUrl: "https://www.alreporter.com/",
     feedUrl: "https://www.alreporter.com/feed/",
