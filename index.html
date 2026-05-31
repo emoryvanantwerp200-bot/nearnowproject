@@ -2,9 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#111827">
-    <title>NearNow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0f766e">
+    <title>NearNow — Real-Time Local Alerts &amp; Community</title>
+    <meta name="description" content="Local news, severe-weather alerts, real nearby places, and a private neighborhood + family-safety community — all filtered by how close they are to you. Now officially live.">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NearNow">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -18,7 +30,7 @@
         <a href="#feeds">Feeds</a>
         <a href="#agent">Agent</a>
         <a href="#plan">Plan</a>
-        <a href="#saved">Saved</a>
+        <a class="nav-cta" href="/app.html">Open the app<span aria-hidden="true"> ↗</span></a>
       </nav>
     </header>
 
@@ -26,9 +38,13 @@
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-media" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow">Mobile, Alabama · live local</p>
+          <p class="eyebrow"><span class="live-badge"><span class="live-dot" aria-hidden="true"></span> Now officially live</span> · Mobile, Alabama &amp; every U.S. ZIP</p>
           <h1 id="page-title">NearNow</h1>
-          <p class="lede">Local news, National Weather Service alerts, and real places around Mobile, Alabama — right now. Drop in any U.S. ZIP code to localize the feed.</p>
+          <p class="lede">Local news, National Weather Service alerts, and real places around you — right now. Then step inside the NearNow community for neighborhood threads, local reels, and family-safety check-ins. Drop in any U.S. ZIP code to localize the feed.</p>
+          <div class="hero-cta">
+            <a class="hero-button primary" href="/app.html">Open the NearNow app<span aria-hidden="true"> ↗</span></a>
+            <a class="hero-button ghost" href="#feeds">Explore live feeds</a>
+          </div>
           <form class="zip-panel" id="zip-form">
             <label for="zip-input">Enter your ZIP code to localize feeds</label>
             <div class="zip-row">
@@ -180,13 +196,44 @@
       </section>
     </main>
 
+    <section class="join-band" aria-labelledby="join-title">
+      <div class="join-inner">
+        <p class="section-kicker">The full experience</p>
+        <h2 id="join-title">Step inside the NearNow community</h2>
+        <p>Neighborhood threads, local-only reels, a shared board, family-safety check-ins with live map pins, and a weekly local briefing. No waitlist — create an account or jump in instantly as a guest.</p>
+        <div class="join-cta">
+          <a class="hero-button primary" href="/app.html">Open the app<span aria-hidden="true"> ↗</span></a>
+          <a class="hero-button ghost" href="/app.html">Try it as a guest</a>
+        </div>
+      </div>
+    </section>
+
     <footer class="footer" id="saved">
-      <span>NearNow Project</span>
-      <a href="https://app.netlify.com/projects/nearnowproject/deploys">Netlify deploys</a>
+      <div class="footer-brand">
+        <span class="brand-mark">NN</span>
+        <div>
+          <strong>NearNow</strong>
+          <span class="footer-tagline">Real-time local alerts &amp; community · Officially live</span>
+        </div>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="#places">Places</a>
+        <a href="#feeds">Feeds</a>
+        <a href="#agent">Agent</a>
+        <a href="/app.html">Community app</a>
+        <a href="/app.html">Family safety</a>
+      </nav>
     </footer>
 
     <script src="feeds.js" defer></script>
     <script src="https://unpkg.com/three@0.164.1/build/three.min.js" defer></script>
     <script src="app.js" defer></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

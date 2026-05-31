@@ -1,22 +1,24 @@
-const CACHE_NAME = 'nearnow-v1';
+const CACHE_NAME = 'nearnow-v2';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/app.html',
+  '/styles.css',
+  '/feeds.js',
+  '/app.js',
   '/manifest.json',
+  '/favicon.png',
   '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js'
+  '/icons/icon-512.png'
 ];
 
 // Install: pre-cache core assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then((cache) => Promise.allSettled(
+        PRECACHE_URLS.map((url) => cache.add(url))
+      ))
       .then(() => self.skipWaiting())
   );
 });
