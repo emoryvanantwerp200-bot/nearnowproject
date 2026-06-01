@@ -50,6 +50,7 @@
             <span>User accounts</span>
             <span>Community reporting</span>
             <span>AI summaries</span>
+            <span>Real local news</span>
           </div>
         </div>
 
@@ -147,6 +148,46 @@
               <a href="#events-list">Event details</a>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section class="news-section" id="local-news" aria-labelledby="news-title">
+        <div class="section-heading">
+          <p class="eyebrow">Real Local News</p>
+          <h2 id="news-title">Choose your Gulf Coast area and open trusted local coverage.</h2>
+          <p>
+            NearNow should make the morning scan easier by grouping real local sources
+            for Baldwin County, Mobile County, Escambia County, West Mobile, and
+            Pascagoula, Mississippi.
+          </p>
+        </div>
+        <div class="news-layout">
+          <div class="area-tabs" role="tablist" aria-label="Local news areas">
+            <button class="area-tab active" type="button" data-area="baldwin" role="tab" aria-selected="true">
+              Baldwin County
+            </button>
+            <button class="area-tab" type="button" data-area="mobile" role="tab" aria-selected="false">
+              Mobile County
+            </button>
+            <button class="area-tab" type="button" data-area="escambia" role="tab" aria-selected="false">
+              Escambia County
+            </button>
+            <button class="area-tab" type="button" data-area="westmobile" role="tab" aria-selected="false">
+              West Mobile
+            </button>
+            <button class="area-tab" type="button" data-area="pascagoula" role="tab" aria-selected="false">
+              Pascagoula, MS
+            </button>
+          </div>
+          <article class="news-focus" id="newsFocus" aria-live="polite">
+            <span class="label">Baldwin County</span>
+            <h3>Baldwin morning news scan</h3>
+            <p>
+              Follow coastal county headlines, beach communities, school updates,
+              local government, roads, and severe-weather coverage.
+            </p>
+          </article>
+          <div class="source-list" id="sourceList" aria-label="Verified local news sources"></div>
         </div>
       </section>
 
