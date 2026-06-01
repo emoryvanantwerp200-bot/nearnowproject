@@ -18,6 +18,8 @@
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="#brief">Daily brief</a>
+        <a href="#safety">Safety</a>
+        <a href="#places">Places</a>
         <a href="#trust">Trust</a>
         <a href="#growth">Growth goals</a>
       </nav>
@@ -51,6 +53,8 @@
             <span>Community reporting</span>
             <span>AI summaries</span>
             <span>Real local news</span>
+            <span>Safety alerts</span>
+            <span>Places to visit</span>
           </div>
         </div>
 
@@ -151,6 +155,59 @@
         </div>
       </section>
 
+      <section class="safety-section" id="safety" aria-labelledby="safety-title">
+        <div class="section-heading">
+          <p class="eyebrow">Safety Alerts</p>
+          <h2 id="safety-title">Crime, AMBER, and weather alerts from sources people recognize.</h2>
+          <p>
+            NearNow should separate urgent public-safety information from ordinary news,
+            show the source, and make it obvious when an alert needs immediate attention.
+          </p>
+        </div>
+        <div class="safety-grid">
+          <article class="safety-card crime">
+            <span class="label">Crime alerts</span>
+            <h3>Local public-safety scan</h3>
+            <p>
+              Pull verified updates from sheriff, police, and trusted regional news sources
+              before community reports are marked confirmed.
+            </p>
+            <div class="source-row">
+              <a href="https://www.mobileso.com/" target="_blank" rel="noopener">Mobile Sheriff</a>
+              <a href="https://sheriff.baldwincountyal.gov/" target="_blank" rel="noopener">Baldwin Sheriff</a>
+              <a href="https://escambiaso.com/" target="_blank" rel="noopener">Escambia Sheriff</a>
+            </div>
+          </article>
+
+          <article class="safety-card amber">
+            <span class="label">AMBER alerts</span>
+            <h3>State alert channels</h3>
+            <p>
+              Route Alabama, Florida, and Mississippi child-abduction alerts through official
+              state systems with clear timestamps and source links.
+            </p>
+            <div class="source-row">
+              <a href="https://app.alea.gov/Community/Default.aspx" target="_blank" rel="noopener">Alabama ALEA</a>
+              <a href="https://www.fdle.state.fl.us/AMBER-Plan/Amber-Alert" target="_blank" rel="noopener">Florida FDLE</a>
+              <a href="https://www.dps.ms.gov/investigation/amber-alert" target="_blank" rel="noopener">Mississippi DPS</a>
+            </div>
+          </article>
+
+          <article class="safety-card weather">
+            <span class="label">Weather alerts</span>
+            <h3>Severe weather readiness</h3>
+            <p>
+              Keep tornado, flood, marine, heat, and tropical-weather notices separate from
+              the casual forecast so residents know what changed.
+            </p>
+            <div class="source-row">
+              <a href="https://www.weather.gov/mob/" target="_blank" rel="noopener">NWS Mobile/Pensacola</a>
+              <a href="https://www.weather.gov/lix/" target="_blank" rel="noopener">NWS New Orleans/Baton Rouge</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <section class="news-section" id="local-news" aria-labelledby="news-title">
         <div class="section-heading">
           <p class="eyebrow">Real Local News</p>
@@ -188,6 +245,27 @@
             </p>
           </article>
           <div class="source-list" id="sourceList" aria-label="Verified local news sources"></div>
+        </div>
+      </section>
+
+      <section class="places-section" id="places" aria-labelledby="places-title">
+        <div class="section-heading">
+          <p class="eyebrow">Places To Visit</p>
+          <h2 id="places-title">Give people useful ideas after they check the alerts.</h2>
+          <p>
+            The daily habit gets stronger when NearNow also answers, "What can we do nearby
+            today?" These picks can later become weather-aware and event-aware.
+          </p>
+        </div>
+        <div class="places-layout">
+          <div class="place-picker" role="tablist" aria-label="Places by area">
+            <button class="place-tab active" type="button" data-area="baldwin" role="tab" aria-selected="true">Baldwin</button>
+            <button class="place-tab" type="button" data-area="mobile" role="tab" aria-selected="false">Mobile</button>
+            <button class="place-tab" type="button" data-area="escambia" role="tab" aria-selected="false">Escambia</button>
+            <button class="place-tab" type="button" data-area="westmobile" role="tab" aria-selected="false">West Mobile</button>
+            <button class="place-tab" type="button" data-area="pascagoula" role="tab" aria-selected="false">Pascagoula</button>
+          </div>
+          <div class="places-grid" id="placesGrid" aria-live="polite"></div>
         </div>
       </section>
 

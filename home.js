@@ -28,6 +28,8 @@ const reportStatus = document.querySelector("#reportStatus");
 const areaTabs = document.querySelectorAll(".area-tab");
 const newsFocus = document.querySelector("#newsFocus");
 const sourceList = document.querySelector("#sourceList");
+const placeTabs = document.querySelectorAll(".place-tab");
+const placesGrid = document.querySelector("#placesGrid");
 
 const localNewsAreas = {
   baldwin: {
@@ -162,6 +164,139 @@ const localNewsAreas = {
   }
 };
 
+const placesByArea = {
+  baldwin: [
+    {
+      name: "Gulf State Park",
+      category: "Outdoors",
+      url: "https://www.alapark.com/parks/gulf-state-park",
+      note: "Beach access, trails, fishing, camping, and family-friendly outdoor space near Gulf Shores."
+    },
+    {
+      name: "Fairhope Municipal Pier",
+      category: "Waterfront",
+      url: "https://www.fairhopeal.gov/",
+      note: "A reliable morning or sunset stop with bay views, walking paths, and nearby downtown shops."
+    },
+    {
+      name: "Weeks Bay Reserve",
+      category: "Nature",
+      url: "https://www.outdooralabama.com/weeks-bay-reserve",
+      note: "Boardwalks and estuary education for a quieter Baldwin County nature visit."
+    },
+    {
+      name: "The Wharf at Orange Beach",
+      category: "Events",
+      url: "https://alwharf.com/",
+      note: "Restaurants, concerts, shopping, marina views, and seasonal community events."
+    }
+  ],
+  mobile: [
+    {
+      name: "USS Alabama Battleship Memorial Park",
+      category: "History",
+      url: "https://www.ussalabama.com/",
+      note: "One of Mobile's signature stops for military history, aircraft, and waterfront views."
+    },
+    {
+      name: "Bellingrath Gardens and Home",
+      category: "Gardens",
+      url: "https://bellingrath.org/",
+      note: "A polished day-trip option for gardens, seasonal blooms, and a historic home tour."
+    },
+    {
+      name: "Downtown Mobile",
+      category: "Food & culture",
+      url: "https://www.cityofmobile.org/",
+      note: "Museums, restaurants, Mardi Gras history, live music, and walkable civic landmarks."
+    },
+    {
+      name: "Dauphin Island",
+      category: "Coast",
+      url: "https://www.townofdauphinisland.org/",
+      note: "Beach time, birding, Fort Gaines, and a calmer coastal outing south of Mobile."
+    }
+  ],
+  escambia: [
+    {
+      name: "Historic Pensacola",
+      category: "History",
+      url: "https://historicpensacola.org/",
+      note: "Museums, preserved buildings, walking tours, and downtown history in one compact area."
+    },
+    {
+      name: "Johnson Beach",
+      category: "Beach",
+      url: "https://www.nps.gov/guis/planyourvisit/johnson-beach.htm",
+      note: "Gulf Islands National Seashore beach access, dunes, water views, and quieter nature time."
+    },
+    {
+      name: "Big Lagoon State Park",
+      category: "Outdoors",
+      url: "https://www.floridastateparks.org/parks-and-trails/big-lagoon-state-park",
+      note: "Kayaking, trails, camping, birding, and a strong choice when beach traffic is heavy."
+    },
+    {
+      name: "Downtown Pensacola",
+      category: "Events",
+      url: "https://www.visitpensacola.com/",
+      note: "Dining, galleries, waterfront walks, performances, and recurring local events."
+    }
+  ],
+  westmobile: [
+    {
+      name: "Medal of Honor Park",
+      category: "Park",
+      url: "https://www.cityofmobile.org/parks-rec/parks/medal-of-honor-park/",
+      note: "Trails, sports fields, playgrounds, and easy everyday green space for West Mobile families."
+    },
+    {
+      name: "Mobile Botanical Gardens",
+      category: "Gardens",
+      url: "https://mbgrebloom.org/",
+      note: "Quiet trails, native plants, seasonal events, and a low-stress local visit."
+    },
+    {
+      name: "University of South Alabama",
+      category: "Campus",
+      url: "https://www.southalabama.edu/",
+      note: "Campus events, athletics, arts programming, and public lectures in West Mobile."
+    },
+    {
+      name: "Municipal Park",
+      category: "Outdoors",
+      url: "https://www.cityofmobile.org/parks-rec/parks/",
+      note: "Nearby walking, disc golf, playgrounds, and open space close to major West Mobile routes."
+    }
+  ],
+  pascagoula: [
+    {
+      name: "Pascagoula River Audubon Center",
+      category: "Nature",
+      url: "https://pascagoula.audubon.org/",
+      note: "A strong local anchor for river ecology, kayaking, birding, and family nature programming."
+    },
+    {
+      name: "Beach Park",
+      category: "Waterfront",
+      url: "https://cityofpascagoula.com/",
+      note: "A simple waterfront stop for walking, views, playground time, and community events."
+    },
+    {
+      name: "La Pointe-Krebs Museum",
+      category: "History",
+      url: "https://lapointekrebs.org/",
+      note: "Regional history in one of the Gulf Coast's oldest surviving structures."
+    },
+    {
+      name: "Round Island Lighthouse",
+      category: "Landmark",
+      url: "https://cityofpascagoula.com/",
+      note: "A visible Pascagoula landmark and easy pairing with downtown or waterfront plans."
+    }
+  ]
+};
+
 filters.forEach((button) => {
   button.addEventListener("click", () => {
     const filter = button.dataset.filter;
@@ -225,6 +360,22 @@ function renderLocalNews(areaKey) {
     .join("");
 }
 
+function renderPlaces(areaKey) {
+  const places = placesByArea[areaKey] || placesByArea.baldwin;
+  placesGrid.innerHTML = places
+    .map(
+      (place) => `
+        <article class="place-card">
+          <span class="source-meta">${place.category}</span>
+          <h3>${place.name}</h3>
+          <p>${place.note}</p>
+          <a href="${place.url}" target="_blank" rel="noopener">Plan a visit</a>
+        </article>
+      `
+    )
+    .join("");
+}
+
 areaTabs.forEach((button) => {
   button.addEventListener("click", () => {
     areaTabs.forEach((item) => {
@@ -238,3 +389,17 @@ areaTabs.forEach((button) => {
 });
 
 renderLocalNews("baldwin");
+
+placeTabs.forEach((button) => {
+  button.addEventListener("click", () => {
+    placeTabs.forEach((item) => {
+      item.classList.remove("active");
+      item.setAttribute("aria-selected", "false");
+    });
+    button.classList.add("active");
+    button.setAttribute("aria-selected", "true");
+    renderPlaces(button.dataset.area);
+  });
+});
+
+renderPlaces("baldwin");
