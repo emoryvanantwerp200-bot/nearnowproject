@@ -38,6 +38,8 @@ const reportStatus = document.querySelector("#reportStatus");
 const areaTabs = document.querySelectorAll(".area-tab");
 const newsFocus = document.querySelector("#newsFocus");
 const sourceList = document.querySelector("#sourceList");
+const reportList = document.querySelector("#reportList");
+const refreshEmbeddedNewsButton = document.querySelector("#refreshEmbeddedNews");
 const placeTabs = document.querySelectorAll(".place-tab");
 const placesGrid = document.querySelector("#placesGrid");
 const enableNotificationsButton = document.querySelector("#enableNotifications");
@@ -178,6 +180,91 @@ const localNewsAreas = {
     ]
   }
 };
+
+const fallbackReports = {
+  baldwin: [
+    {
+      source: "FOX10 Baldwin County",
+      title: "Open Baldwin County live coverage",
+      url: "https://www.fox10tv.com/news/baldwin-county/",
+      published: "Live source",
+      summary: "Embedded feeds are loading. Use this verified source for Baldwin County headlines."
+    },
+    {
+      source: "Gulf Coast Media",
+      title: "Open Gulf Coast Media",
+      url: "https://gulfcoastmedia.com/",
+      published: "Live source",
+      summary: "Local newspaper coverage for Baldwin County communities."
+    }
+  ],
+  mobile: [
+    {
+      source: "WKRG News 5",
+      title: "Open Mobile County live coverage",
+      url: "https://www.wkrg.com/mobile-county/",
+      published: "Live source",
+      summary: "Mobile County headlines, traffic, weather, and public-safety updates."
+    },
+    {
+      source: "Lagniappe Mobile",
+      title: "Open Lagniappe Mobile",
+      url: "https://www.lagniappemobile.com/",
+      published: "Live source",
+      summary: "Independent reporting, civic coverage, food, arts, and local events."
+    }
+  ],
+  escambia: [
+    {
+      source: "WEAR ABC 3",
+      title: "Open Northwest Florida local coverage",
+      url: "https://weartv.com/news/local",
+      published: "Live source",
+      summary: "Escambia County and Pensacola breaking news, weather, and traffic."
+    },
+    {
+      source: "NorthEscambia.com",
+      title: "Open North Escambia community news",
+      url: "https://www.northescambia.com/",
+      published: "Live source",
+      summary: "Community-focused reporting for north Escambia towns and roads."
+    }
+  ],
+  westmobile: [
+    {
+      source: "WKRG News 5",
+      title: "Open West Mobile area coverage",
+      url: "https://www.wkrg.com/mobile-county/",
+      published: "Live source",
+      summary: "Mobile County feed filtered for stories useful to West Mobile residents."
+    },
+    {
+      source: "FOX10 Mobile",
+      title: "Open FOX10 Mobile coverage",
+      url: "https://www.fox10tv.com/",
+      published: "Live source",
+      summary: "Weather, traffic, safety, and breaking news for the Mobile area."
+    }
+  ],
+  pascagoula: [
+    {
+      source: "WLOX",
+      title: "Open Mississippi Coast live coverage",
+      url: "https://www.wlox.com/",
+      published: "Live source",
+      summary: "Pascagoula, Jackson County, Biloxi, Gulfport, and Mississippi Coast headlines."
+    },
+    {
+      source: "Sun Herald Local",
+      title: "Open South Mississippi local news",
+      url: "https://www.sunherald.com/news/local/",
+      published: "Live source",
+      summary: "Regional reporting for South Mississippi and the Coast."
+    }
+  ]
+};
+
+let activeNewsArea = "baldwin";
 
 const placesByArea = {
   baldwin: [
@@ -427,6 +514,7 @@ testNotificationButton.addEventListener("click", async () => {
 
 function renderLocalNews(areaKey) {
   const area = localNewsAreas[areaKey] || localNewsAreas.baldwin;
+  activeNewsArea = areaKey;
   newsFocus.innerHTML = `
     <span class="label">${area.label}</span>
     <h3>${area.title}</h3>
@@ -445,6 +533,41 @@ function renderLocalNews(areaKey) {
       `
     )
     .join("");
+
+  loadEmbeddedReports(areaKey);
+}
+
+function renderReports(items, areaKey) {
+  const reports = items.length ? items : fallbackReports[areaKey] || fallbackReports.baldwin;
+  reportList.innerHTML = reports
+    .slice(0, 6)
+    .map(
+      (item) => `
+        <article class="report-card">
+          <div class="report-meta">
+            <span>${item.source || "Verified source"}</span>
+            <span>${item.published || "Latest update"}</span>
+          </div>
+          <h3>${item.title}</h3>
+          <p>${item.summary || "Open the source report for details and updates."}</p>
+          <a href="${item.url}" target="_blank" rel="noopener">Read full report</a>
+        </article>
+      `
+    )
+    .join("");
+}
+
+async function loadEmbeddedReports(areaKey = activeNewsArea) {
+  reportList.innerHTML = '<article class="report-card loading">Loading embedded reports from verified sources...</article>';
+
+  try {
+    const response = await fetch(`/api/embedded-news?area=${encodeURIComponent(areaKey)}`);
+    if (!response.ok) throw new Error("News feed unavailable");
+    const data = await response.json();
+    renderReports(Array.isArray(data.items) ? data.items : [], areaKey);
+  } catch {
+    renderReports([], areaKey);
+  }
 }
 
 function renderPlaces(areaKey) {
@@ -477,6 +600,7 @@ areaTabs.forEach((button) => {
 
 renderLocalNews("baldwin");
 loadNotificationPreferences();
+refreshEmbeddedNewsButton.addEventListener("click", () => loadEmbeddedReports(activeNewsArea));
 
 placeTabs.forEach((button) => {
   button.addEventListener("click", () => {
