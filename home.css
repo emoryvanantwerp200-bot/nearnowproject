@@ -15,6 +15,7 @@
   --blue: #386c93;
   --blue-soft: #e0edf4;
   --shadow: 0 18px 50px rgba(23, 32, 27, 0.12);
+  --shadow-soft: 0 10px 26px rgba(23, 32, 27, 0.08);
 }
 
 * {
@@ -88,6 +89,7 @@ textarea {
 
 .nav-links {
   gap: 22px;
+  flex-wrap: wrap;
 }
 
 .nav-links a,
@@ -167,6 +169,38 @@ h3 {
   margin: 30px 0 20px;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.primary-action,
+.secondary-action,
+.soft-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.primary-action {
+  color: #fff;
+  background: var(--green);
+}
+
+.secondary-action,
+.soft-button {
+  border: 1px solid #9ecab2;
+  color: var(--green);
+  background: var(--green-soft);
+}
+
 .location-form label,
 .report-panel label {
   display: block;
@@ -206,6 +240,15 @@ button {
   background: var(--green);
   cursor: pointer;
   font-weight: 800;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(33, 107, 78, 0.28);
+  outline-offset: 2px;
 }
 
 .input-row button,
@@ -356,6 +399,7 @@ button {
 
 .brief-section,
 .safety-section,
+.notification-section,
 .news-section,
 .places-section,
 .trust-section,
@@ -375,6 +419,13 @@ button {
 .safety-section {
   background:
     linear-gradient(180deg, #ffffff 0%, #f8faf6 100%);
+}
+
+.notification-section {
+  background:
+    linear-gradient(135deg, rgba(33, 107, 78, 0.09), rgba(56, 108, 147, 0.08)),
+    #fbfcf8;
+  border-bottom: 1px solid var(--line);
 }
 
 .section-heading {
@@ -428,6 +479,13 @@ button {
 .summary-panel p,
 .community-section p {
   color: var(--muted);
+}
+
+.brief-note {
+  margin-top: 18px;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  font-weight: 800;
 }
 
 .source-row a,
@@ -508,6 +566,66 @@ button {
   border-top: 5px solid var(--blue);
 }
 
+.notification-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  gap: 18px;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.notification-copy {
+  padding: clamp(22px, 4vw, 38px);
+  background:
+    linear-gradient(135deg, rgba(33, 107, 78, 0.12), rgba(184, 111, 21, 0.11)),
+    var(--panel);
+}
+
+.notification-copy h3 {
+  margin-top: 16px;
+  font-size: clamp(1.55rem, 2.8vw, 2.25rem);
+}
+
+.notification-copy p {
+  color: var(--muted);
+}
+
+.notification-form {
+  display: grid;
+  gap: 10px;
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.notification-form label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.notification-form input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--green);
+}
+
+.notification-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+
 .news-section {
   background: var(--paper);
 }
@@ -567,6 +685,7 @@ button {
   display: grid;
   gap: 8px;
   padding: 16px;
+  border-left: 5px solid var(--green);
 }
 
 .source-card h3 {
@@ -632,6 +751,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+  box-shadow: var(--shadow-soft);
 }
 
 .place-card h3 {
@@ -730,7 +850,8 @@ button {
 
 @media (max-width: 1050px) {
   .hero,
-  .community-section {
+  .community-section,
+  .notification-panel {
     grid-template-columns: 1fr;
   }
 
@@ -792,6 +913,10 @@ button {
   .news-layout,
   .area-tabs,
   .places-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-actions {
     grid-template-columns: 1fr;
   }
 

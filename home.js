@@ -1,18 +1,28 @@
 const briefData = {
-  Downtown: {
-    time: "Updated 6:30 AM",
+  "Mobile County": {
+    time: "Updated 6:40 AM",
     summary:
-      "Light fog is slowing the west side commute, Main Street has a lane closure near 4th, and the farmers market opens early. No severe weather has been issued for your area."
+      "Mobile County has a normal morning weather pattern, routine traffic pressure around I-10 and Airport Boulevard, and no active AMBER alert displayed in this demo brief."
   },
-  Midtown: {
+  "Baldwin County": {
     time: "Updated 6:42 AM",
     summary:
-      "A light rain band is moving east, buses are running normally, and two school events begin after 4 PM. Watch the 6th Avenue signal outage during the morning commute."
+      "Baldwin County residents should scan beach weather, county road updates, and school notices before the commute. No confirmed emergency report is marked active in this demo brief."
   },
-  Riverside: {
+  "Escambia County": {
+    time: "Updated 6:47 AM",
+    summary:
+      "Escambia County coverage is watching Pensacola traffic, severe-weather notices from NWS Mobile/Pensacola, and public-safety updates from verified sources."
+  },
+  "West Mobile": {
     time: "Updated 6:51 AM",
     summary:
-      "River fog is heavier than usual, the south bridge is backed up, and city crews are clearing branches near the park. No emergency closures are active."
+      "West Mobile has a school-and-commute-focused scan for Airport Boulevard, Schillinger Road, Dawes, Tanner Williams, and nearby neighborhood reports."
+  },
+  Pascagoula: {
+    time: "Updated 6:55 AM",
+    summary:
+      "Pascagoula coverage is watching Jackson County alerts, Coast weather, river and port conditions, and verified updates from WLOX, Sun Herald, and city sources."
   }
 };
 
@@ -30,6 +40,11 @@ const newsFocus = document.querySelector("#newsFocus");
 const sourceList = document.querySelector("#sourceList");
 const placeTabs = document.querySelectorAll(".place-tab");
 const placesGrid = document.querySelector("#placesGrid");
+const enableNotificationsButton = document.querySelector("#enableNotifications");
+const saveNotificationsButton = document.querySelector("#saveNotifications");
+const testNotificationButton = document.querySelector("#testNotification");
+const notificationStatus = document.querySelector("#notificationStatus");
+const notifyAreaInputs = document.querySelectorAll('input[name="notifyArea"]');
 
 const localNewsAreas = {
   baldwin: {
@@ -305,7 +320,7 @@ filters.forEach((button) => {
 
     pins.forEach((pin) => {
       const matchesFilter = filter === "all" || pin.dataset.type === filter;
-      pin.classList.toggle("visible", matchesFilter || pin.dataset.type === "news");
+      pin.classList.toggle("visible", matchesFilter);
     });
 
     popover.innerHTML = `
@@ -328,14 +343,86 @@ pins.forEach((pin) => {
 
 refreshButton.addEventListener("click", () => {
   const normalized = locationInput.value.trim();
-  const area = briefData[normalized] ? normalized : "Downtown";
+  const area = briefData[normalized] ? normalized : "Mobile County";
   summaryText.textContent = briefData[area].summary;
   summaryTime.textContent = briefData[area].time;
   locationInput.value = area;
+  document.querySelector("#briefNote").textContent = `Coverage area: ${area}`;
 });
 
 reportButton.addEventListener("click", () => {
-  reportStatus.textContent = "Badge status: Submitted for moderator verification";
+  reportStatus.textContent = "Badge status: Submitted for moderator verification. It will not be marked verified until a trusted source confirms it.";
+});
+
+function selectedNotificationAreas() {
+  return Array.from(notifyAreaInputs)
+    .filter((input) => input.checked)
+    .map((input) => input.value);
+}
+
+function saveNotificationPreferences() {
+  const areas = selectedNotificationAreas();
+  localStorage.setItem("nearnowNotificationAreas", JSON.stringify(areas));
+  notificationStatus.textContent = areas.length
+    ? `Saved big-alert notifications for ${areas.join(", ")}.`
+    : "No areas selected. Choose at least one area to receive big alerts.";
+  return areas;
+}
+
+function loadNotificationPreferences() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("nearnowNotificationAreas") || "[]");
+    if (saved.length) {
+      notifyAreaInputs.forEach((input) => {
+        input.checked = saved.includes(input.value);
+      });
+      notificationStatus.textContent = `Saved big-alert notifications for ${saved.join(", ")}.`;
+    }
+  } catch {
+    localStorage.removeItem("nearnowNotificationAreas");
+  }
+}
+
+async function enableNotifications() {
+  const areas = saveNotificationPreferences();
+
+  if (!("Notification" in window)) {
+    notificationStatus.textContent = "This browser does not support notifications. Your area preferences were saved on this device.";
+    return;
+  }
+
+  const permission = Notification.permission === "default"
+    ? await Notification.requestPermission()
+    : Notification.permission;
+
+  if (permission === "granted") {
+    notificationStatus.textContent = `Notifications enabled for major alerts in ${areas.join(", ") || "your selected areas"}.`;
+    new Notification("NearNow big alerts enabled", {
+      body: "You will be notified about major weather, AMBER, crime, traffic, and breaking alerts for your selected areas."
+    });
+  } else {
+    notificationStatus.textContent = "Notification permission was not granted. Your area preferences were still saved.";
+  }
+}
+
+enableNotificationsButton.addEventListener("click", enableNotifications);
+saveNotificationsButton.addEventListener("click", saveNotificationPreferences);
+testNotificationButton.addEventListener("click", async () => {
+  if (!("Notification" in window)) {
+    notificationStatus.textContent = "Test notification unavailable in this browser.";
+    return;
+  }
+
+  if (Notification.permission !== "granted") {
+    await enableNotifications();
+    return;
+  }
+
+  const areas = selectedNotificationAreas();
+  new Notification("NearNow test alert", {
+    body: `Major-alert test for ${areas.join(", ") || "your selected areas"}.`
+  });
+  notificationStatus.textContent = "Test notification sent.";
 });
 
 function renderLocalNews(areaKey) {
@@ -389,6 +476,7 @@ areaTabs.forEach((button) => {
 });
 
 renderLocalNews("baldwin");
+loadNotificationPreferences();
 
 placeTabs.forEach((button) => {
   button.addEventListener("click", () => {

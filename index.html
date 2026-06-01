@@ -19,6 +19,7 @@
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="#brief">Daily brief</a>
         <a href="#safety">Safety</a>
+        <a href="#notifications">Notifications</a>
         <a href="#places">Places</a>
         <a href="#trust">Trust</a>
         <a href="#growth">Growth goals</a>
@@ -40,10 +41,21 @@
           <form class="location-form" aria-label="Find local alerts">
             <label for="location">Your area</label>
             <div class="input-row">
-              <input id="location" name="location" type="text" value="Downtown" autocomplete="postal-code">
+              <input id="location" name="location" type="text" value="Mobile County" list="areaOptions" autocomplete="postal-code">
+              <datalist id="areaOptions">
+                <option value="Mobile County"></option>
+                <option value="Baldwin County"></option>
+                <option value="Escambia County"></option>
+                <option value="West Mobile"></option>
+                <option value="Pascagoula"></option>
+              </datalist>
               <button type="button" id="refreshBrief">Update brief</button>
             </div>
           </form>
+          <div class="hero-actions">
+            <a class="primary-action" href="#brief">Open today's brief</a>
+            <button class="secondary-action" type="button" id="enableNotifications">Enable big alerts</button>
+          </div>
           <div class="free-strip" aria-label="Free features">
             <span>Local news feed</span>
             <span>Weather alerts</span>
@@ -64,6 +76,7 @@
             <button class="map-filter" type="button" data-filter="weather">Weather</button>
             <button class="map-filter" type="button" data-filter="traffic">Traffic</button>
             <button class="map-filter" type="button" data-filter="events">Events</button>
+            <button class="map-filter" type="button" data-filter="news">News</button>
           </div>
           <div class="map-canvas" id="mapCanvas">
             <svg class="street-map" viewBox="0 0 640 420" role="img" aria-label="Stylized neighborhood map with alert pins">
@@ -121,6 +134,7 @@
               <a href="https://www.weather.gov/">Weather.gov</a>
               <a href="https://www.511.org/">511 traffic</a>
             </div>
+            <p class="brief-note" id="briefNote">Coverage area: Mobile County</p>
           </article>
 
           <article class="alert-card urgent" data-alert="weather">
@@ -205,6 +219,38 @@
               <a href="https://www.weather.gov/lix/" target="_blank" rel="noopener">NWS New Orleans/Baton Rouge</a>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section class="notification-section" id="notifications" aria-labelledby="notification-title">
+        <div class="section-heading">
+          <p class="eyebrow">Big Stuff Notifications</p>
+          <h2 id="notification-title">Turn on alerts for the counties you care about.</h2>
+          <p>
+            NearNow can ask your browser for notification permission and save your area
+            choices. For production, these preferences connect to official alert feeds and
+            push notifications.
+          </p>
+        </div>
+        <div class="notification-panel">
+          <div class="notification-copy">
+            <span class="label">Notify me about</span>
+            <h3>Major weather, AMBER, crime, traffic, and breaking local alerts</h3>
+            <p id="notificationStatus">
+              Notifications are not enabled yet. Choose your areas, then turn on big alerts.
+            </p>
+          </div>
+          <form class="notification-form" aria-label="Notification preferences">
+            <label><input type="checkbox" name="notifyArea" value="Mobile County" checked> Mobile County</label>
+            <label><input type="checkbox" name="notifyArea" value="Baldwin County" checked> Baldwin County</label>
+            <label><input type="checkbox" name="notifyArea" value="Escambia County" checked> Escambia County</label>
+            <label><input type="checkbox" name="notifyArea" value="Pascagoula" checked> Pascagoula</label>
+            <label><input type="checkbox" name="notifyArea" value="West Mobile" checked> West Mobile</label>
+            <div class="notification-actions">
+              <button type="button" id="saveNotifications">Save alerts</button>
+              <button class="soft-button" type="button" id="testNotification">Send test</button>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -304,8 +350,8 @@
           <h2 id="community-title">Make the free version worth checking every day.</h2>
           <p>
             NearNow should earn habits before monetization. The homepage leads with utility,
-            then gives residents a simple way to create an account, save their area, and submit
-            reports that improve the feed for everyone nearby.
+            then gives residents a simple way to save their area, open trusted sources, and
+            submit reports for review before anything is marked verified.
           </p>
         </div>
         <form class="report-panel" aria-label="Community report preview">
