@@ -8,9 +8,6 @@
       name="description"
       content="NearNow brings free local alerts, weather, traffic, events, verified sources, and AI summaries into one daily community briefing."
     >
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./home.css">
   </head>
   <body>
@@ -20,11 +17,13 @@
         <span>NearNow</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#feed">Live feed</a>
+        <a href="#live-feed">Feed</a>
         <a href="#brief">Daily brief</a>
         <a href="#safety">Safety</a>
         <a href="#notifications">Notifications</a>
+        <a href="#accounts">Accounts</a>
         <a href="#places">Places</a>
+        <a href="#emergency">Emergency</a>
         <a href="#trust">Trust</a>
       </nav>
       <a class="status-link" href="https://app.netlify.com/projects/nearnowproject/deploys">
@@ -35,29 +34,35 @@
     <main id="home">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">Everything free while NearNow earns daily trust</p>
+          <p class="eyebrow">Focused first on Mobile, Daphne, and Fairhope</p>
           <h1 id="hero-title">Real-time alerts, news, weather, and events happening around you.</h1>
           <p class="hero-text">
-            NearNow is the first thing to check before you leave the house. One live local
-            feed pulls together weather, traffic, community reports, events, and emergency
-            alerts &mdash; each one stamped with its source, time, and verification status.
+            Open NearNow before school or work for a fast, verified view of weather,
+            traffic, local events, breaking alerts, and community reports.
           </p>
           <form class="location-form" aria-label="Find local alerts">
-            <label for="location">Your ZIP code or area</label>
+            <label for="location">Search by ZIP, city, street, business, or event</label>
             <div class="input-row">
-              <input id="location" name="location" type="text" value="Mobile County" list="areaOptions" placeholder="Enter a ZIP code or county" autocomplete="postal-code">
+              <input id="location" name="location" type="text" value="Mobile County" list="areaOptions" autocomplete="postal-code">
               <datalist id="areaOptions">
+                <option value="36602"></option>
+                <option value="36608"></option>
+                <option value="36526"></option>
+                <option value="36532"></option>
                 <option value="Mobile County"></option>
+                <option value="Mobile"></option>
+                <option value="Daphne"></option>
+                <option value="Fairhope"></option>
                 <option value="Baldwin County"></option>
                 <option value="Escambia County"></option>
                 <option value="West Mobile"></option>
                 <option value="Pascagoula"></option>
               </datalist>
-              <button type="button" id="refreshBrief">Show my area</button>
+              <button type="button" id="refreshBrief">Update brief</button>
             </div>
           </form>
           <div class="hero-actions">
-            <a class="primary-action" href="#feed">See the live feed</a>
+            <a class="primary-action" href="#brief">Open today's brief</a>
             <button class="secondary-action" type="button" id="enableNotifications">Enable big alerts</button>
           </div>
           <div class="free-strip" aria-label="Free features">
@@ -72,105 +77,34 @@
             <span>Safety alerts</span>
             <span>Places to visit</span>
           </div>
+          <div class="search-result" id="searchResult" aria-live="polite">
+            Mobile County selected. Showing weather, traffic, alerts, events, and local reports.
+          </div>
         </div>
 
         <div class="map-shell" aria-label="Interactive local map and alerts">
           <div class="map-toolbar">
             <button class="map-filter active" type="button" data-filter="all">All</button>
             <button class="map-filter" type="button" data-filter="weather">Weather</button>
+            <button class="map-filter" type="button" data-filter="crime">Crime</button>
             <button class="map-filter" type="button" data-filter="traffic">Traffic</button>
             <button class="map-filter" type="button" data-filter="events">Events</button>
+            <button class="map-filter" type="button" data-filter="community">Community</button>
             <button class="map-filter" type="button" data-filter="news">News</button>
           </div>
           <div class="map-canvas" id="mapCanvas">
             <svg class="street-map" viewBox="0 0 640 420" role="img" aria-label="Stylized neighborhood map with alert pins">
-              <rect width="640" height="420" fill="#edf4eb"></rect>
-              
-              <!-- Sinuous Scenic River -->
-              <path d="M-40 370 C 180 310, 220 380, 440 210 S 580 40, 680 10" fill="none" stroke="#add8e6" stroke-width="24" stroke-linecap="round" opacity="0.75"></path>
-              <path d="M-40 370 C 180 310, 220 380, 440 210 S 580 40, 680 10" fill="none" stroke="#bfe3f0" stroke-width="12" stroke-linecap="round" opacity="0.5"></path>
-              
-              <!-- Grid overlay for cartographic tech feel -->
-              <g stroke="#ffffff" stroke-width="1.5" opacity="0.45">
-                <line x1="80" y1="0" x2="80" y2="420" stroke-dasharray="6,6"></line>
-                <line x1="160" y1="0" x2="160" y2="420" stroke-dasharray="6,6"></line>
-                <line x1="240" y1="0" x2="240" y2="420" stroke-dasharray="6,6"></line>
-                <line x1="320" y1="0" x2="320" y2="420" stroke-dasharray="6,6"></line>
-                <line x1="400" y1="0" x2="400" y2="420" stroke-dasharray="6,6"></line>
-                <line x1="480" y1="0" x2="480" y2="420" stroke-dasharray="6,6"></line>
-                <line x1="560" y1="0" x2="560" y2="420" stroke-dasharray="6,6"></line>
-                <line x1="0" y1="80" x2="640" y2="80" stroke-dasharray="6,6"></line>
-                <line x1="0" y1="160" x2="640" y2="160" stroke-dasharray="6,6"></line>
-                <line x1="0" y1="240" x2="640" y2="240" stroke-dasharray="6,6"></line>
-                <line x1="0" y1="320" x2="640" y2="320" stroke-dasharray="6,6"></line>
-              </g>
-
-              <!-- Main Roads -->
+              <rect width="640" height="420" fill="#eef4ec"></rect>
               <path d="M-20 95 C110 72 178 120 260 96 S426 56 680 88" class="route route-main"></path>
               <path d="M54 -12 C88 82 104 148 92 246 S98 354 128 444" class="route"></path>
               <path d="M228 -16 C256 64 252 148 286 206 S370 312 378 444" class="route"></path>
               <path d="M500 -24 C462 76 488 154 444 238 S400 342 424 444" class="route"></path>
               <path d="M-30 302 C82 278 168 300 252 278 S426 232 672 274" class="route route-main"></path>
               <path d="M-24 180 C110 214 196 180 312 168 S472 164 664 204" class="route"></path>
-
-              <!-- Neighborhood Blocks -->
               <path d="M150 42 L250 60 L238 126 L126 112 Z" class="block green"></path>
               <path d="M358 92 L496 68 L540 142 L392 168 Z" class="block tan"></path>
               <path d="M66 258 L194 240 L212 334 L96 362 Z" class="block blue"></path>
               <path d="M432 270 L558 246 L594 348 L450 366 Z" class="block green"></path>
-
-              <!-- Stylized Tree Clusters in Green Spaces -->
-              <g class="map-trees">
-                <!-- Top Left Block Trees -->
-                <circle cx="160" cy="70" r="5" fill="#8bc2a3" opacity="0.95"></circle>
-                <circle cx="170" cy="65" r="6" fill="#7cb394" opacity="0.95"></circle>
-                <circle cx="178" cy="72" r="4" fill="#8bc2a3" opacity="0.95"></circle>
-                <circle cx="168" cy="76" r="5.5" fill="#69a081" opacity="0.95"></circle>
-                
-                <!-- Bottom Right Block Trees -->
-                <circle cx="460" cy="300" r="5.5" fill="#8bc2a3" opacity="0.95"></circle>
-                <circle cx="472" cy="295" r="6.5" fill="#7cb394" opacity="0.95"></circle>
-                <circle cx="482" cy="303" r="4.5" fill="#8bc2a3" opacity="0.95"></circle>
-                <circle cx="510" cy="350" r="5.5" fill="#69a081" opacity="0.95"></circle>
-                <circle cx="522" cy="342" r="4.5" fill="#7cb394" opacity="0.95"></circle>
-
-                <!-- Scattered Trees -->
-                <circle cx="210" cy="110" r="5" fill="#7cb394"></circle>
-                <circle cx="410" cy="130" r="4.5" fill="#7cb394"></circle>
-                <circle cx="110" cy="320" r="4.5" fill="#7cb394"></circle>
-                <circle cx="340" cy="360" r="5" fill="#7cb394"></circle>
-              </g>
-
-              <!-- Stylized Vector Buildings -->
-              <g class="map-buildings">
-                <!-- Top Left Block Buildings -->
-                <rect x="185" y="82" width="14" height="14" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
-                <rect x="205" y="74" width="16" height="12" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
-                
-                <!-- Top Right Block Buildings -->
-                <rect x="420" y="100" width="18" height="18" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
-                <rect x="450" y="115" width="20" height="14" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
-                <rect x="480" y="90" width="15" height="15" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
-
-                <!-- Bottom Left Block Buildings -->
-                <rect x="110" y="280" width="16" height="16" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
-                <rect x="135" y="270" width="18" height="18" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
-                <rect x="165" y="295" width="14" height="14" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
-
-                <!-- Bottom Right Block Buildings -->
-                <rect x="540" y="275" width="16" height="16" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
-                <rect x="562" y="290" width="15" height="15" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
-              </g>
-
-              <!-- Tactical Compass and Coordinate Badge -->
-              <g transform="translate(32, 38)" opacity="0.9">
-                <circle cx="0" cy="0" r="15" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.06));"></circle>
-                <line x1="0" y1="-12" x2="0" y2="12" stroke="#475569" stroke-width="1"></line>
-                <line x1="-12" y1="0" x2="12" y2="0" stroke="#475569" stroke-width="1"></line>
-                <polygon points="0,-12 -3.5,-3 0,-1" fill="#ce5d44"></polygon>
-                <polygon points="0,12 3.5,3 0,1" fill="#475569"></polygon>
-                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954° N / 88.0399° W</text>
-              </g>
             </svg>
             <button class="pin weather visible" style="left: 26%; top: 24%" data-type="weather" data-title="Dense fog advisory">
               <span>W</span>
@@ -178,8 +112,14 @@
             <button class="pin traffic visible" style="left: 59%; top: 47%" data-type="traffic" data-title="Main St lane closure">
               <span>T</span>
             </button>
+            <button class="pin crime visible" style="left: 48%; top: 31%" data-type="crime" data-title="Police activity near Government St">
+              <span>C</span>
+            </button>
             <button class="pin events visible" style="left: 72%; top: 68%" data-type="events" data-title="Farmers market opens at 8">
               <span>E</span>
+            </button>
+            <button class="pin community visible" style="left: 18%; top: 60%" data-type="community" data-title="Road hazard reported by neighbor">
+              <span>R</span>
             </button>
             <button class="pin news visible" style="left: 38%; top: 72%" data-type="news" data-title="School board meeting tonight">
               <span>N</span>
@@ -192,31 +132,57 @@
         </div>
       </section>
 
-      <section class="feed-section" id="feed" aria-labelledby="feed-title">
+      <section class="platform-section" id="platform" aria-labelledby="platform-title">
         <div class="section-heading">
-          <p class="eyebrow">The live local feed</p>
-          <h2 id="feed-title">Everything happening near you, in one place.</h2>
-          <p>
-            Weather, traffic, local news, community reports, events, and emergency alerts &mdash;
-            sorted newest first, each tagged with its source and verification status.
-          </p>
+          <p class="eyebrow">See The Platform</p>
+          <h2 id="platform-title">NearNow is built around the map, the feed, and the morning answer.</h2>
         </div>
-        <div class="feed-controls">
-          <div class="feed-filters" id="feedFilters" role="tablist" aria-label="Filter the live feed by category">
-            <button class="feed-chip active" type="button" data-category="all" role="tab" aria-selected="true">All</button>
-            <button class="feed-chip" type="button" data-category="weather" role="tab" aria-selected="false">Weather</button>
-            <button class="feed-chip" type="button" data-category="traffic" role="tab" aria-selected="false">Traffic</button>
-            <button class="feed-chip" type="button" data-category="news" role="tab" aria-selected="false">News</button>
-            <button class="feed-chip" type="button" data-category="community" role="tab" aria-selected="false">Community</button>
-            <button class="feed-chip" type="button" data-category="events" role="tab" aria-selected="false">Events</button>
-            <button class="feed-chip" type="button" data-category="emergency" role="tab" aria-selected="false">Emergency</button>
-          </div>
-          <button class="soft-button" type="button" id="refreshFeed">Refresh</button>
+        <div class="platform-grid">
+          <article class="screenshot-card">
+            <span class="source-meta">Map screenshot</span>
+            <div class="mini-screen map-preview" aria-hidden="true">
+              <span class="mini-pin one"></span>
+              <span class="mini-pin two"></span>
+              <span class="mini-pin three"></span>
+            </div>
+            <h3>Layered local map</h3>
+            <p>Crime, traffic, weather, events, and community pins are separated into map layers.</p>
+          </article>
+          <article class="screenshot-card">
+            <span class="source-meta">Feed screenshot</span>
+            <div class="mini-screen feed-preview" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <h3>Live local feed</h3>
+            <p>Weather, traffic, news, community, events, and emergency alerts in one stream.</p>
+          </article>
+          <article class="demo-card">
+            <span class="source-meta">Short demo video</span>
+            <button class="demo-button" type="button" id="playDemo">Play demo</button>
+            <div class="demo-frame" id="demoFrame">
+              <strong>NearNow in 30 seconds</strong>
+              <p>Search your area, check the map, scan alerts, save preferences, and submit a report.</p>
+            </div>
+          </article>
         </div>
-        <p class="feed-context" id="feedContext">Showing the latest local items.</p>
-        <div class="feed-list" id="feedList" aria-live="polite">
-          <article class="feed-card loading">Loading the live local feed&hellip;</article>
+      </section>
+
+      <section class="feed-section" id="live-feed" aria-labelledby="feed-title">
+        <div class="section-heading">
+          <p class="eyebrow">Live Local Feed</p>
+          <h2 id="feed-title">The fastest answer to what is going on nearby.</h2>
+          <p>Filter the feed by the categories people need every day.</p>
         </div>
+        <div class="feed-controls" role="tablist" aria-label="Feed categories">
+          <button class="feed-filter active" type="button" data-feed="all">All</button>
+          <button class="feed-filter" type="button" data-feed="weather">Weather</button>
+          <button class="feed-filter" type="button" data-feed="traffic">Traffic</button>
+          <button class="feed-filter" type="button" data-feed="news">Local News</button>
+          <button class="feed-filter" type="button" data-feed="community">Community Reports</button>
+          <button class="feed-filter" type="button" data-feed="events">Events</button>
+          <button class="feed-filter" type="button" data-feed="emergency">Emergency Alerts</button>
+        </div>
+        <div class="live-feed-grid" id="liveFeedGrid" aria-live="polite"></div>
       </section>
 
       <section class="brief-section" id="brief" aria-labelledby="brief-title">
@@ -361,6 +327,42 @@
         </div>
       </section>
 
+      <section class="account-section" id="accounts" aria-labelledby="account-title">
+        <div class="section-heading">
+          <p class="eyebrow">User Accounts</p>
+          <h2 id="account-title">Save locations, alerts, reports, and favorite places.</h2>
+          <p>
+            Email preferences are available on this page. Google and Apple sign-in buttons
+            explain the required OAuth setup until those providers are connected in production.
+          </p>
+        </div>
+        <div class="account-grid">
+          <form class="account-card" aria-label="Email account preferences">
+            <h3>Email account</h3>
+            <label for="accountEmail">Email</label>
+            <input id="accountEmail" type="email" placeholder="you@example.com">
+            <label for="savedLocation">Saved location</label>
+            <input id="savedLocation" type="text" value="Mobile">
+            <button type="button" id="saveAccount">Save account preferences</button>
+            <p id="accountStatus" class="report-status">No account preferences saved yet.</p>
+          </form>
+          <div class="account-card">
+            <h3>Sign in options</h3>
+            <button type="button" class="provider-button" data-provider="Google">Continue with Google</button>
+            <button type="button" class="provider-button" data-provider="Apple">Continue with Apple</button>
+            <p id="providerStatus">Provider buttons are ready for OAuth configuration.</p>
+          </div>
+          <div class="account-card">
+            <h3>Saved items</h3>
+            <ul class="saved-list" id="savedList">
+              <li>Mobile weather alerts</li>
+              <li>Daphne traffic incidents</li>
+              <li>Fairhope community events</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       <section class="news-section" id="local-news" aria-labelledby="news-title">
         <div class="section-heading">
           <p class="eyebrow">Real Local News</p>
@@ -431,6 +433,38 @@
         </div>
       </section>
 
+      <section class="events-section" id="events-list" aria-labelledby="events-title">
+        <div class="section-heading">
+          <p class="eyebrow">Events Calendar</p>
+          <h2 id="events-title">Find festivals, school events, sports, meetings, and charity events.</h2>
+        </div>
+        <div class="event-filters" role="tablist" aria-label="Event date filters">
+          <button class="event-filter active" type="button" data-range="today">Today</button>
+          <button class="event-filter" type="button" data-range="week">This week</button>
+          <button class="event-filter" type="button" data-range="month">This month</button>
+        </div>
+        <div class="events-grid" id="eventsGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="emergency-section" id="emergency" aria-labelledby="emergency-title">
+        <div class="section-heading">
+          <p class="eyebrow">Emergency Mode</p>
+          <h2 id="emergency-title">A focused view for hurricanes, tornadoes, flooding, and major accidents.</h2>
+          <p>
+            Emergency mode brings official alerts, shelters, closures, and contacts to the top.
+          </p>
+        </div>
+        <div class="emergency-panel">
+          <button type="button" id="toggleEmergency">Preview emergency mode</button>
+          <div class="emergency-list" id="emergencyList">
+            <article><strong>Shelters</strong><span>Mobile County Emergency Management shelter list</span></article>
+            <article><strong>Road closures</strong><span>ALGO Traffic and county road updates</span></article>
+            <article><strong>Official alerts</strong><span>NWS Mobile/Pensacola and local emergency managers</span></article>
+            <article><strong>Emergency contacts</strong><span>Call 911 for life-threatening emergencies</span></article>
+          </div>
+        </div>
+      </section>
+
       <section class="trust-section" id="trust" aria-labelledby="trust-title">
         <div class="section-heading">
           <p class="eyebrow">Phase 2: Build Trust</p>
@@ -470,30 +504,19 @@
             submit reports for review before anything is marked verified.
           </p>
         </div>
-        <form class="report-panel" aria-label="Submit a community report">
+        <form class="report-panel" aria-label="Community report preview">
           <h3>Community report</h3>
-          <label for="reportTitle">What's happening?</label>
-          <input id="reportTitle" name="reportTitle" type="text" maxlength="200" value="Tree blocking the right lane on Pine near 7th" placeholder="Short headline for your report">
           <label for="reportType">Report type</label>
           <select id="reportType" name="reportType">
-            <option value="traffic">Road closure / traffic hazard</option>
-            <option value="weather">Weather damage</option>
-            <option value="news">School update</option>
-            <option value="events">Local event</option>
-            <option value="community">Community / lost pet / other</option>
-          </select>
-          <label for="reportArea">Area</label>
-          <select id="reportArea" name="reportArea">
-            <option value="mobile">Mobile County</option>
-            <option value="baldwin">Baldwin County</option>
-            <option value="escambia">Escambia County</option>
-            <option value="westmobile">West Mobile</option>
-            <option value="pascagoula">Pascagoula, MS</option>
+            <option>Road closure</option>
+            <option>Weather damage</option>
+            <option>School update</option>
+            <option>Local event</option>
           </select>
           <label for="reportText">Details</label>
-          <textarea id="reportText" name="reportText" rows="3">Crews not yet on scene. Use the left lane if heading north.</textarea>
+          <textarea id="reportText" name="reportText" rows="4">Tree blocking the right lane on Pine near 7th.</textarea>
           <button type="button" id="submitReport">Submit for verification</button>
-          <p class="report-status" id="reportStatus">New reports post to the live feed marked Unverified until a trusted source or moderator confirms them.</p>
+          <p class="report-status" id="reportStatus">Badge status: Pending review</p>
         </form>
       </section>
 

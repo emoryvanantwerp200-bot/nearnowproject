@@ -9,6 +9,16 @@ const briefData = {
     summary:
       "Baldwin County residents should scan beach weather, county road updates, and school notices before the commute. No confirmed emergency report is marked active in this demo brief."
   },
+  Daphne: {
+    time: "Updated 6:44 AM",
+    summary:
+      "Daphne residents should check Highway 98 traffic, bay weather, school notices, and evening community events before heading out."
+  },
+  Fairhope: {
+    time: "Updated 6:45 AM",
+    summary:
+      "Fairhope has a calm morning brief with bayfront weather, downtown event reminders, and Baldwin County traffic updates."
+  },
   "Escambia County": {
     time: "Updated 6:47 AM",
     summary:
@@ -42,19 +52,111 @@ const reportList = document.querySelector("#reportList");
 const refreshEmbeddedNewsButton = document.querySelector("#refreshEmbeddedNews");
 const placeTabs = document.querySelectorAll(".place-tab");
 const placesGrid = document.querySelector("#placesGrid");
-const feedList = document.querySelector("#feedList");
-const feedChips = document.querySelectorAll(".feed-chip");
-const feedContext = document.querySelector("#feedContext");
-const refreshFeedButton = document.querySelector("#refreshFeed");
-const reportTitleInput = document.querySelector("#reportTitle");
-const reportTypeSelect = document.querySelector("#reportType");
-const reportAreaSelect = document.querySelector("#reportArea");
-const reportTextInput = document.querySelector("#reportText");
 const enableNotificationsButton = document.querySelector("#enableNotifications");
 const saveNotificationsButton = document.querySelector("#saveNotifications");
 const testNotificationButton = document.querySelector("#testNotification");
 const notificationStatus = document.querySelector("#notificationStatus");
 const notifyAreaInputs = document.querySelectorAll('input[name="notifyArea"]');
+const searchResult = document.querySelector("#searchResult");
+const liveFeedGrid = document.querySelector("#liveFeedGrid");
+const feedFilters = document.querySelectorAll(".feed-filter");
+const playDemoButton = document.querySelector("#playDemo");
+const demoFrame = document.querySelector("#demoFrame");
+const accountEmail = document.querySelector("#accountEmail");
+const savedLocation = document.querySelector("#savedLocation");
+const saveAccountButton = document.querySelector("#saveAccount");
+const accountStatus = document.querySelector("#accountStatus");
+const providerButtons = document.querySelectorAll(".provider-button");
+const providerStatus = document.querySelector("#providerStatus");
+const savedList = document.querySelector("#savedList");
+const eventFilters = document.querySelectorAll(".event-filter");
+const eventsGrid = document.querySelector("#eventsGrid");
+const toggleEmergencyButton = document.querySelector("#toggleEmergency");
+const emergencyPanel = document.querySelector(".emergency-panel");
+
+const searchAliases = {
+  "36602": "Mobile County",
+  "36608": "West Mobile",
+  "36526": "Daphne",
+  "36532": "Fairhope",
+  mobile: "Mobile County",
+  "mobile county": "Mobile County",
+  daphne: "Daphne",
+  fairhope: "Fairhope",
+  "baldwin county": "Baldwin County",
+  "escambia county": "Escambia County",
+  "west mobile": "West Mobile",
+  pascagoula: "Pascagoula"
+};
+
+const liveFeedItems = [
+  {
+    kind: "weather",
+    title: "Weather Alert",
+    body: "Thunderstorm warning possible after 3 PM for parts of Mobile and Baldwin counties.",
+    time: "7:10 AM",
+    source: "Official Source",
+    trust: "official"
+  },
+  {
+    kind: "traffic",
+    title: "Traffic",
+    body: "Accident reported on Highway 98. Expect delays near the Daphne approach.",
+    time: "7:18 AM",
+    source: "Traffic source",
+    trust: "official"
+  },
+  {
+    kind: "news",
+    title: "Local News",
+    body: "Mobile and Baldwin headlines are embedded below from verified regional sources.",
+    time: "7:25 AM",
+    source: "Verified newsroom",
+    trust: "official"
+  },
+  {
+    kind: "community",
+    title: "Community",
+    body: "School fundraiser Saturday. Submitted by a community member and awaiting moderator review.",
+    time: "7:28 AM",
+    source: "Community Report",
+    trust: "community"
+  },
+  {
+    kind: "events",
+    title: "Events",
+    body: "Fairhope evening market and Mobile civic meeting are listed for tonight.",
+    time: "7:35 AM",
+    source: "Event calendar",
+    trust: "official"
+  },
+  {
+    kind: "emergency",
+    title: "Emergency Alerts",
+    body: "No active emergency mode. Official alerts will move here during hurricanes, tornadoes, flooding, or major accidents.",
+    time: "Current",
+    source: "NearNow status",
+    trust: "official"
+  }
+];
+
+const eventsByRange = {
+  today: [
+    { title: "Mobile community meeting", type: "Community meeting", area: "Mobile", date: "Today, 6 PM" },
+    { title: "Fairhope live music night", type: "Community event", area: "Fairhope", date: "Today, 7 PM" },
+    { title: "Daphne youth sports games", type: "Sports", area: "Daphne", date: "Today, 5:30 PM" }
+  ],
+  week: [
+    { title: "Baldwin school fundraiser", type: "School event", area: "Daphne", date: "Saturday" },
+    { title: "Mobile charity walk", type: "Charity event", area: "Mobile", date: "This week" },
+    { title: "Fairhope arts festival preview", type: "Festival", area: "Fairhope", date: "This week" }
+  ],
+  month: [
+    { title: "Gulf Coast food festival", type: "Festival", area: "Mobile Bay", date: "This month" },
+    { title: "County commission meeting", type: "Local government", area: "Baldwin County", date: "This month" },
+    { title: "Community cleanup day", type: "Charity event", area: "Mobile", date: "This month" }
+  ]
+};
 
 const localNewsAreas = {
   baldwin: {
@@ -431,65 +533,27 @@ pins.forEach((pin) => {
     const type = pin.dataset.type.charAt(0).toUpperCase() + pin.dataset.type.slice(1);
     popover.innerHTML = `
       <strong>${title}</strong>
-      <span>${type} report verified at 6:22 AM with source history attached.</span>
+      <span>${type} report. Time reported: 6:22 AM. Photos: not attached. Verification: source history attached.</span>
     `;
   });
 });
 
+function resolveArea(value) {
+  const normalized = value.trim().toLowerCase();
+  return searchAliases[normalized] || briefData[value.trim()] && value.trim() || "Mobile County";
+}
+
 refreshButton.addEventListener("click", () => {
-  const normalized = locationInput.value.trim();
-  const area = briefData[normalized] ? normalized : "Mobile County";
+  const area = resolveArea(locationInput.value);
+  summaryText.textContent = briefData[area].summary;
   summaryTime.textContent = briefData[area].time;
   locationInput.value = area;
   document.querySelector("#briefNote").textContent = `Coverage area: ${area}`;
-  activeFeedArea = areaKeyFromLabel(area);
-  loadFeed();
-  loadDailySummary();
+  searchResult.textContent = `${area} selected. Showing alerts, embedded news, events, places, and report tools for this area.`;
 });
 
-reportButton.addEventListener("click", async () => {
-  const title = (reportTitleInput.value || "").trim();
-  if (!title) {
-    reportStatus.textContent = "Add a short headline before submitting.";
-    return;
-  }
-
-  reportButton.disabled = true;
-  reportStatus.textContent = "Submitting your report...";
-
-  try {
-    const response = await fetch("/api/feed", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title,
-        body: (reportTextInput.value || "").trim(),
-        category: reportTypeSelect.value,
-        area: reportAreaSelect.value
-      })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Report could not be submitted.");
-
-    reportStatus.textContent = data.message || "Report submitted for verification.";
-    reportTitleInput.value = "";
-    reportTextInput.value = "";
-
-    // Jump the live feed to the area the report was filed under so the user sees it.
-    activeFeedArea = reportAreaSelect.value;
-    activeFeedCategory = "all";
-    feedChips.forEach((chip) => {
-      const isAll = chip.dataset.category === "all";
-      chip.classList.toggle("active", isAll);
-      chip.setAttribute("aria-selected", isAll ? "true" : "false");
-    });
-    await loadFeed();
-    loadDailySummary();
-  } catch (error) {
-    reportStatus.textContent = error.message || "Report could not be submitted. Please try again.";
-  } finally {
-    reportButton.disabled = false;
-  }
+reportButton.addEventListener("click", () => {
+  reportStatus.textContent = "Badge status: Submitted for moderator verification. It will not be marked verified until a trusted source confirms it.";
 });
 
 function selectedNotificationAreas() {
@@ -637,6 +701,109 @@ function renderPlaces(areaKey) {
     .join("");
 }
 
+function badgeForTrust(trust) {
+  if (trust === "community") return '<span class="trust-badge community">Community Report</span>';
+  if (trust === "unverified") return '<span class="trust-badge unverified">Unverified</span>';
+  return '<span class="trust-badge">Official Source</span>';
+}
+
+function renderLiveFeed(kind = "all") {
+  const items = kind === "all" ? liveFeedItems : liveFeedItems.filter((item) => item.kind === kind);
+  liveFeedGrid.innerHTML = items
+    .map(
+      (item) => `
+        <article class="feed-card" data-kind="${item.kind}">
+          <span class="source-meta">${item.kind}</span>
+          <h3>${item.title}</h3>
+          <p>${item.body}</p>
+          <div class="meta-row"><span>${item.time}</span><span>${item.source}</span></div>
+          ${badgeForTrust(item.trust)}
+        </article>
+      `
+    )
+    .join("");
+}
+
+function renderEvents(range = "today") {
+  const items = eventsByRange[range] || eventsByRange.today;
+  eventsGrid.innerHTML = items
+    .map(
+      (event) => `
+        <article class="event-card">
+          <span class="source-meta">${event.type}</span>
+          <h3>${event.title}</h3>
+          <p>${event.area}</p>
+          <div class="meta-row"><span>${event.date}</span><span>Verified calendar item</span></div>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function loadAccountPreferences() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("nearnowAccount") || "{}");
+    if (saved.email) accountEmail.value = saved.email;
+    if (saved.location) savedLocation.value = saved.location;
+    if (saved.email || saved.location) {
+      accountStatus.textContent = `Saved preferences for ${saved.email || "local user"}.`;
+      savedList.innerHTML = `
+        <li>${saved.location || "Mobile"} saved location</li>
+        <li>Custom alert preferences saved on this device</li>
+        <li>Favorite places ready to sync when accounts are connected</li>
+      `;
+    }
+  } catch {
+    localStorage.removeItem("nearnowAccount");
+  }
+}
+
+feedFilters.forEach((button) => {
+  button.addEventListener("click", () => {
+    feedFilters.forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    renderLiveFeed(button.dataset.feed);
+  });
+});
+
+eventFilters.forEach((button) => {
+  button.addEventListener("click", () => {
+    eventFilters.forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    renderEvents(button.dataset.range);
+  });
+});
+
+playDemoButton.addEventListener("click", () => {
+  demoFrame.classList.toggle("playing");
+  demoFrame.innerHTML = demoFrame.classList.contains("playing")
+    ? "<strong>Demo playing</strong><p>1. Search ZIP 36608. 2. Tap weather and traffic pins. 3. Save big alerts. 4. Submit a community report for moderation.</p>"
+    : "<strong>NearNow in 30 seconds</strong><p>Search your area, check the map, scan alerts, save preferences, and submit a report.</p>";
+});
+
+saveAccountButton.addEventListener("click", () => {
+  const data = {
+    email: accountEmail.value.trim(),
+    location: savedLocation.value.trim() || "Mobile"
+  };
+  localStorage.setItem("nearnowAccount", JSON.stringify(data));
+  accountStatus.textContent = `Saved preferences for ${data.email || "local user"} in ${data.location}.`;
+  loadAccountPreferences();
+});
+
+providerButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    providerStatus.textContent = `${button.dataset.provider} sign in requires OAuth provider setup in production. Email preferences are available now.`;
+  });
+});
+
+toggleEmergencyButton.addEventListener("click", () => {
+  emergencyPanel.classList.toggle("active");
+  toggleEmergencyButton.textContent = emergencyPanel.classList.contains("active")
+    ? "Exit emergency preview"
+    : "Preview emergency mode";
+});
+
 areaTabs.forEach((button) => {
   button.addEventListener("click", () => {
     areaTabs.forEach((item) => {
@@ -651,6 +818,9 @@ areaTabs.forEach((button) => {
 
 renderLocalNews("baldwin");
 loadNotificationPreferences();
+loadAccountPreferences();
+renderLiveFeed("all");
+renderEvents("today");
 refreshEmbeddedNewsButton.addEventListener("click", () => loadEmbeddedReports(activeNewsArea));
 
 placeTabs.forEach((button) => {
@@ -666,154 +836,3 @@ placeTabs.forEach((button) => {
 });
 
 renderPlaces("baldwin");
-
-/* ---------- Live local feed + AI daily summary ---------- */
-
-let activeFeedArea = "mobile";
-let activeFeedCategory = "all";
-
-const areaLabels = {
-  baldwin: "Baldwin County",
-  mobile: "Mobile County",
-  escambia: "Escambia County",
-  westmobile: "West Mobile",
-  pascagoula: "Pascagoula, MS"
-};
-
-const categoryLabels = {
-  weather: "Weather",
-  traffic: "Traffic",
-  news: "Local news",
-  community: "Community",
-  events: "Events",
-  emergency: "Emergency"
-};
-
-const trustBadges = {
-  official: { label: "Official source", icon: "✅", className: "trust-official" },
-  community: { label: "Community report", icon: "🟡", className: "trust-community" },
-  unverified: { label: "Unverified", icon: "🔴", className: "trust-unverified" }
-};
-
-function areaKeyFromLabel(value) {
-  const v = (value || "").toLowerCase();
-  if (v.includes("baldwin") || v.includes("fairhope") || v.includes("daphne")) return "baldwin";
-  if (v.includes("escambia") || v.includes("pensacola")) return "escambia";
-  if (v.includes("west")) return "westmobile";
-  if (v.includes("pascagoula") || v.includes("jackson")) return "pascagoula";
-  if (v.includes("mobile")) return "mobile";
-  return "mobile";
-}
-
-function escapeHtml(value = "") {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function relativeTime(value) {
-  if (!value) return "Just now";
-  const then = new Date(value).getTime();
-  if (Number.isNaN(then)) return "Recently";
-  const diffMin = Math.round((Date.now() - then) / 60000);
-  if (diffMin < 1) return "Just now";
-  if (diffMin < 60) return `${diffMin} min ago`;
-  const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `${diffHr} hr ago`;
-  const diffDay = Math.round(diffHr / 24);
-  return `${diffDay} day${diffDay > 1 ? "s" : ""} ago`;
-}
-
-function renderFeed(items) {
-  if (!items.length) {
-    feedList.innerHTML =
-      '<article class="feed-card empty">No items match this filter yet. Try another category or submit a community report below.</article>';
-    return;
-  }
-
-  feedList.innerHTML = items
-    .map((item) => {
-      const badge = trustBadges[item.trust] || trustBadges.unverified;
-      const category = categoryLabels[item.category] || "Update";
-      const link = item.sourceUrl
-        ? `<a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">Open source</a>`
-        : "";
-      return `
-        <article class="feed-card category-${escapeHtml(item.category)}">
-          <div class="feed-card-top">
-            <span class="feed-category">${category}</span>
-            <span class="feed-trust ${badge.className}"><span aria-hidden="true">${badge.icon}</span> ${badge.label}</span>
-          </div>
-          <h3>${escapeHtml(item.title)}</h3>
-          ${item.body ? `<p>${escapeHtml(item.body)}</p>` : ""}
-          <div class="feed-card-meta">
-            <span>${escapeHtml(item.source || "Local source")}</span>
-            <span>${relativeTime(item.createdAt)}</span>
-            ${link}
-          </div>
-        </article>
-      `;
-    })
-    .join("");
-}
-
-async function loadFeed() {
-  feedList.innerHTML = '<article class="feed-card loading">Loading the live local feed…</article>';
-  const params = new URLSearchParams({ area: activeFeedArea, category: activeFeedCategory });
-  const areaLabel = areaLabels[activeFeedArea] || "your area";
-  const categoryLabel =
-    activeFeedCategory === "all" ? "all categories" : (categoryLabels[activeFeedCategory] || activeFeedCategory).toLowerCase();
-  feedContext.textContent = `Showing ${categoryLabel} for ${areaLabel}.`;
-
-  try {
-    const response = await fetch(`/api/feed?${params.toString()}`);
-    if (!response.ok) throw new Error("Feed unavailable");
-    const data = await response.json();
-    renderFeed(Array.isArray(data.items) ? data.items : []);
-  } catch {
-    feedList.innerHTML =
-      '<article class="feed-card empty">The live feed is temporarily unavailable. Please refresh in a moment.</article>';
-  }
-}
-
-async function loadDailySummary() {
-  if (!summaryText) return;
-  const areaLabel = areaLabels[activeFeedArea] || "your area";
-  try {
-    const response = await fetch(`/api/daily-summary?area=${encodeURIComponent(activeFeedArea)}`);
-    if (!response.ok) throw new Error("Summary unavailable");
-    const data = await response.json();
-    if (data.summary) {
-      summaryText.textContent = data.summary;
-    }
-  } catch {
-    summaryText.textContent = `We could not refresh the AI summary for ${areaLabel} just now. The live feed below is up to date.`;
-  }
-}
-
-feedChips.forEach((chip) => {
-  chip.addEventListener("click", () => {
-    feedChips.forEach((item) => {
-      item.classList.remove("active");
-      item.setAttribute("aria-selected", "false");
-    });
-    chip.classList.add("active");
-    chip.setAttribute("aria-selected", "true");
-    activeFeedCategory = chip.dataset.category;
-    loadFeed();
-  });
-});
-
-if (refreshFeedButton) {
-  refreshFeedButton.addEventListener("click", () => {
-    loadFeed();
-    loadDailySummary();
-  });
-}
-
-// Initialize the feed and AI summary from the default location on first load.
-activeFeedArea = areaKeyFromLabel(locationInput.value);
-loadFeed();
-loadDailySummary();
