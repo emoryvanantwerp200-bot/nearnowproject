@@ -55,6 +55,7 @@ const saveNotificationsButton = document.querySelector("#saveNotifications");
 const testNotificationButton = document.querySelector("#testNotification");
 const notificationStatus = document.querySelector("#notificationStatus");
 const notifyAreaInputs = document.querySelectorAll('input[name="notifyArea"]');
+const signupButtons = document.querySelectorAll(".signup-button");
 
 const localNewsAreas = {
   baldwin: {
@@ -521,6 +522,33 @@ function loadNotificationPreferences() {
   }
 }
 
+function updateSignupButtons(provider) {
+  signupButtons.forEach((button) => {
+    const isConnected = provider && button.dataset.provider === provider;
+    button.classList.toggle("connected", Boolean(isConnected));
+    button.setAttribute("aria-pressed", isConnected ? "true" : "false");
+    const label = button.querySelector("span:last-child");
+    if (label) {
+      label.textContent = isConnected ? `${provider} connected` : `Sign up with ${button.dataset.provider}`;
+    }
+  });
+}
+
+function loadSignupProvider() {
+  updateSignupButtons(localStorage.getItem("nearnowSignupProvider"));
+}
+
+signupButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const provider = button.dataset.provider;
+    localStorage.setItem("nearnowSignupProvider", provider);
+    updateSignupButtons(provider);
+    if (notificationStatus) {
+      notificationStatus.textContent = `${provider} sign-up selected. Saved locations and custom alerts are ready on this device.`;
+    }
+  });
+});
+
 async function enableNotifications() {
   const areas = saveNotificationPreferences();
 
@@ -651,6 +679,7 @@ areaTabs.forEach((button) => {
 
 renderLocalNews("baldwin");
 loadNotificationPreferences();
+loadSignupProvider();
 refreshEmbeddedNewsButton.addEventListener("click", () => loadEmbeddedReports(activeNewsArea));
 
 placeTabs.forEach((button) => {
