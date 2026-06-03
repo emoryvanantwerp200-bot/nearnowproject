@@ -3,185 +3,530 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#111827">
-    <title>NearNow</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>NearNow | Your morning local briefing</title>
+    <meta
+      name="description"
+      content="NearNow brings free local alerts, weather, traffic, events, verified sources, and AI summaries into one daily community briefing."
+    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./home.css">
   </head>
   <body>
-    <header class="topbar">
-      <a class="brand" href="./" aria-label="NearNow home">
-        <span class="brand-mark">NN</span>
+    <header class="topbar" aria-label="NearNow navigation">
+      <a class="brand" href="#home" aria-label="NearNow home">
+        <span class="brand-mark" aria-hidden="true">N</span>
         <span>NearNow</span>
       </a>
-      <nav class="nav" aria-label="Primary">
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#feed">Live feed</a>
+        <a href="#brief">Daily brief</a>
+        <a href="#safety">Safety</a>
+        <a href="#notifications">Notifications</a>
         <a href="#places">Places</a>
-        <a href="#feeds">Feeds</a>
-        <a href="#agent">Agent</a>
-        <a href="#plan">Plan</a>
-        <a href="#saved">Saved</a>
+        <a href="#trust">Trust</a>
       </nav>
+      <a class="status-link" href="https://app.netlify.com/projects/nearnowproject/deploys">
+        Netlify status
+      </a>
     </header>
 
-    <main>
-      <section class="hero" aria-labelledby="page-title">
-        <div class="hero-media" aria-hidden="true"></div>
-        <div class="hero-content">
-          <p class="eyebrow">Live local discovery</p>
-          <h1 id="page-title">NearNow</h1>
-          <p class="lede">Find worthwhile places, pop-ups, and open windows around you right now.</p>
-          <form class="zip-panel" id="zip-form">
-            <label for="zip-input">Enter your ZIP code to localize feeds</label>
-            <div class="zip-row">
-              <input id="zip-input" name="zip" type="text" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="ZIP code" autocomplete="postal-code" required>
-              <button type="submit">Use ZIP</button>
-            </div>
-            <p class="zip-status" id="zip-status">RSS feeds unlock after a valid 5-digit ZIP code.</p>
-          </form>
-          <form class="search-panel" id="search-form">
-            <label for="search-input">Search nearby</label>
-            <div class="search-row">
-              <input id="search-input" name="query" type="search" placeholder="coffee, music, food, quiet work..." autocomplete="off">
-              <button type="submit">Search</button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <section class="workspace" id="places" aria-label="NearNow workspace">
-        <aside class="filters" aria-label="Discovery filters">
-          <div class="now-box location-box">
-            <p class="section-kicker">Location</p>
-            <strong id="location-name">Enter ZIP</strong>
-            <span id="location-detail">Real places and alerts load by ZIP code.</span>
-          </div>
-
-          <div>
-            <p class="section-kicker">Radius</p>
-            <div class="segmented" role="group" aria-label="Search radius">
-              <button class="is-active" type="button" data-radius="1">1 mi</button>
-              <button type="button" data-radius="3">3 mi</button>
-              <button type="button" data-radius="8">8 mi</button>
-            </div>
-          </div>
-
-          <div>
-            <p class="section-kicker">Mood</p>
-            <div class="chips" id="mood-filters" aria-label="Mood filters">
-              <button class="chip is-active" type="button" data-mood="all">All</button>
-              <button class="chip" type="button" data-mood="food">Food</button>
-              <button class="chip" type="button" data-mood="music">Music</button>
-              <button class="chip" type="button" data-mood="work">Work</button>
-              <button class="chip" type="button" data-mood="outside">Outside</button>
-            </div>
-          </div>
-
-          <div class="now-box">
-            <p class="section-kicker">Now</p>
-            <strong id="open-count">0 places open</strong>
-            <span id="time-window">Updated just now</span>
-          </div>
-        </aside>
-
-        <section class="results" aria-labelledby="results-title">
-          <div class="section-head">
-            <div>
-              <p class="section-kicker">Best matches</p>
-              <h2 id="results-title">Open near you</h2>
-            </div>
-            <button class="ghost-button" id="clear-saved" type="button">Clear saved</button>
-          </div>
-          <div class="place-list" id="place-list"></div>
-        </section>
-
-        <section class="planner" id="plan" aria-labelledby="plan-title">
-          <p class="section-kicker">Quick plan</p>
-          <h2 id="plan-title">Build a tiny route</h2>
-          <div class="timeline" id="timeline"></div>
-        </section>
-      </section>
-
-      <section class="alerts-section" id="alerts" aria-labelledby="alerts-title">
-        <div class="feed-shell">
-          <div class="section-head">
-            <div>
-              <p class="section-kicker">Local alerts</p>
-              <h2 id="alerts-title">Alerts near your ZIP</h2>
-            </div>
-          </div>
-          <div class="alert-list" id="alert-list"></div>
-        </div>
-      </section>
-
-      <section class="map-section" id="map" aria-labelledby="map-title">
-        <div class="map-head">
-          <div>
-            <p class="section-kicker">3D local view</p>
-            <h2 id="map-title">Places and alerts map</h2>
-          </div>
-          <div class="map-controls" aria-label="Map controls">
-            <button type="button" id="map-reset">Reset view</button>
-            <button type="button" id="map-toggle-alerts">Alerts</button>
-            <button type="button" id="map-toggle-places">Places</button>
-          </div>
-        </div>
-        <div class="map-stage">
-          <canvas id="local-map" aria-label="Interactive 3D map of nearby places and alerts"></canvas>
-          <div class="map-card" id="map-card">
-            <strong>Enter a ZIP code</strong>
-            <span>Real places and alerts will appear here.</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="feed-section" id="feeds" aria-labelledby="feeds-title">
-        <div class="feed-shell">
-          <div class="section-head">
-            <div>
-              <p class="section-kicker">RSS network</p>
-              <h2 id="feeds-title">US feeds from your workbook</h2>
-            </div>
-            <div class="feed-search">
-              <label for="feed-search-input">Search feeds</label>
-              <input id="feed-search-input" type="search" placeholder="Reuters, tech, local...">
-            </div>
-          </div>
-          <div class="feed-categories" id="feed-categories" aria-label="Feed categories"></div>
-          <div class="feed-grid" id="feed-grid"></div>
-          <div class="feed-preview" id="feed-preview" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <section class="agent-section" id="agent" aria-labelledby="agent-title">
-        <div class="agent-shell">
-          <div>
-            <p class="section-kicker">AI assistant</p>
-            <h2 id="agent-title">NearNow Agent</h2>
-            <p class="agent-copy">Ask for a quick route, a source recommendation, or a local-now summary.</p>
-            <div class="agent-prompts" aria-label="Suggested prompts">
-              <button type="button" data-agent-prompt="Plan a 2-stop evening route with food and music.">2-stop route</button>
-              <button type="button" data-agent-prompt="Which RSS sources should I preview for national news right now?">News sources</button>
-              <button type="button" data-agent-prompt="Find a quiet work option and explain why it fits.">Quiet work</button>
-            </div>
-          </div>
-          <form class="agent-panel" id="agent-form">
-            <label for="agent-input">Ask NearNow</label>
-            <textarea id="agent-input" rows="4" placeholder="What should I do near me right now?"></textarea>
-            <button class="agent-submit" type="submit">Ask agent</button>
-            <div class="agent-response" id="agent-response" aria-live="polite">
-              The agent is ready for a question.
+    <main id="home">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Everything free while NearNow earns daily trust</p>
+          <h1 id="hero-title">Real-time alerts, news, weather, and events happening around you.</h1>
+          <p class="hero-text">
+            NearNow is the first thing to check before you leave the house. One live local
+            feed pulls together weather, traffic, community reports, events, and emergency
+            alerts &mdash; each one stamped with its source, time, and verification status.
+          </p>
+          <form class="location-form" aria-label="Find local alerts">
+            <label for="location">Your ZIP code or area</label>
+            <div class="input-row">
+              <input id="location" name="location" type="text" value="Mobile County" list="areaOptions" placeholder="Enter a ZIP code or county" autocomplete="postal-code">
+              <datalist id="areaOptions">
+                <option value="Mobile County"></option>
+                <option value="Baldwin County"></option>
+                <option value="Escambia County"></option>
+                <option value="West Mobile"></option>
+                <option value="Pascagoula"></option>
+              </datalist>
+              <button type="button" id="refreshBrief">Show my area</button>
             </div>
           </form>
+          <div class="hero-actions">
+            <a class="primary-action" href="#feed">See the live feed</a>
+            <button class="secondary-action" type="button" id="enableNotifications">Enable big alerts</button>
+          </div>
+          <div class="free-strip" aria-label="Free features">
+            <span>Local news feed</span>
+            <span>Weather alerts</span>
+            <span>Traffic alerts</span>
+            <span>Interactive map</span>
+            <span>User accounts</span>
+            <span>Community reporting</span>
+            <span>AI summaries</span>
+            <span>Real local news</span>
+            <span>Safety alerts</span>
+            <span>Places to visit</span>
+          </div>
+        </div>
+
+        <div class="map-shell" aria-label="Interactive local map and alerts">
+          <div class="map-toolbar">
+            <button class="map-filter active" type="button" data-filter="all">All</button>
+            <button class="map-filter" type="button" data-filter="weather">Weather</button>
+            <button class="map-filter" type="button" data-filter="traffic">Traffic</button>
+            <button class="map-filter" type="button" data-filter="events">Events</button>
+            <button class="map-filter" type="button" data-filter="news">News</button>
+          </div>
+          <div class="map-canvas" id="mapCanvas">
+            <svg class="street-map" viewBox="0 0 640 420" role="img" aria-label="Stylized neighborhood map with alert pins">
+              <rect width="640" height="420" fill="#edf4eb"></rect>
+              
+              <!-- Sinuous Scenic River -->
+              <path d="M-40 370 C 180 310, 220 380, 440 210 S 580 40, 680 10" fill="none" stroke="#add8e6" stroke-width="24" stroke-linecap="round" opacity="0.75"></path>
+              <path d="M-40 370 C 180 310, 220 380, 440 210 S 580 40, 680 10" fill="none" stroke="#bfe3f0" stroke-width="12" stroke-linecap="round" opacity="0.5"></path>
+              
+              <!-- Grid overlay for cartographic tech feel -->
+              <g stroke="#ffffff" stroke-width="1.5" opacity="0.45">
+                <line x1="80" y1="0" x2="80" y2="420" stroke-dasharray="6,6"></line>
+                <line x1="160" y1="0" x2="160" y2="420" stroke-dasharray="6,6"></line>
+                <line x1="240" y1="0" x2="240" y2="420" stroke-dasharray="6,6"></line>
+                <line x1="320" y1="0" x2="320" y2="420" stroke-dasharray="6,6"></line>
+                <line x1="400" y1="0" x2="400" y2="420" stroke-dasharray="6,6"></line>
+                <line x1="480" y1="0" x2="480" y2="420" stroke-dasharray="6,6"></line>
+                <line x1="560" y1="0" x2="560" y2="420" stroke-dasharray="6,6"></line>
+                <line x1="0" y1="80" x2="640" y2="80" stroke-dasharray="6,6"></line>
+                <line x1="0" y1="160" x2="640" y2="160" stroke-dasharray="6,6"></line>
+                <line x1="0" y1="240" x2="640" y2="240" stroke-dasharray="6,6"></line>
+                <line x1="0" y1="320" x2="640" y2="320" stroke-dasharray="6,6"></line>
+              </g>
+
+              <!-- Main Roads -->
+              <path d="M-20 95 C110 72 178 120 260 96 S426 56 680 88" class="route route-main"></path>
+              <path d="M54 -12 C88 82 104 148 92 246 S98 354 128 444" class="route"></path>
+              <path d="M228 -16 C256 64 252 148 286 206 S370 312 378 444" class="route"></path>
+              <path d="M500 -24 C462 76 488 154 444 238 S400 342 424 444" class="route"></path>
+              <path d="M-30 302 C82 278 168 300 252 278 S426 232 672 274" class="route route-main"></path>
+              <path d="M-24 180 C110 214 196 180 312 168 S472 164 664 204" class="route"></path>
+
+              <!-- Neighborhood Blocks -->
+              <path d="M150 42 L250 60 L238 126 L126 112 Z" class="block green"></path>
+              <path d="M358 92 L496 68 L540 142 L392 168 Z" class="block tan"></path>
+              <path d="M66 258 L194 240 L212 334 L96 362 Z" class="block blue"></path>
+              <path d="M432 270 L558 246 L594 348 L450 366 Z" class="block green"></path>
+
+              <!-- Stylized Tree Clusters in Green Spaces -->
+              <g class="map-trees">
+                <!-- Top Left Block Trees -->
+                <circle cx="160" cy="70" r="5" fill="#8bc2a3" opacity="0.95"></circle>
+                <circle cx="170" cy="65" r="6" fill="#7cb394" opacity="0.95"></circle>
+                <circle cx="178" cy="72" r="4" fill="#8bc2a3" opacity="0.95"></circle>
+                <circle cx="168" cy="76" r="5.5" fill="#69a081" opacity="0.95"></circle>
+                
+                <!-- Bottom Right Block Trees -->
+                <circle cx="460" cy="300" r="5.5" fill="#8bc2a3" opacity="0.95"></circle>
+                <circle cx="472" cy="295" r="6.5" fill="#7cb394" opacity="0.95"></circle>
+                <circle cx="482" cy="303" r="4.5" fill="#8bc2a3" opacity="0.95"></circle>
+                <circle cx="510" cy="350" r="5.5" fill="#69a081" opacity="0.95"></circle>
+                <circle cx="522" cy="342" r="4.5" fill="#7cb394" opacity="0.95"></circle>
+
+                <!-- Scattered Trees -->
+                <circle cx="210" cy="110" r="5" fill="#7cb394"></circle>
+                <circle cx="410" cy="130" r="4.5" fill="#7cb394"></circle>
+                <circle cx="110" cy="320" r="4.5" fill="#7cb394"></circle>
+                <circle cx="340" cy="360" r="5" fill="#7cb394"></circle>
+              </g>
+
+              <!-- Stylized Vector Buildings -->
+              <g class="map-buildings">
+                <!-- Top Left Block Buildings -->
+                <rect x="185" y="82" width="14" height="14" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
+                <rect x="205" y="74" width="16" height="12" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
+                
+                <!-- Top Right Block Buildings -->
+                <rect x="420" y="100" width="18" height="18" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
+                <rect x="450" y="115" width="20" height="14" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
+                <rect x="480" y="90" width="15" height="15" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
+
+                <!-- Bottom Left Block Buildings -->
+                <rect x="110" y="280" width="16" height="16" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
+                <rect x="135" y="270" width="18" height="18" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
+                <rect x="165" y="295" width="14" height="14" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
+
+                <!-- Bottom Right Block Buildings -->
+                <rect x="540" y="275" width="16" height="16" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"></rect>
+                <rect x="562" y="290" width="15" height="15" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"></rect>
+              </g>
+
+              <!-- Tactical Compass and Coordinate Badge -->
+              <g transform="translate(32, 38)" opacity="0.9">
+                <circle cx="0" cy="0" r="15" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.06));"></circle>
+                <line x1="0" y1="-12" x2="0" y2="12" stroke="#475569" stroke-width="1"></line>
+                <line x1="-12" y1="0" x2="12" y2="0" stroke="#475569" stroke-width="1"></line>
+                <polygon points="0,-12 -3.5,-3 0,-1" fill="#ce5d44"></polygon>
+                <polygon points="0,12 3.5,3 0,1" fill="#475569"></polygon>
+                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954° N / 88.0399° W</text>
+              </g>
+            </svg>
+            <button class="pin weather visible" style="left: 26%; top: 24%" data-type="weather" data-title="Dense fog advisory">
+              <span>W</span>
+            </button>
+            <button class="pin traffic visible" style="left: 59%; top: 47%" data-type="traffic" data-title="Main St lane closure">
+              <span>T</span>
+            </button>
+            <button class="pin events visible" style="left: 72%; top: 68%" data-type="events" data-title="Farmers market opens at 8">
+              <span>E</span>
+            </button>
+            <button class="pin news visible" style="left: 38%; top: 72%" data-type="news" data-title="School board meeting tonight">
+              <span>N</span>
+            </button>
+            <div class="map-popover" id="mapPopover" role="status" aria-live="polite">
+              <strong>Tap a marker</strong>
+              <span>See the alert, source, and posted time.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="feed-section" id="feed" aria-labelledby="feed-title">
+        <div class="section-heading">
+          <p class="eyebrow">The live local feed</p>
+          <h2 id="feed-title">Everything happening near you, in one place.</h2>
+          <p>
+            Weather, traffic, local news, community reports, events, and emergency alerts &mdash;
+            sorted newest first, each tagged with its source and verification status.
+          </p>
+        </div>
+        <div class="feed-controls">
+          <div class="feed-filters" id="feedFilters" role="tablist" aria-label="Filter the live feed by category">
+            <button class="feed-chip active" type="button" data-category="all" role="tab" aria-selected="true">All</button>
+            <button class="feed-chip" type="button" data-category="weather" role="tab" aria-selected="false">Weather</button>
+            <button class="feed-chip" type="button" data-category="traffic" role="tab" aria-selected="false">Traffic</button>
+            <button class="feed-chip" type="button" data-category="news" role="tab" aria-selected="false">News</button>
+            <button class="feed-chip" type="button" data-category="community" role="tab" aria-selected="false">Community</button>
+            <button class="feed-chip" type="button" data-category="events" role="tab" aria-selected="false">Events</button>
+            <button class="feed-chip" type="button" data-category="emergency" role="tab" aria-selected="false">Emergency</button>
+          </div>
+          <button class="soft-button" type="button" id="refreshFeed">Refresh</button>
+        </div>
+        <p class="feed-context" id="feedContext">Showing the latest local items.</p>
+        <div class="feed-list" id="feedList" aria-live="polite">
+          <article class="feed-card loading">Loading the live local feed&hellip;</article>
+        </div>
+      </section>
+
+      <section class="brief-section" id="brief" aria-labelledby="brief-title">
+        <div class="section-heading">
+          <p class="eyebrow">Daily use case</p>
+          <h2 id="brief-title">Start the day with one reliable local briefing.</h2>
+        </div>
+        <div class="dashboard-grid">
+          <article class="summary-panel">
+            <div class="panel-header">
+              <span class="label">AI summary</span>
+              <span class="time" id="summaryTime">Updated 6:30 AM</span>
+            </div>
+            <h3>What's happening near you?</h3>
+            <p id="summaryText">
+              Light fog is slowing the west side commute, Main Street has a lane closure
+              near 4th, and the farmers market opens early. No severe weather has been
+              issued for your area.
+            </p>
+            <div class="source-row">
+              <span class="badge verified">Verified sources</span>
+              <a href="https://www.weather.gov/">Weather.gov</a>
+              <a href="https://www.511.org/">511 traffic</a>
+            </div>
+            <p class="brief-note" id="briefNote">Coverage area: Mobile County</p>
+          </article>
+
+          <article class="alert-card urgent" data-alert="weather">
+            <span class="label">Weather</span>
+            <h3>Fog advisory through 9 AM</h3>
+            <p>Reduced visibility on low-lying roads and near the river.</p>
+            <div class="meta-row">
+              <span>6:18 AM</span>
+              <a href="https://www.weather.gov/">Original source</a>
+            </div>
+          </article>
+
+          <article class="alert-card" data-alert="traffic">
+            <span class="label">Traffic</span>
+            <h3>Main St lane closure</h3>
+            <p>Expect 12 minute delays between 3rd and 5th until mid-morning.</p>
+            <div class="meta-row">
+              <span>6:22 AM</span>
+              <a href="https://www.511.org/">Original source</a>
+            </div>
+          </article>
+
+          <article class="alert-card" data-alert="events">
+            <span class="label">Local events</span>
+            <h3>Farmers market opens at 8</h3>
+            <p>Community lot vendors are active today with two road-side stalls.</p>
+            <div class="meta-row">
+              <span>6:05 AM</span>
+              <a href="#events-list">Event details</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="safety-section" id="safety" aria-labelledby="safety-title">
+        <div class="section-heading">
+          <p class="eyebrow">Safety Alerts</p>
+          <h2 id="safety-title">Crime, AMBER, and weather alerts from sources people recognize.</h2>
+          <p>
+            NearNow should separate urgent public-safety information from ordinary news,
+            show the source, and make it obvious when an alert needs immediate attention.
+          </p>
+        </div>
+        <div class="safety-grid">
+          <article class="safety-card crime">
+            <span class="label">Crime alerts</span>
+            <h3>Local public-safety scan</h3>
+            <p>
+              Pull verified updates from sheriff, police, and trusted regional news sources
+              before community reports are marked confirmed.
+            </p>
+            <div class="source-row">
+              <a href="https://www.mobileso.com/" target="_blank" rel="noopener">Mobile Sheriff</a>
+              <a href="https://sheriff.baldwincountyal.gov/" target="_blank" rel="noopener">Baldwin Sheriff</a>
+              <a href="https://escambiaso.com/" target="_blank" rel="noopener">Escambia Sheriff</a>
+            </div>
+          </article>
+
+          <article class="safety-card amber">
+            <span class="label">AMBER alerts</span>
+            <h3>State alert channels</h3>
+            <p>
+              Route Alabama, Florida, and Mississippi child-abduction alerts through official
+              state systems with clear timestamps and source links.
+            </p>
+            <div class="source-row">
+              <a href="https://app.alea.gov/Community/Default.aspx" target="_blank" rel="noopener">Alabama ALEA</a>
+              <a href="https://www.fdle.state.fl.us/AMBER-Plan/Amber-Alert" target="_blank" rel="noopener">Florida FDLE</a>
+              <a href="https://www.dps.ms.gov/investigation/amber-alert" target="_blank" rel="noopener">Mississippi DPS</a>
+            </div>
+          </article>
+
+          <article class="safety-card weather">
+            <span class="label">Weather alerts</span>
+            <h3>Severe weather readiness</h3>
+            <p>
+              Keep tornado, flood, marine, heat, and tropical-weather notices separate from
+              the casual forecast so residents know what changed.
+            </p>
+            <div class="source-row">
+              <a href="https://www.weather.gov/mob/" target="_blank" rel="noopener">NWS Mobile/Pensacola</a>
+              <a href="https://www.weather.gov/lix/" target="_blank" rel="noopener">NWS New Orleans/Baton Rouge</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="notification-section" id="notifications" aria-labelledby="notification-title">
+        <div class="section-heading">
+          <p class="eyebrow">Big Stuff Notifications</p>
+          <h2 id="notification-title">Turn on alerts for the counties you care about.</h2>
+          <p>
+            NearNow can ask your browser for notification permission and save your area
+            choices. For production, these preferences connect to official alert feeds and
+            push notifications.
+          </p>
+        </div>
+        <div class="notification-panel">
+          <div class="notification-copy">
+            <span class="label">Notify me about</span>
+            <h3>Major weather, AMBER, crime, traffic, and breaking local alerts</h3>
+            <p id="notificationStatus">
+              Notifications are not enabled yet. Choose your areas, then turn on big alerts.
+            </p>
+          </div>
+          <form class="notification-form" aria-label="Notification preferences">
+            <label><input type="checkbox" name="notifyArea" value="Mobile County" checked> Mobile County</label>
+            <label><input type="checkbox" name="notifyArea" value="Baldwin County" checked> Baldwin County</label>
+            <label><input type="checkbox" name="notifyArea" value="Escambia County" checked> Escambia County</label>
+            <label><input type="checkbox" name="notifyArea" value="Pascagoula" checked> Pascagoula</label>
+            <label><input type="checkbox" name="notifyArea" value="West Mobile" checked> West Mobile</label>
+            <div class="notification-actions">
+              <button type="button" id="saveNotifications">Save alerts</button>
+              <button class="soft-button" type="button" id="testNotification">Send test</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="news-section" id="local-news" aria-labelledby="news-title">
+        <div class="section-heading">
+          <p class="eyebrow">Real Local News</p>
+          <h2 id="news-title">Choose your Gulf Coast area and open trusted local coverage.</h2>
+          <p>
+            NearNow should make the morning scan easier by grouping real local sources
+            for Baldwin County, Mobile County, Escambia County, West Mobile, and
+            Pascagoula, Mississippi.
+          </p>
+        </div>
+        <div class="news-layout">
+          <div class="area-tabs" role="tablist" aria-label="Local news areas">
+            <button class="area-tab active" type="button" data-area="baldwin" role="tab" aria-selected="true">
+              Baldwin County
+            </button>
+            <button class="area-tab" type="button" data-area="mobile" role="tab" aria-selected="false">
+              Mobile County
+            </button>
+            <button class="area-tab" type="button" data-area="escambia" role="tab" aria-selected="false">
+              Escambia County
+            </button>
+            <button class="area-tab" type="button" data-area="westmobile" role="tab" aria-selected="false">
+              West Mobile
+            </button>
+            <button class="area-tab" type="button" data-area="pascagoula" role="tab" aria-selected="false">
+              Pascagoula, MS
+            </button>
+          </div>
+          <article class="news-focus" id="newsFocus" aria-live="polite">
+            <span class="label">Baldwin County</span>
+            <h3>Baldwin morning news scan</h3>
+            <p>
+              Follow coastal county headlines, beach communities, school updates,
+              local government, roads, and severe-weather coverage.
+            </p>
+          </article>
+          <div class="embedded-news">
+            <div class="embedded-header">
+              <span class="label">Embedded reports</span>
+              <button class="soft-button" type="button" id="refreshEmbeddedNews">Refresh</button>
+            </div>
+            <div class="report-list" id="reportList" aria-live="polite">
+              <article class="report-card loading">Loading local reports...</article>
+            </div>
+          </div>
+          <div class="source-list" id="sourceList" aria-label="Verified local news sources"></div>
+        </div>
+      </section>
+
+      <section class="places-section" id="places" aria-labelledby="places-title">
+        <div class="section-heading">
+          <p class="eyebrow">Places To Visit</p>
+          <h2 id="places-title">Give people useful ideas after they check the alerts.</h2>
+          <p>
+            The daily habit gets stronger when NearNow also answers, "What can we do nearby
+            today?" These picks can later become weather-aware and event-aware.
+          </p>
+        </div>
+        <div class="places-layout">
+          <div class="place-picker" role="tablist" aria-label="Places by area">
+            <button class="place-tab active" type="button" data-area="baldwin" role="tab" aria-selected="true">Baldwin</button>
+            <button class="place-tab" type="button" data-area="mobile" role="tab" aria-selected="false">Mobile</button>
+            <button class="place-tab" type="button" data-area="escambia" role="tab" aria-selected="false">Escambia</button>
+            <button class="place-tab" type="button" data-area="westmobile" role="tab" aria-selected="false">West Mobile</button>
+            <button class="place-tab" type="button" data-area="pascagoula" role="tab" aria-selected="false">Pascagoula</button>
+          </div>
+          <div class="places-grid" id="placesGrid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="trust-section" id="trust" aria-labelledby="trust-title">
+        <div class="section-heading">
+          <p class="eyebrow">Phase 2: Build Trust</p>
+          <h2 id="trust-title">Every alert shows why people should believe it.</h2>
+        </div>
+        <div class="trust-grid">
+          <article class="trust-card">
+            <span class="trust-icon">V</span>
+            <h3>Verified sources</h3>
+            <p>Official agencies, local outlets, schools, public safety feeds, and approved community moderators are labeled clearly.</p>
+          </article>
+          <article class="trust-card">
+            <span class="trust-icon">T</span>
+            <h3>Time stamps</h3>
+            <p>Alerts show when they were posted and when the source last changed, so stale information is easy to spot.</p>
+          </article>
+          <article class="trust-card">
+            <span class="trust-icon">L</span>
+            <h3>Original links</h3>
+            <p>Each summary keeps a path back to source material instead of asking users to trust a black box.</p>
+          </article>
+          <article class="trust-card">
+            <span class="trust-icon">B</span>
+            <h3>Report badges</h3>
+            <p>Community reports move from unreviewed to confirmed only after a trusted source or local moderator verifies them.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="community-section" aria-labelledby="community-title">
+        <div>
+          <p class="eyebrow">Phase 1: Get Users</p>
+          <h2 id="community-title">Make the free version worth checking every day.</h2>
+          <p>
+            NearNow should earn habits before monetization. The homepage leads with utility,
+            then gives residents a simple way to save their area, open trusted sources, and
+            submit reports for review before anything is marked verified.
+          </p>
+        </div>
+        <form class="report-panel" aria-label="Submit a community report">
+          <h3>Community report</h3>
+          <label for="reportTitle">What's happening?</label>
+          <input id="reportTitle" name="reportTitle" type="text" maxlength="200" value="Tree blocking the right lane on Pine near 7th" placeholder="Short headline for your report">
+          <label for="reportType">Report type</label>
+          <select id="reportType" name="reportType">
+            <option value="traffic">Road closure / traffic hazard</option>
+            <option value="weather">Weather damage</option>
+            <option value="news">School update</option>
+            <option value="events">Local event</option>
+            <option value="community">Community / lost pet / other</option>
+          </select>
+          <label for="reportArea">Area</label>
+          <select id="reportArea" name="reportArea">
+            <option value="mobile">Mobile County</option>
+            <option value="baldwin">Baldwin County</option>
+            <option value="escambia">Escambia County</option>
+            <option value="westmobile">West Mobile</option>
+            <option value="pascagoula">Pascagoula, MS</option>
+          </select>
+          <label for="reportText">Details</label>
+          <textarea id="reportText" name="reportText" rows="3">Crews not yet on scene. Use the left lane if heading north.</textarea>
+          <button type="button" id="submitReport">Submit for verification</button>
+          <p class="report-status" id="reportStatus">New reports post to the live feed marked Unverified until a trusted source or moderator confirms them.</p>
+        </form>
+      </section>
+
+      <section class="growth-section" id="growth" aria-labelledby="growth-title">
+        <div class="section-heading">
+          <p class="eyebrow">Simple growth path</p>
+          <h2 id="growth-title">Build daily value before charging for anything.</h2>
+        </div>
+        <div class="milestones" aria-label="User growth milestones">
+          <article class="milestone active">
+            <span>1</span>
+            <h3>First 100 users</h3>
+            <p>Launch a clear morning brief, shareable alerts, and neighborhood onboarding.</p>
+          </article>
+          <article class="milestone">
+            <span>2</span>
+            <h3>Then 500 users</h3>
+            <p>Add saved locations, event reminders, reporting reputation, and source history.</p>
+          </article>
+          <article class="milestone">
+            <span>3</span>
+            <h3>Then 1,000 users</h3>
+            <p>Expand verified community coverage and deepen personalization by commute and school routes.</p>
+          </article>
         </div>
       </section>
     </main>
 
-    <footer class="footer" id="saved">
-      <span>NearNow Project</span>
-      <a href="https://app.netlify.com/projects/nearnowproject/deploys">Netlify deploys</a>
+    <footer class="footer">
+      <span>NearNow is free for local residents.</span>
+      <span>Deploys tracked on Netlify.</span>
     </footer>
 
-    <script src="feeds.js" defer></script>
-    <script src="https://unpkg.com/three@0.164.1/build/three.min.js" defer></script>
-    <script src="app.js" defer></script>
+    <script src="./home.js"></script>
   </body>
 </html>
