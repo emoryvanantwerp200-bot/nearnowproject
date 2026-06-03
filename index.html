@@ -69,6 +69,19 @@
             feed pulls together weather, traffic, community reports, events, and emergency
             alerts &mdash; each one stamped with its source, time, and verification status.
           </p>
+          <article class="morning-brief" aria-label="Personalized daily brief">
+            <div class="brief-topline">
+              <span class="label">Personalized Daily Brief</span>
+              <span>What changed since yesterday?</span>
+            </div>
+            <div class="brief-cards">
+              <span><strong>Weather</strong> Rain risk after 3 PM</span>
+              <span><strong>Traffic</strong> I-10 delay near the tunnel</span>
+              <span><strong>Schools</strong> No closings reported</span>
+              <span><strong>Events</strong> 4 nearby tonight</span>
+              <span><strong>Safety</strong> 2 verified alerts watched</span>
+            </div>
+          </article>
           <form class="location-form" aria-label="Find local alerts">
             <label for="location">Your ZIP code or area</label>
             <div class="input-row">
@@ -120,7 +133,13 @@
             <button class="map-filter active" type="button" data-filter="all">All</button>
             <button class="map-filter" type="button" data-filter="weather">Weather</button>
             <button class="map-filter" type="button" data-filter="traffic">Traffic</button>
+            <button class="map-filter" type="button" data-filter="crime">Crime</button>
+            <button class="map-filter" type="button" data-filter="closure">Closures</button>
+            <button class="map-filter" type="button" data-filter="severe">Severe zones</button>
+            <button class="map-filter" type="button" data-filter="community">Community</button>
             <button class="map-filter" type="button" data-filter="events">Events</button>
+            <button class="map-filter" type="button" data-filter="pet">Lost pets</button>
+            <button class="map-filter" type="button" data-filter="yard">Yard sales</button>
             <button class="map-filter" type="button" data-filter="news">News</button>
           </div>
           <div class="map-canvas" id="mapCanvas">
@@ -226,6 +245,24 @@
             </button>
             <button class="pin news visible" style="left: 38%; top: 72%" data-type="news" data-title="School board meeting tonight">
               <span>N</span>
+            </button>
+            <button class="pin crime visible" style="left: 46%; top: 31%" data-type="crime" data-title="Police advisory near Government St">
+              <span>C</span>
+            </button>
+            <button class="pin closure visible" style="left: 18%; top: 57%" data-type="closure" data-title="Road closure near Spring Hill">
+              <span>R</span>
+            </button>
+            <button class="pin severe visible" style="left: 82%; top: 34%" data-type="severe" data-title="Severe weather watch zone">
+              <span>S</span>
+            </button>
+            <button class="pin community visible" style="left: 52%; top: 78%" data-type="community" data-title="Community post: tree down">
+              <span>P</span>
+            </button>
+            <button class="pin pet visible" style="left: 68%; top: 22%" data-type="pet" data-title="Lost pet reported nearby">
+              <span>L</span>
+            </button>
+            <button class="pin yard visible" style="left: 30%; top: 46%" data-type="yard" data-title="Neighborhood yard sale Saturday">
+              <span>Y</span>
             </button>
             <div class="map-popover" id="mapPopover" role="status" aria-live="polite">
               <strong>Tap a marker</strong>
@@ -503,6 +540,100 @@
         </div>
       </section>
 
+      <section class="reputation-section" id="reputation" aria-labelledby="reputation-title">
+        <div class="section-heading">
+          <p class="eyebrow">Community reputation</p>
+          <h2 id="reputation-title">Trust grows when every contributor has context.</h2>
+          <p>NearNow labels who posted, how reliable they are, and whether a source or moderator has checked the report.</p>
+        </div>
+        <div class="feature-grid reputation-grid">
+          <article class="feature-card resident">
+            <span class="feature-icon">VR</span>
+            <h3>Verified resident</h3>
+            <p>Residents can earn a local badge after confirming their area and building a history of accurate reports.</p>
+            <strong>Reputation 92</strong>
+          </article>
+          <article class="feature-card business">
+            <span class="feature-icon">VB</span>
+            <h3>Verified local business</h3>
+            <p>Restaurants, shops, schools, and organizations get a badge before posting specials or public updates.</p>
+            <strong>Official partner</strong>
+          </article>
+          <article class="feature-card source-check">
+            <span class="feature-icon">SV</span>
+            <h3>Source verification</h3>
+            <p>Posts show official links, timestamps, and whether a trusted moderator has confirmed the details.</p>
+            <strong>Checked 8 min ago</strong>
+          </article>
+          <article class="feature-card abuse">
+            <span class="feature-icon">!</span>
+            <h3>Report abuse</h3>
+            <p>Every community post can be flagged for misinformation, spam, duplicate alerts, or unsafe content.</p>
+            <button type="button" class="soft-button report-abuse">Report abuse</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="local-pages-section" id="local-pages" aria-labelledby="local-pages-title">
+        <div class="section-heading">
+          <p class="eyebrow">Hyperlocal pages</p>
+          <h2 id="local-pages-title">City, neighborhood, and ZIP pages built for local search.</h2>
+          <p>Each page can carry live alerts, weather, events, and community discussions for one exact place.</p>
+        </div>
+        <div class="local-page-grid">
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Downtown Mobile</h3>
+            <p>Live alerts, port traffic, events, public safety, restaurants, and civic updates.</p>
+          </article>
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Fairhope</h3>
+            <p>Bayfront weather, school updates, local events, community posts, and downtown alerts.</p>
+          </article>
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Daphne</h3>
+            <p>Causeway traffic, severe weather, local meetings, high school events, and safety reports.</p>
+          </article>
+          <article class="local-page-card">
+            <span>Neighborhood page</span>
+            <h3>Spanish Fort</h3>
+            <p>Eastern Shore road conditions, shopping-area traffic, local business posts, and events.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="business-section" id="businesses" aria-labelledby="business-title">
+        <div class="section-heading">
+          <p class="eyebrow">Local business partnerships</p>
+          <h2 id="business-title">Free business profiles create useful local updates and future revenue.</h2>
+          <p>Businesses can post specials, events, closings, hiring notices, and announcements that belong in the local feed.</p>
+        </div>
+        <div class="business-grid">
+          <article class="business-card">
+            <span>Coffee shop</span>
+            <h3>Morning special</h3>
+            <p>Post breakfast deals, storm-hour changes, and community board announcements.</p>
+          </article>
+          <article class="business-card">
+            <span>Restaurant</span>
+            <h3>Tonight's event</h3>
+            <p>Share live music, fundraiser nights, pop-ups, and weather-related patio updates.</p>
+          </article>
+          <article class="business-card">
+            <span>Barber</span>
+            <h3>Open slots</h3>
+            <p>Publish same-day appointments, holiday hours, and neighborhood promotions.</p>
+          </article>
+          <article class="business-card">
+            <span>Local store</span>
+            <h3>Announcement</h3>
+            <p>Post sales, lost-and-found notices, school drives, and emergency supply availability.</p>
+          </article>
+        </div>
+      </section>
+
       <section class="community-section" aria-labelledby="community-title">
         <div>
           <p class="eyebrow">Phase 1: Get Users</p>
@@ -515,6 +646,12 @@
         </div>
         <form class="report-panel" aria-label="Submit a community report">
           <h3>Community report</h3>
+          <div class="quick-report-grid" aria-label="One tap report shortcuts">
+            <button type="button" class="quick-report" data-title="Photo report: road hazard" data-type="traffic">Photo</button>
+            <button type="button" class="quick-report" data-title="Video report: flooding" data-type="weather">Video</button>
+            <button type="button" class="quick-report" data-title="Voice note: community update" data-type="community">Voice note</button>
+            <button type="button" class="quick-report" data-title="One tap report: needs review" data-type="community">One tap</button>
+          </div>
           <label for="reportTitle">What's happening?</label>
           <input id="reportTitle" name="reportTitle" type="text" maxlength="200" value="Tree blocking the right lane on Pine near 7th" placeholder="Short headline for your report">
           <label for="reportType">Report type</label>
@@ -538,6 +675,60 @@
           <button type="button" id="submitReport">Submit for verification</button>
           <p class="report-status" id="reportStatus">New reports post to the live feed marked Unverified until a trusted source or moderator confirms them.</p>
         </form>
+      </section>
+
+      <section class="emergency-mode-section" id="emergency-mode" aria-labelledby="emergency-mode-title">
+        <div class="section-heading">
+          <p class="eyebrow">Emergency mode</p>
+          <h2 id="emergency-mode-title">A Gulf Coast command view for hurricanes, tornadoes, flooding, and major accidents.</h2>
+        </div>
+        <div class="emergency-grid">
+          <article class="emergency-card shelters">
+            <span>Shelters</span>
+            <h3>Nearest open shelters</h3>
+            <p>Show official shelter locations, capacity notes, pet rules, and accessibility details.</p>
+          </article>
+          <article class="emergency-card roads">
+            <span>Road closures</span>
+            <h3>Blocked routes</h3>
+            <p>Put flooded roads, evacuation routes, bridge closures, and accidents above ordinary posts.</p>
+          </article>
+          <article class="emergency-card contacts">
+            <span>Emergency contacts</span>
+            <h3>Tap-to-call resources</h3>
+            <p>Surface county emergency management, power outage lines, schools, and city contacts.</p>
+          </article>
+          <article class="emergency-card updates">
+            <span>Live updates</span>
+            <h3>Official timeline</h3>
+            <p>Keep verified source updates pinned at the top until the event is resolved.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="rewards-section" id="rewards" aria-labelledby="rewards-title">
+        <div class="section-heading">
+          <p class="eyebrow">Gamify participation</p>
+          <h2 id="rewards-title">Reward people for helping their neighbors.</h2>
+        </div>
+        <div class="badge-ladder">
+          <article class="reward-card bronze">
+            <span>Bronze Reporter</span>
+            <p>Submit 3 helpful reports.</p>
+          </article>
+          <article class="reward-card silver">
+            <span>Silver Reporter</span>
+            <p>Verify 10 local posts.</p>
+          </article>
+          <article class="reward-card gold">
+            <span>Gold Reporter</span>
+            <p>Keep a 90+ reputation score.</p>
+          </article>
+          <article class="reward-card hero-badge">
+            <span>Community Hero</span>
+            <p>Help neighbors during emergency mode.</p>
+          </article>
+        </div>
       </section>
 
       <section class="growth-section" id="growth" aria-labelledby="growth-title">

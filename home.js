@@ -56,6 +56,8 @@ const testNotificationButton = document.querySelector("#testNotification");
 const notificationStatus = document.querySelector("#notificationStatus");
 const notifyAreaInputs = document.querySelectorAll('input[name="notifyArea"]');
 const signupButtons = document.querySelectorAll(".signup-button");
+const quickReportButtons = document.querySelectorAll(".quick-report");
+const abuseButtons = document.querySelectorAll(".report-abuse");
 
 const localNewsAreas = {
   baldwin: {
@@ -546,6 +548,23 @@ signupButtons.forEach((button) => {
     if (notificationStatus) {
       notificationStatus.textContent = `${provider} sign-up selected. Saved locations and custom alerts are ready on this device.`;
     }
+  });
+});
+
+quickReportButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    reportTitleInput.value = button.dataset.title || "One tap report: needs review";
+    reportTypeSelect.value = button.dataset.type || "community";
+    reportTextInput.value = "Fast report started. Add photos, video, or a voice note when media uploads are connected.";
+    reportStatus.textContent = "One-tap report started. Add any details, then submit for verification.";
+    reportTitleInput.focus();
+  });
+});
+
+abuseButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    button.textContent = "Flag saved";
+    button.disabled = true;
   });
 });
 

@@ -592,6 +592,53 @@ textarea:focus-visible {
   background: rgba(219, 238, 228, 0.85);
 }
 
+.morning-brief {
+  display: grid;
+  gap: 12px;
+  max-width: 660px;
+  margin: 24px 0 22px;
+  padding: 16px;
+  border: 1px solid rgba(27, 154, 170, 0.22);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(223, 247, 248, 0.75)),
+    var(--panel);
+  box-shadow: 0 16px 38px rgba(23, 32, 27, 0.1);
+}
+
+.brief-topline,
+.brief-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brief-topline {
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.brief-cards span {
+  display: grid;
+  gap: 2px;
+  min-width: 130px;
+  flex: 1 1 130px;
+  padding: 10px 12px;
+  border: 1px solid rgba(33, 107, 78, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.brief-cards strong {
+  color: var(--ink);
+}
+
 .map-shell {
   min-width: 0;
   padding: 16px;
@@ -760,6 +807,36 @@ textarea:focus-visible {
   animation: pulse-news 2.5s infinite;
 }
 
+.pin.crime {
+  background: linear-gradient(135deg, #7c2d12, var(--red));
+  animation: pulse-traffic 2.5s infinite;
+}
+
+.pin.closure {
+  background: linear-gradient(135deg, #f97316, var(--amber));
+  animation: pulse-events 2.5s infinite;
+}
+
+.pin.severe {
+  background: linear-gradient(135deg, #6b21a8, var(--violet));
+  animation: pulse-weather 2.5s infinite;
+}
+
+.pin.community {
+  background: linear-gradient(135deg, var(--teal), var(--green));
+  animation: pulse-news 2.5s infinite;
+}
+
+.pin.pet {
+  background: linear-gradient(135deg, #ec4899, var(--violet));
+  animation: pulse-events 2.5s infinite;
+}
+
+.pin.yard {
+  background: linear-gradient(135deg, var(--sun), #65a30d);
+  animation: pulse-news 2.5s infinite;
+}
+
 @keyframes pulse-weather {
   0% { box-shadow: 0 0 0 0 rgba(56, 108, 147, 0.65), 0 8px 18px rgba(23, 32, 27, 0.2); }
   70% { box-shadow: 0 0 0 14px rgba(56, 108, 147, 0), 0 8px 18px rgba(23, 32, 27, 0.2); }
@@ -812,6 +889,11 @@ textarea:focus-visible {
 .trust-section,
 .community-section,
 .growth-section,
+.reputation-section,
+.local-pages-section,
+.business-section,
+.emergency-mode-section,
+.rewards-section,
 .feed-section {
   padding: clamp(52px, 8vw, 96px) clamp(18px, 5vw, 64px);
 }
@@ -1255,6 +1337,191 @@ textarea:focus-visible {
   gap: 16px;
 }
 
+.reputation-section,
+.business-section,
+.rewards-section {
+  background:
+    radial-gradient(circle at 12% 16%, rgba(27, 154, 170, 0.11), transparent 28%),
+    radial-gradient(circle at 88% 78%, rgba(243, 178, 59, 0.13), transparent 30%),
+    var(--paper);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.local-pages-section,
+.emergency-mode-section {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(107, 91, 210, 0.1), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f7faf5 100%);
+  border-bottom: 1px solid var(--line);
+}
+
+.feature-grid,
+.local-page-grid,
+.business-grid,
+.emergency-grid,
+.badge-ladder {
+  display: grid;
+  gap: 16px;
+}
+
+.feature-grid,
+.business-grid,
+.emergency-grid,
+.badge-ladder {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.local-page-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.feature-card,
+.local-page-card,
+.business-card,
+.emergency-card,
+.reward-card {
+  display: grid;
+  gap: 10px;
+  min-height: 220px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.feature-card:hover,
+.local-page-card:hover,
+.business-card:hover,
+.emergency-card:hover,
+.reward-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(27, 154, 170, 0.34);
+  box-shadow: 0 18px 40px rgba(23, 32, 27, 0.12);
+}
+
+.feature-card p,
+.local-page-card p,
+.business-card p,
+.emergency-card p,
+.reward-card p {
+  color: var(--muted);
+}
+
+.feature-card strong,
+.local-page-card span,
+.business-card span,
+.emergency-card span,
+.reward-card span {
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.feature-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--green), var(--teal));
+  font-weight: 900;
+}
+
+.feature-card.resident {
+  background: linear-gradient(145deg, #fff, var(--green-soft));
+}
+
+.feature-card.business,
+.business-card {
+  background: linear-gradient(145deg, #fff, var(--amber-soft));
+}
+
+.feature-card.source-check,
+.local-page-card {
+  background: linear-gradient(145deg, #fff, var(--teal-soft));
+}
+
+.feature-card.abuse,
+.emergency-card {
+  background: linear-gradient(145deg, #fff, var(--red-soft));
+}
+
+.report-abuse {
+  justify-self: start;
+  color: var(--red);
+  border-color: rgba(185, 65, 53, 0.24);
+  background: var(--red-soft);
+}
+
+.quick-report-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.quick-report {
+  min-height: 42px;
+  padding: 0 10px;
+  color: var(--green);
+  background: linear-gradient(135deg, var(--green-soft), var(--teal-soft));
+  border: 1px solid rgba(33, 107, 78, 0.2);
+  font-size: 0.84rem;
+}
+
+.emergency-card.shelters {
+  border-top: 5px solid var(--green);
+}
+
+.emergency-card.roads {
+  border-top: 5px solid var(--amber);
+}
+
+.emergency-card.contacts {
+  border-top: 5px solid var(--blue);
+}
+
+.emergency-card.updates {
+  border-top: 5px solid var(--red);
+}
+
+.reward-card {
+  min-height: 150px;
+  overflow: hidden;
+  position: relative;
+}
+
+.reward-card::after {
+  content: "";
+  position: absolute;
+  right: -28px;
+  top: -28px;
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  opacity: 0.22;
+}
+
+.reward-card.bronze::after {
+  background: #b86f15;
+}
+
+.reward-card.silver::after {
+  background: #94a3b8;
+}
+
+.reward-card.gold::after {
+  background: var(--sun);
+}
+
+.reward-card.hero-badge::after {
+  background: var(--violet);
+}
+
 .trust-card,
 .milestone {
   padding: 22px;
@@ -1350,7 +1617,12 @@ textarea:focus-visible {
   .trust-grid,
   .safety-grid,
   .milestones,
-  .news-layout {
+  .news-layout,
+  .feature-grid,
+  .local-page-grid,
+  .business-grid,
+  .emergency-grid,
+  .badge-ladder {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1391,7 +1663,13 @@ textarea:focus-visible {
   .milestones,
   .news-layout,
   .area-tabs,
-  .places-grid {
+  .places-grid,
+  .feature-grid,
+  .local-page-grid,
+  .business-grid,
+  .emergency-grid,
+  .badge-ladder,
+  .quick-report-grid {
     grid-template-columns: 1fr;
   }
 
