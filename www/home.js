@@ -55,6 +55,9 @@ const saveNotificationsButton = document.querySelector("#saveNotifications");
 const testNotificationButton = document.querySelector("#testNotification");
 const notificationStatus = document.querySelector("#notificationStatus");
 const notifyAreaInputs = document.querySelectorAll('input[name="notifyArea"]');
+const signupButtons = document.querySelectorAll(".signup-button");
+const quickReportButtons = document.querySelectorAll(".quick-report");
+const abuseButtons = document.querySelectorAll(".report-abuse");
 
 const localNewsAreas = {
   baldwin: {
@@ -521,6 +524,50 @@ function loadNotificationPreferences() {
   }
 }
 
+function updateSignupButtons(provider) {
+  signupButtons.forEach((button) => {
+    const isConnected = provider && button.dataset.provider === provider;
+    button.classList.toggle("connected", Boolean(isConnected));
+    button.setAttribute("aria-pressed", isConnected ? "true" : "false");
+    const label = button.querySelector("span:last-child");
+    if (label) {
+      label.textContent = isConnected ? `${provider} connected` : `Sign up with ${button.dataset.provider}`;
+    }
+  });
+}
+
+function loadSignupProvider() {
+  updateSignupButtons(localStorage.getItem("nearnowSignupProvider"));
+}
+
+signupButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const provider = button.dataset.provider;
+    localStorage.setItem("nearnowSignupProvider", provider);
+    updateSignupButtons(provider);
+    if (notificationStatus) {
+      notificationStatus.textContent = `${provider} sign-up selected. Saved locations and custom alerts are ready on this device.`;
+    }
+  });
+});
+
+quickReportButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    reportTitleInput.value = button.dataset.title || "One tap report: needs review";
+    reportTypeSelect.value = button.dataset.type || "community";
+    reportTextInput.value = "Fast report started. Add photos, video, or a voice note when media uploads are connected.";
+    reportStatus.textContent = "One-tap report started. Add any details, then submit for verification.";
+    reportTitleInput.focus();
+  });
+});
+
+abuseButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    button.textContent = "Flag saved";
+    button.disabled = true;
+  });
+});
+
 async function enableNotifications() {
   const areas = saveNotificationPreferences();
 
@@ -651,6 +698,7 @@ areaTabs.forEach((button) => {
 
 renderLocalNews("baldwin");
 loadNotificationPreferences();
+loadSignupProvider();
 refreshEmbeddedNewsButton.addEventListener("click", () => loadEmbeddedReports(activeNewsArea));
 
 placeTabs.forEach((button) => {
@@ -690,9 +738,9 @@ const categoryLabels = {
 };
 
 const trustBadges = {
-  official: { label: "Official source", icon: "✅", className: "trust-official" },
-  community: { label: "Community report", icon: "🟡", className: "trust-community" },
-  unverified: { label: "Unverified", icon: "🔴", className: "trust-unverified" }
+  official: { label: "Official source", icon: "âœ…", className: "trust-official" },
+  community: { label: "Community report", icon: "ðŸŸ¡", className: "trust-community" },
+  unverified: { label: "Unverified", icon: "ðŸ”´", className: "trust-unverified" }
 };
 
 function areaKeyFromLabel(value) {
@@ -760,7 +808,7 @@ function renderFeed(items) {
 }
 
 async function loadFeed() {
-  feedList.innerHTML = '<article class="feed-card loading">Loading the live local feed…</article>';
+  feedList.innerHTML = '<article class="feed-card loading">Loading the live local feedâ€¦</article>';
   const params = new URLSearchParams({ area: activeFeedArea, category: activeFeedCategory });
   const areaLabel = areaLabels[activeFeedArea] || "your area";
   const categoryLabel =

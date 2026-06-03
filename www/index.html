@@ -8,6 +8,13 @@
       name="description"
       content="NearNow brings free local alerts, weather, traffic, events, verified sources, and AI summaries into one daily community briefing."
     >
+    <meta property="og:title" content="NearNow | Real-time local alerts">
+    <meta property="og:description" content="Real-time alerts, news, weather, traffic, events, and trusted local reports happening around you.">
+    <meta property="og:image" content="https://www.near-now.com/nearnow-banner.svg">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#216b4e">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,6 +34,16 @@
         <a href="#places">Places</a>
         <a href="#trust">Trust</a>
       </nav>
+      <div class="top-signup" aria-label="Create a NearNow account">
+        <button class="signup-button google" type="button" data-provider="Google">
+          <span class="signup-icon" aria-hidden="true">G</span>
+          <span>Sign up with Google</span>
+        </button>
+        <button class="signup-button apple" type="button" data-provider="Apple">
+          <span class="signup-icon" aria-hidden="true">A</span>
+          <span>Sign up with Apple</span>
+        </button>
+      </div>
       <a class="status-link" href="https://app.netlify.com/projects/nearnowproject/deploys">
         Netlify status
       </a>
@@ -34,7 +51,17 @@
 
     <main id="home">
       <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-motion" aria-hidden="true">
+          <span class="signal-dot dot-weather"></span>
+          <span class="signal-dot dot-traffic"></span>
+          <span class="signal-dot dot-safety"></span>
+          <span class="signal-line line-one"></span>
+          <span class="signal-line line-two"></span>
+        </div>
         <div class="hero-copy">
+          <div class="site-banner">
+            <img src="./nearnow-banner.svg" alt="NearNow live local intelligence banner">
+          </div>
           <p class="eyebrow">Everything free while NearNow earns daily trust</p>
           <h1 id="hero-title">Real-time alerts, news, weather, and events happening around you.</h1>
           <p class="hero-text">
@@ -42,6 +69,66 @@
             feed pulls together weather, traffic, community reports, events, and emergency
             alerts &mdash; each one stamped with its source, time, and verification status.
           </p>
+          <article class="morning-brief" aria-label="Personalized daily brief">
+            <div class="brief-topline">
+              <span class="label">Personalized Daily Brief</span>
+              <span>What changed since yesterday?</span>
+            </div>
+            <div class="brief-cards">
+              <span class="brief-card-item weather">
+                <svg class="brief-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                  <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                </svg>
+                <div class="brief-card-content">
+                  <strong>Weather</strong>
+                  <span>Rain risk after 3 PM</span>
+                </div>
+              </span>
+              <span class="brief-card-item traffic">
+                <svg class="brief-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M12 2v6M8 5h8M12 11V8"/>
+                </svg>
+                <div class="brief-card-content">
+                  <strong>Traffic</strong>
+                  <span>I-10 delay near the tunnel</span>
+                </div>
+              </span>
+              <span class="brief-card-item schools">
+                <svg class="brief-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
+                </svg>
+                <div class="brief-card-content">
+                  <strong>Schools</strong>
+                  <span>No closings reported</span>
+                </div>
+              </span>
+              <span class="brief-card-item events">
+                <svg class="brief-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <div class="brief-card-content">
+                  <strong>Events</strong>
+                  <span>4 nearby tonight</span>
+                </div>
+              </span>
+              <span class="brief-card-item safety">
+                <svg class="brief-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="M12 8v4M12 16h.01" stroke-width="3"/>
+                </svg>
+                <div class="brief-card-content">
+                  <strong>Safety</strong>
+                  <span>2 verified alerts watched</span>
+                </div>
+              </span>
+            </div>
+          </article>
           <form class="location-form" aria-label="Find local alerts">
             <label for="location">Your ZIP code or area</label>
             <div class="input-row">
@@ -59,6 +146,20 @@
           <div class="hero-actions">
             <a class="primary-action" href="#feed">See the live feed</a>
             <button class="secondary-action" type="button" id="enableNotifications">Enable big alerts</button>
+          </div>
+          <div class="live-ribbon" aria-label="Live local alert examples">
+            <div class="ribbon-track">
+              <span>Weather: Gulf storm watch</span>
+              <span>Traffic: I-10 delay reported</span>
+              <span>Safety: Official alerts monitored</span>
+              <span>Events: Tonight near you</span>
+              <span>News: Local sources embedded</span>
+              <span>Weather: Gulf storm watch</span>
+              <span>Traffic: I-10 delay reported</span>
+              <span>Safety: Official alerts monitored</span>
+              <span>Events: Tonight near you</span>
+              <span>News: Local sources embedded</span>
+            </div>
           </div>
           <div class="free-strip" aria-label="Free features">
             <span>Local news feed</span>
@@ -79,10 +180,18 @@
             <button class="map-filter active" type="button" data-filter="all">All</button>
             <button class="map-filter" type="button" data-filter="weather">Weather</button>
             <button class="map-filter" type="button" data-filter="traffic">Traffic</button>
+            <button class="map-filter" type="button" data-filter="crime">Crime</button>
+            <button class="map-filter" type="button" data-filter="closure">Closures</button>
+            <button class="map-filter" type="button" data-filter="severe">Severe zones</button>
+            <button class="map-filter" type="button" data-filter="community">Community</button>
             <button class="map-filter" type="button" data-filter="events">Events</button>
+            <button class="map-filter" type="button" data-filter="pet">Lost pets</button>
+            <button class="map-filter" type="button" data-filter="yard">Yard sales</button>
             <button class="map-filter" type="button" data-filter="news">News</button>
           </div>
           <div class="map-canvas" id="mapCanvas">
+            <div class="map-glow" aria-hidden="true"></div>
+            <div class="radar-sweep" aria-hidden="true"></div>
             <svg class="street-map" viewBox="0 0 640 420" role="img" aria-label="Stylized neighborhood map with alert pins">
               <rect width="640" height="420" fill="#edf4eb"></rect>
               
@@ -169,7 +278,7 @@
                 <line x1="-12" y1="0" x2="12" y2="0" stroke="#475569" stroke-width="1"></line>
                 <polygon points="0,-12 -3.5,-3 0,-1" fill="#ce5d44"></polygon>
                 <polygon points="0,12 3.5,3 0,1" fill="#475569"></polygon>
-                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954° N / 88.0399° W</text>
+                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954Â° N / 88.0399Â° W</text>
               </g>
             </svg>
             <button class="pin weather visible" style="left: 26%; top: 24%" data-type="weather" data-title="Dense fog advisory">
@@ -183,6 +292,24 @@
             </button>
             <button class="pin news visible" style="left: 38%; top: 72%" data-type="news" data-title="School board meeting tonight">
               <span>N</span>
+            </button>
+            <button class="pin crime visible" style="left: 46%; top: 31%" data-type="crime" data-title="Police advisory near Government St">
+              <span>C</span>
+            </button>
+            <button class="pin closure visible" style="left: 18%; top: 57%" data-type="closure" data-title="Road closure near Spring Hill">
+              <span>R</span>
+            </button>
+            <button class="pin severe visible" style="left: 82%; top: 34%" data-type="severe" data-title="Severe weather watch zone">
+              <span>S</span>
+            </button>
+            <button class="pin community visible" style="left: 52%; top: 78%" data-type="community" data-title="Community post: tree down">
+              <span>P</span>
+            </button>
+            <button class="pin pet visible" style="left: 68%; top: 22%" data-type="pet" data-title="Lost pet reported nearby">
+              <span>L</span>
+            </button>
+            <button class="pin yard visible" style="left: 30%; top: 46%" data-type="yard" data-title="Neighborhood yard sale Saturday">
+              <span>Y</span>
             </button>
             <div class="map-popover" id="mapPopover" role="status" aria-live="polite">
               <strong>Tap a marker</strong>
@@ -437,25 +564,163 @@
           <h2 id="trust-title">Every alert shows why people should believe it.</h2>
         </div>
         <div class="trust-grid">
-          <article class="trust-card">
-            <span class="trust-icon">V</span>
+          <article class="trust-card verified">
+            <span class="trust-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 11 2 2 4-4" stroke-width="3"/>
+              </svg>
+            </span>
             <h3>Verified sources</h3>
             <p>Official agencies, local outlets, schools, public safety feeds, and approved community moderators are labeled clearly.</p>
           </article>
-          <article class="trust-card">
-            <span class="trust-icon">T</span>
+          <article class="trust-card timestamps">
+            <span class="trust-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </span>
             <h3>Time stamps</h3>
             <p>Alerts show when they were posted and when the source last changed, so stale information is easy to spot.</p>
           </article>
-          <article class="trust-card">
-            <span class="trust-icon">L</span>
+          <article class="trust-card links">
+            <span class="trust-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </span>
             <h3>Original links</h3>
             <p>Each summary keeps a path back to source material instead of asking users to trust a black box.</p>
           </article>
-          <article class="trust-card">
-            <span class="trust-icon">B</span>
+          <article class="trust-card badges">
+            <span class="trust-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="7"/>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+              </svg>
+            </span>
             <h3>Report badges</h3>
             <p>Community reports move from unreviewed to confirmed only after a trusted source or local moderator verifies them.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="reputation-section" id="reputation" aria-labelledby="reputation-title">
+        <div class="section-heading">
+          <p class="eyebrow">Community reputation</p>
+          <h2 id="reputation-title">Trust grows when every contributor has context.</h2>
+          <p>NearNow labels who posted, how reliable they are, and whether a source or moderator has checked the report.</p>
+        </div>
+        <div class="feature-grid reputation-grid">
+          <article class="feature-card resident">
+            <span class="feature-icon resident">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+                <path d="m16 11 2 2 4-4" stroke-width="3" stroke="var(--green)"/>
+              </svg>
+            </span>
+            <h3>Verified resident</h3>
+            <p>Residents can earn a local badge after confirming their area and building a history of accurate reports.</p>
+            <strong>Reputation 92</strong>
+          </article>
+          <article class="feature-card business">
+            <span class="feature-icon business">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/>
+                <path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/>
+                <path d="M12 3v6M6 14h12M6 18h12"/>
+              </svg>
+            </span>
+            <h3>Verified local business</h3>
+            <p>Restaurants, shops, schools, and organizations get a badge before posting specials or public updates.</p>
+            <strong>Official partner</strong>
+          </article>
+          <article class="feature-card source-check">
+            <span class="feature-icon source-check">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="m9 15 2 2 4-4"/>
+              </svg>
+            </span>
+            <h3>Source verification</h3>
+            <p>Posts show official links, timestamps, and whether a trusted moderator has confirmed the details.</p>
+            <strong>Checked 8 min ago</strong>
+          </article>
+          <article class="feature-card abuse">
+            <span class="feature-icon abuse">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/>
+              </svg>
+            </span>
+            <h3>Report abuse</h3>
+            <p>Every community post can be flagged for misinformation, spam, duplicate alerts, or unsafe content.</p>
+            <button type="button" class="soft-button report-abuse">Report abuse</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="local-pages-section" id="local-pages" aria-labelledby="local-pages-title">
+        <div class="section-heading">
+          <p class="eyebrow">Hyperlocal pages</p>
+          <h2 id="local-pages-title">City, neighborhood, and ZIP pages built for local search.</h2>
+          <p>Each page can carry live alerts, weather, events, and community discussions for one exact place.</p>
+        </div>
+        <div class="local-page-grid">
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Downtown Mobile</h3>
+            <p>Live alerts, port traffic, events, public safety, restaurants, and civic updates.</p>
+          </article>
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Fairhope</h3>
+            <p>Bayfront weather, school updates, local events, community posts, and downtown alerts.</p>
+          </article>
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Daphne</h3>
+            <p>Causeway traffic, severe weather, local meetings, high school events, and safety reports.</p>
+          </article>
+          <article class="local-page-card">
+            <span>Neighborhood page</span>
+            <h3>Spanish Fort</h3>
+            <p>Eastern Shore road conditions, shopping-area traffic, local business posts, and events.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="business-section" id="businesses" aria-labelledby="business-title">
+        <div class="section-heading">
+          <p class="eyebrow">Local business partnerships</p>
+          <h2 id="business-title">Free business profiles create useful local updates and future revenue.</h2>
+          <p>Businesses can post specials, events, closings, hiring notices, and announcements that belong in the local feed.</p>
+        </div>
+        <div class="business-grid">
+          <article class="business-card">
+            <span>Coffee shop</span>
+            <h3>Morning special</h3>
+            <p>Post breakfast deals, storm-hour changes, and community board announcements.</p>
+          </article>
+          <article class="business-card">
+            <span>Restaurant</span>
+            <h3>Tonight's event</h3>
+            <p>Share live music, fundraiser nights, pop-ups, and weather-related patio updates.</p>
+          </article>
+          <article class="business-card">
+            <span>Barber</span>
+            <h3>Open slots</h3>
+            <p>Publish same-day appointments, holiday hours, and neighborhood promotions.</p>
+          </article>
+          <article class="business-card">
+            <span>Local store</span>
+            <h3>Announcement</h3>
+            <p>Post sales, lost-and-found notices, school drives, and emergency supply availability.</p>
           </article>
         </div>
       </section>
@@ -472,6 +737,12 @@
         </div>
         <form class="report-panel" aria-label="Submit a community report">
           <h3>Community report</h3>
+          <div class="quick-report-grid" aria-label="One tap report shortcuts">
+            <button type="button" class="quick-report" data-title="Photo report: road hazard" data-type="traffic">Photo</button>
+            <button type="button" class="quick-report" data-title="Video report: flooding" data-type="weather">Video</button>
+            <button type="button" class="quick-report" data-title="Voice note: community update" data-type="community">Voice note</button>
+            <button type="button" class="quick-report" data-title="One tap report: needs review" data-type="community">One tap</button>
+          </div>
           <label for="reportTitle">What's happening?</label>
           <input id="reportTitle" name="reportTitle" type="text" maxlength="200" value="Tree blocking the right lane on Pine near 7th" placeholder="Short headline for your report">
           <label for="reportType">Report type</label>
@@ -495,6 +766,87 @@
           <button type="button" id="submitReport">Submit for verification</button>
           <p class="report-status" id="reportStatus">New reports post to the live feed marked Unverified until a trusted source or moderator confirms them.</p>
         </form>
+      </section>
+
+      <section class="emergency-mode-section" id="emergency-mode" aria-labelledby="emergency-mode-title">
+        <div class="section-heading">
+          <p class="eyebrow">Emergency mode</p>
+          <h2 id="emergency-mode-title">A Gulf Coast command view for hurricanes, tornadoes, flooding, and major accidents.</h2>
+        </div>
+        <div class="emergency-grid">
+          <article class="emergency-card shelters">
+            <span>Shelters</span>
+            <h3>Nearest open shelters</h3>
+            <p>Show official shelter locations, capacity notes, pet rules, and accessibility details.</p>
+          </article>
+          <article class="emergency-card roads">
+            <span>Road closures</span>
+            <h3>Blocked routes</h3>
+            <p>Put flooded roads, evacuation routes, bridge closures, and accidents above ordinary posts.</p>
+          </article>
+          <article class="emergency-card contacts">
+            <span>Emergency contacts</span>
+            <h3>Tap-to-call resources</h3>
+            <p>Surface county emergency management, power outage lines, schools, and city contacts.</p>
+          </article>
+          <article class="emergency-card updates">
+            <span>Live updates</span>
+            <h3>Official timeline</h3>
+            <p>Keep verified source updates pinned at the top until the event is resolved.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="rewards-section" id="rewards" aria-labelledby="rewards-title">
+        <div class="section-heading">
+          <p class="eyebrow">Gamify participation</p>
+          <h2 id="rewards-title">Reward people for helping their neighbors.</h2>
+        </div>
+        <div class="badge-ladder">
+          <article class="reward-card bronze">
+            <div class="reward-badge-icon bronze">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6" fill="#cd7f32" stroke="#a05a2c"/>
+                <path d="M15.47 13.39 19 21l-7-2-7 2 3.53-7.61" stroke-width="2"/>
+                <text x="12" y="10.5" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">3</text>
+              </svg>
+            </div>
+            <span>Bronze Reporter</span>
+            <p>Submit 3 helpful reports.</p>
+          </article>
+          <article class="reward-card silver">
+            <div class="reward-badge-icon silver">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6" fill="#c0c0c0" stroke="#708090"/>
+                <path d="M15.47 13.39 19 21l-7-2-7 2 3.53-7.61" stroke-width="2"/>
+                <text x="12" y="10.5" font-size="6" font-weight="900" fill="#fff" text-anchor="middle">10</text>
+              </svg>
+            </div>
+            <span>Silver Reporter</span>
+            <p>Verify 10 local posts.</p>
+          </article>
+          <article class="reward-card gold">
+            <div class="reward-badge-icon gold">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6" fill="#ffd700" stroke="#b8860b"/>
+                <path d="M15.47 13.39 19 21l-7-2-7 2 3.53-7.61" stroke-width="2"/>
+                <text x="12" y="10.5" font-size="6" font-weight="900" fill="#fff" text-anchor="middle">90+</text>
+              </svg>
+            </div>
+            <span>Gold Reporter</span>
+            <p>Keep a 90+ reputation score.</p>
+          </article>
+          <article class="reward-card hero-badge">
+            <div class="reward-badge-icon hero">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#0ea5e9" stroke="#0369a1"/>
+                <path d="M12 7l1.5 3.5h3.5l-2.8 2.2 1 3.8-3.2-2.5-3.2 2.5 1-3.8-2.8-2.2h3.5z" fill="#fff" stroke="none"/>
+              </svg>
+            </div>
+            <span>Community Hero</span>
+            <p>Help neighbors during emergency mode.</p>
+          </article>
+        </div>
       </section>
 
       <section class="growth-section" id="growth" aria-labelledby="growth-title">
