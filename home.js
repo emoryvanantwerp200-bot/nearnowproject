@@ -42,6 +42,14 @@ const reportList = document.querySelector("#reportList");
 const refreshEmbeddedNewsButton = document.querySelector("#refreshEmbeddedNews");
 const placeTabs = document.querySelectorAll(".place-tab");
 const placesGrid = document.querySelector("#placesGrid");
+const feedList = document.querySelector("#feedList");
+const feedChips = document.querySelectorAll(".feed-chip");
+const feedContext = document.querySelector("#feedContext");
+const refreshFeedButton = document.querySelector("#refreshFeed");
+const reportTitleInput = document.querySelector("#reportTitle");
+const reportTypeSelect = document.querySelector("#reportType");
+const reportAreaSelect = document.querySelector("#reportArea");
+const reportTextInput = document.querySelector("#reportText");
 const enableNotificationsButton = document.querySelector("#enableNotifications");
 const saveNotificationsButton = document.querySelector("#saveNotifications");
 const testNotificationButton = document.querySelector("#testNotification");
@@ -431,14 +439,57 @@ pins.forEach((pin) => {
 refreshButton.addEventListener("click", () => {
   const normalized = locationInput.value.trim();
   const area = briefData[normalized] ? normalized : "Mobile County";
-  summaryText.textContent = briefData[area].summary;
   summaryTime.textContent = briefData[area].time;
   locationInput.value = area;
   document.querySelector("#briefNote").textContent = `Coverage area: ${area}`;
+  activeFeedArea = areaKeyFromLabel(area);
+  loadFeed();
+  loadDailySummary();
 });
 
-reportButton.addEventListener("click", () => {
-  reportStatus.textContent = "Badge status: Submitted for moderator verification. It will not be marked verified until a trusted source confirms it.";
+reportButton.addEventListener("click", async () => {
+  const title = (reportTitleInput.value || "").trim();
+  if (!title) {
+    reportStatus.textContent = "Add a short headline before submitting.";
+    return;
+  }
+
+  reportButton.disabled = true;
+  reportStatus.textContent = "Submitting your report...";
+
+  try {
+    const response = await fetch("/api/feed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        body: (reportTextInput.value || "").trim(),
+        category: reportTypeSelect.value,
+        area: reportAreaSelect.value
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Report could not be submitted.");
+
+    reportStatus.textContent = data.message || "Report submitted for verification.";
+    reportTitleInput.value = "";
+    reportTextInput.value = "";
+
+    // Jump the live feed to the area the report was filed under so the user sees it.
+    activeFeedArea = reportAreaSelect.value;
+    activeFeedCategory = "all";
+    feedChips.forEach((chip) => {
+      const isAll = chip.dataset.category === "all";
+      chip.classList.toggle("active", isAll);
+      chip.setAttribute("aria-selected", isAll ? "true" : "false");
+    });
+    await loadFeed();
+    loadDailySummary();
+  } catch (error) {
+    reportStatus.textContent = error.message || "Report could not be submitted. Please try again.";
+  } finally {
+    reportButton.disabled = false;
+  }
 });
 
 function selectedNotificationAreas() {
@@ -615,3 +666,154 @@ placeTabs.forEach((button) => {
 });
 
 renderPlaces("baldwin");
+
+/* ---------- Live local feed + AI daily summary ---------- */
+
+let activeFeedArea = "mobile";
+let activeFeedCategory = "all";
+
+const areaLabels = {
+  baldwin: "Baldwin County",
+  mobile: "Mobile County",
+  escambia: "Escambia County",
+  westmobile: "West Mobile",
+  pascagoula: "Pascagoula, MS"
+};
+
+const categoryLabels = {
+  weather: "Weather",
+  traffic: "Traffic",
+  news: "Local news",
+  community: "Community",
+  events: "Events",
+  emergency: "Emergency"
+};
+
+const trustBadges = {
+  official: { label: "Official source", icon: "✅", className: "trust-official" },
+  community: { label: "Community report", icon: "🟡", className: "trust-community" },
+  unverified: { label: "Unverified", icon: "🔴", className: "trust-unverified" }
+};
+
+function areaKeyFromLabel(value) {
+  const v = (value || "").toLowerCase();
+  if (v.includes("baldwin") || v.includes("fairhope") || v.includes("daphne")) return "baldwin";
+  if (v.includes("escambia") || v.includes("pensacola")) return "escambia";
+  if (v.includes("west")) return "westmobile";
+  if (v.includes("pascagoula") || v.includes("jackson")) return "pascagoula";
+  if (v.includes("mobile")) return "mobile";
+  return "mobile";
+}
+
+function escapeHtml(value = "") {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function relativeTime(value) {
+  if (!value) return "Just now";
+  const then = new Date(value).getTime();
+  if (Number.isNaN(then)) return "Recently";
+  const diffMin = Math.round((Date.now() - then) / 60000);
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffHr = Math.round(diffMin / 60);
+  if (diffHr < 24) return `${diffHr} hr ago`;
+  const diffDay = Math.round(diffHr / 24);
+  return `${diffDay} day${diffDay > 1 ? "s" : ""} ago`;
+}
+
+function renderFeed(items) {
+  if (!items.length) {
+    feedList.innerHTML =
+      '<article class="feed-card empty">No items match this filter yet. Try another category or submit a community report below.</article>';
+    return;
+  }
+
+  feedList.innerHTML = items
+    .map((item) => {
+      const badge = trustBadges[item.trust] || trustBadges.unverified;
+      const category = categoryLabels[item.category] || "Update";
+      const link = item.sourceUrl
+        ? `<a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">Open source</a>`
+        : "";
+      return `
+        <article class="feed-card category-${escapeHtml(item.category)}">
+          <div class="feed-card-top">
+            <span class="feed-category">${category}</span>
+            <span class="feed-trust ${badge.className}"><span aria-hidden="true">${badge.icon}</span> ${badge.label}</span>
+          </div>
+          <h3>${escapeHtml(item.title)}</h3>
+          ${item.body ? `<p>${escapeHtml(item.body)}</p>` : ""}
+          <div class="feed-card-meta">
+            <span>${escapeHtml(item.source || "Local source")}</span>
+            <span>${relativeTime(item.createdAt)}</span>
+            ${link}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+async function loadFeed() {
+  feedList.innerHTML = '<article class="feed-card loading">Loading the live local feed…</article>';
+  const params = new URLSearchParams({ area: activeFeedArea, category: activeFeedCategory });
+  const areaLabel = areaLabels[activeFeedArea] || "your area";
+  const categoryLabel =
+    activeFeedCategory === "all" ? "all categories" : (categoryLabels[activeFeedCategory] || activeFeedCategory).toLowerCase();
+  feedContext.textContent = `Showing ${categoryLabel} for ${areaLabel}.`;
+
+  try {
+    const response = await fetch(`/api/feed?${params.toString()}`);
+    if (!response.ok) throw new Error("Feed unavailable");
+    const data = await response.json();
+    renderFeed(Array.isArray(data.items) ? data.items : []);
+  } catch {
+    feedList.innerHTML =
+      '<article class="feed-card empty">The live feed is temporarily unavailable. Please refresh in a moment.</article>';
+  }
+}
+
+async function loadDailySummary() {
+  if (!summaryText) return;
+  const areaLabel = areaLabels[activeFeedArea] || "your area";
+  try {
+    const response = await fetch(`/api/daily-summary?area=${encodeURIComponent(activeFeedArea)}`);
+    if (!response.ok) throw new Error("Summary unavailable");
+    const data = await response.json();
+    if (data.summary) {
+      summaryText.textContent = data.summary;
+    }
+  } catch {
+    summaryText.textContent = `We could not refresh the AI summary for ${areaLabel} just now. The live feed below is up to date.`;
+  }
+}
+
+feedChips.forEach((chip) => {
+  chip.addEventListener("click", () => {
+    feedChips.forEach((item) => {
+      item.classList.remove("active");
+      item.setAttribute("aria-selected", "false");
+    });
+    chip.classList.add("active");
+    chip.setAttribute("aria-selected", "true");
+    activeFeedCategory = chip.dataset.category;
+    loadFeed();
+  });
+});
+
+if (refreshFeedButton) {
+  refreshFeedButton.addEventListener("click", () => {
+    loadFeed();
+    loadDailySummary();
+  });
+}
+
+// Initialize the feed and AI summary from the default location on first load.
+activeFeedArea = areaKeyFromLabel(locationInput.value);
+loadFeed();
+loadDailySummary();

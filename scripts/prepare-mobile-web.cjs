@@ -16,7 +16,9 @@ const staticEntries = [
   "vendor",
   "styles.css",
   "app.js",
-  "feeds.js"
+  "feeds.js",
+  "home.css",
+  "home.js"
 ];
 
 function rmIfExists(targetPath) {
