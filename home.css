@@ -14,6 +14,11 @@
   --red-soft: #fde3df;
   --blue: #386c93;
   --blue-soft: #e0edf4;
+  --teal: #1b9aaa;
+  --teal-soft: #dff7f8;
+  --violet: #6b5bd2;
+  --violet-soft: #ebe7ff;
+  --sun: #f3b23b;
   --shadow: 0 18px 50px rgba(23, 32, 27, 0.12);
   --shadow-soft: 0 10px 26px rgba(23, 32, 27, 0.08);
 
@@ -33,7 +38,9 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  background: linear-gradient(180deg, #f9faf6 0%, var(--paper) 46%, #f3f6ef 100%);
+  background:
+    linear-gradient(120deg, rgba(33, 107, 78, 0.05), rgba(27, 154, 170, 0.05), rgba(243, 178, 59, 0.06)),
+    linear-gradient(180deg, #f9faf6 0%, var(--paper) 46%, #f3f6ef 100%);
   font-family: var(--font-body);
   line-height: 1.55;
   letter-spacing: -0.01em;
@@ -68,7 +75,9 @@ h1, h2, h3, h4, h5, h6 {
   gap: 20px;
   min-height: 72px;
   padding: 14px clamp(18px, 5vw, 64px);
-  background: rgba(255, 255, 252, 0.95);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 252, 0.97), rgba(246, 255, 252, 0.95)),
+    rgba(255, 255, 252, 0.95);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(14px);
 }
@@ -97,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 36px;
   height: 36px;
   color: #fff;
-  background: linear-gradient(135deg, var(--green) 0%, #154c34 100%);
+  background: linear-gradient(135deg, var(--green) 0%, var(--teal) 58%, #154c34 100%);
   border-radius: 10px;
   font-weight: 800;
   font-family: var(--font-display);
@@ -139,11 +148,99 @@ h1, h2, h3, h4, h5, h6 {
   min-height: calc(100vh - 72px);
   padding: clamp(42px, 6vw, 76px) clamp(18px, 5vw, 64px) 42px;
   align-items: center;
-  background-image: 
-    radial-gradient(circle at 12% 15%, rgba(33, 107, 78, 0.04) 0%, transparent 45%),
-    radial-gradient(circle at 88% 85%, rgba(184, 111, 21, 0.04) 0%, transparent 45%),
+  overflow: hidden;
+  background-image:
+    radial-gradient(circle at 12% 15%, rgba(33, 107, 78, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 88% 85%, rgba(184, 111, 21, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 60% 8%, rgba(27, 154, 170, 0.11) 0%, transparent 38%),
     radial-gradient(rgba(33, 107, 78, 0.06) 1.5px, transparent 1.5px);
-  background-size: 100% 100%, 100% 100%, 28px 28px;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    conic-gradient(from 120deg, transparent 0deg, rgba(27, 154, 170, 0.1) 36deg, transparent 72deg),
+    conic-gradient(from 280deg, transparent 0deg, rgba(243, 178, 59, 0.1) 28deg, transparent 62deg);
+  animation: rotate-wash 26s linear infinite;
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--green), var(--teal), var(--sun), var(--red), var(--violet), var(--green));
+  background-size: 260% 100%;
+  animation: color-slide 9s linear infinite;
+}
+
+.hero-motion {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.signal-dot,
+.signal-line {
+  position: absolute;
+  display: block;
+}
+
+.signal-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.55), 0 0 42px currentColor;
+  animation: float-signal 9s ease-in-out infinite;
+}
+
+.dot-weather {
+  left: 6%;
+  top: 18%;
+  color: var(--blue);
+  background: var(--blue);
+}
+
+.dot-traffic {
+  left: 43%;
+  top: 82%;
+  color: var(--amber);
+  background: var(--amber);
+  animation-delay: -2.8s;
+}
+
+.dot-safety {
+  right: 8%;
+  top: 16%;
+  color: var(--red);
+  background: var(--red);
+  animation-delay: -5.6s;
+}
+
+.signal-line {
+  width: 340px;
+  height: 2px;
+  opacity: 0.45;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  transform: rotate(-18deg);
+  animation: scan-line 8s ease-in-out infinite;
+}
+
+.line-one {
+  left: -80px;
+  top: 26%;
+}
+
+.line-two {
+  right: -120px;
+  bottom: 20%;
+  background: linear-gradient(90deg, transparent, var(--sun), transparent);
+  animation-delay: -4s;
 }
 
 .hero-copy {
@@ -222,14 +319,97 @@ h3 {
 
 .primary-action {
   color: #fff;
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--teal));
+  box-shadow: 0 10px 24px rgba(33, 107, 78, 0.24);
 }
 
 .secondary-action,
 .soft-button {
   border: 1px solid #9ecab2;
   color: var(--green);
-  background: var(--green-soft);
+  background: linear-gradient(135deg, var(--green-soft), var(--teal-soft));
+}
+
+.primary-action,
+.secondary-action,
+.soft-button,
+.input-row button,
+.report-panel button,
+.notification-actions button {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+}
+
+.primary-action:hover,
+.secondary-action:hover,
+.soft-button:hover,
+.input-row button:hover,
+.report-panel button:hover,
+.notification-actions button:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 14px 28px rgba(33, 107, 78, 0.18);
+}
+
+.live-ribbon {
+  position: relative;
+  max-width: 660px;
+  margin: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid rgba(33, 107, 78, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 12px 32px rgba(23, 32, 27, 0.08);
+}
+
+.live-ribbon::before,
+.live-ribbon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 52px;
+  pointer-events: none;
+}
+
+.live-ribbon::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 252, 0.98), transparent);
+}
+
+.live-ribbon::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(255, 255, 252, 0.98), transparent);
+}
+
+.ribbon-track {
+  display: flex;
+  width: max-content;
+  gap: 8px;
+  padding: 7px 8px;
+  animation: ticker 26s linear infinite;
+}
+
+.ribbon-track span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--green-soft), #fff6de);
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.ribbon-track span:nth-child(2n) {
+  background: linear-gradient(135deg, var(--blue-soft), var(--teal-soft));
+}
+
+.ribbon-track span:nth-child(3n) {
+  background: linear-gradient(135deg, var(--red-soft), var(--amber-soft));
 }
 
 .location-form label,
@@ -325,10 +505,12 @@ textarea:focus-visible {
 .map-shell {
   min-width: 0;
   padding: 16px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(27, 154, 170, 0.22);
   border-radius: 16px;
-  background: var(--panel);
-  box-shadow: var(--shadow);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(239, 255, 252, 0.86)),
+    var(--panel);
+  box-shadow: 0 22px 70px rgba(27, 154, 170, 0.14), var(--shadow);
 }
 
 .map-toolbar {
@@ -358,7 +540,7 @@ textarea:focus-visible {
 }
 
 .map-filter.active {
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--teal));
   color: #fff;
   box-shadow: 0 4px 12px rgba(33, 107, 78, 0.22);
 }
@@ -368,8 +550,37 @@ textarea:focus-visible {
   min-height: clamp(390px, 64vh, 660px);
   overflow: hidden;
   border-radius: 12px;
-  background: #edf4eb;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(27, 154, 170, 0.18), transparent 28%),
+    radial-gradient(circle at 18% 80%, rgba(243, 178, 59, 0.16), transparent 32%),
+    #edf4eb;
   border: 1px solid var(--line);
+}
+
+.map-glow,
+.radar-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.map-glow {
+  background:
+    radial-gradient(circle at 26% 24%, rgba(56, 108, 147, 0.18), transparent 13%),
+    radial-gradient(circle at 59% 47%, rgba(185, 65, 53, 0.18), transparent 12%),
+    radial-gradient(circle at 72% 68%, rgba(184, 111, 21, 0.2), transparent 13%),
+    radial-gradient(circle at 38% 72%, rgba(33, 107, 78, 0.18), transparent 12%);
+  animation: map-breathe 5.5s ease-in-out infinite;
+}
+
+.radar-sweep {
+  background:
+    conic-gradient(from 0deg at 52% 50%, transparent 0deg, rgba(27, 154, 170, 0.32) 24deg, transparent 48deg),
+    radial-gradient(circle at 52% 50%, transparent 0 14%, rgba(33, 107, 78, 0.16) 14.3% 14.7%, transparent 15% 30%, rgba(27, 154, 170, 0.13) 30.3% 30.8%, transparent 31%);
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+  animation: radar-spin 9s linear infinite;
 }
 
 .street-map {
@@ -377,6 +588,7 @@ textarea:focus-visible {
   inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 1;
 }
 
 .route {
@@ -384,6 +596,8 @@ textarea:focus-visible {
   stroke: #ffffff;
   stroke-width: 28;
   stroke-linecap: round;
+  stroke-dasharray: 18 22;
+  animation: road-flow 12s linear infinite;
 }
 
 .route-main {
@@ -417,7 +631,7 @@ textarea:focus-visible {
   box-shadow: 0 8px 18px rgba(23, 32, 27, 0.2);
   transform: translate(-50%, -50%);
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
-  z-index: 4;
+  z-index: 5;
 }
 
 .pin.visible {
@@ -437,22 +651,22 @@ textarea:focus-visible {
 }
 
 .pin.weather {
-  background: var(--blue);
+  background: linear-gradient(135deg, #2b8fd3, var(--blue));
   animation: pulse-weather 2.5s infinite;
 }
 
 .pin.traffic {
-  background: var(--red);
+  background: linear-gradient(135deg, #f36f45, var(--red));
   animation: pulse-traffic 2.5s infinite;
 }
 
 .pin.events {
-  background: var(--amber);
+  background: linear-gradient(135deg, var(--sun), var(--amber));
   animation: pulse-events 2.5s infinite;
 }
 
 .pin.news {
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--teal));
   animation: pulse-news 2.5s infinite;
 }
 
@@ -493,6 +707,7 @@ textarea:focus-visible {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 12px 36px rgba(23, 32, 27, 0.15);
+  z-index: 6;
 }
 
 .map-popover span {
@@ -514,19 +729,23 @@ textarea:focus-visible {
 .brief-section,
 .safety-section,
 .growth-section {
-  background: #fff;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 246, 222, 0.5)),
+    #fff;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
 
 .safety-section {
   background:
+    radial-gradient(circle at 8% 20%, rgba(185, 65, 53, 0.08), transparent 26%),
+    radial-gradient(circle at 88% 80%, rgba(56, 108, 147, 0.08), transparent 28%),
     linear-gradient(180deg, #ffffff 0%, #f8faf6 100%);
 }
 
 .notification-section {
   background:
-    linear-gradient(135deg, rgba(33, 107, 78, 0.09), rgba(56, 108, 147, 0.08)),
+    linear-gradient(135deg, rgba(33, 107, 78, 0.12), rgba(27, 154, 170, 0.11), rgba(243, 178, 59, 0.12)),
     #fbfcf8;
   border-bottom: 1px solid var(--line);
 }
@@ -616,7 +835,7 @@ textarea:focus-visible {
 }
 
 .alert-card.urgent {
-  background: var(--red-soft);
+  background: linear-gradient(135deg, var(--red-soft), #fff7e9);
   border-color: #f3beb8;
 }
 
@@ -659,14 +878,17 @@ textarea:focus-visible {
 
 .safety-card.crime {
   border-top: 5px solid var(--red);
+  background: linear-gradient(180deg, #fff, var(--red-soft));
 }
 
 .safety-card.amber {
   border-top: 5px solid var(--amber);
+  background: linear-gradient(180deg, #fff, var(--amber-soft));
 }
 
 .safety-card.weather {
   border-top: 5px solid var(--blue);
+  background: linear-gradient(180deg, #fff, var(--blue-soft));
 }
 
 .notification-panel {
@@ -730,7 +952,10 @@ textarea:focus-visible {
 }
 
 .news-section {
-  background: var(--paper);
+  background:
+    radial-gradient(circle at 14% 18%, rgba(107, 91, 210, 0.08), transparent 28%),
+    radial-gradient(circle at 92% 74%, rgba(27, 154, 170, 0.1), transparent 28%),
+    var(--paper);
 }
 
 .news-layout {
@@ -757,7 +982,7 @@ textarea:focus-visible {
 
 .area-tab.active {
   border-color: #9ecab2;
-  background: var(--green-soft);
+  background: linear-gradient(135deg, var(--green-soft), var(--teal-soft));
   color: var(--green);
 }
 
@@ -811,6 +1036,7 @@ textarea:focus-visible {
   gap: 8px;
   padding: 14px;
   border-left: 5px solid var(--blue);
+  background: linear-gradient(135deg, #fff, rgba(224, 237, 244, 0.55));
 }
 
 .report-card.loading {
@@ -845,6 +1071,7 @@ textarea:focus-visible {
   gap: 8px;
   padding: 16px;
   border-left: 5px solid var(--green);
+  background: linear-gradient(135deg, #fff, rgba(219, 238, 228, 0.6));
 }
 
 .source-card h3 {
@@ -867,7 +1094,10 @@ textarea:focus-visible {
 }
 
 .places-section {
-  background: #fff;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(243, 178, 59, 0.13), transparent 28%),
+    radial-gradient(circle at 84% 78%, rgba(33, 107, 78, 0.11), transparent 30%),
+    #fff;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -892,7 +1122,7 @@ textarea:focus-visible {
 }
 
 .place-tab.active {
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--teal));
   color: #fff;
 }
 
@@ -909,7 +1139,7 @@ textarea:focus-visible {
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--panel);
+  background: linear-gradient(145deg, #fff, rgba(255, 240, 216, 0.44));
   box-shadow: var(--shadow-soft);
 }
 
@@ -942,7 +1172,7 @@ textarea:focus-visible {
 
 .trust-icon {
   margin-bottom: 20px;
-  background: var(--amber);
+  background: linear-gradient(135deg, var(--amber), var(--sun));
 }
 
 .community-section {
@@ -995,7 +1225,7 @@ textarea:focus-visible {
 
 .milestone.active {
   border-color: #9ecab2;
-  background: var(--green-soft);
+  background: linear-gradient(135deg, var(--green-soft), var(--teal-soft));
 }
 
 .footer {
@@ -1110,7 +1340,10 @@ textarea:focus-visible {
 /* ---------- Live local feed ---------- */
 
 .feed-section {
-  background: linear-gradient(180deg, #ffffff 0%, #f6f9f4 100%);
+  background:
+    radial-gradient(circle at 10% 18%, rgba(56, 108, 147, 0.09), transparent 26%),
+    radial-gradient(circle at 88% 26%, rgba(184, 111, 21, 0.09), transparent 25%),
+    linear-gradient(180deg, #ffffff 0%, #f6f9f4 100%);
   border-bottom: 1px solid var(--line);
 }
 
@@ -1141,7 +1374,7 @@ textarea:focus-visible {
 }
 
 .feed-chip.active {
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--teal));
   border-color: var(--green);
   color: #fff;
 }
@@ -1195,7 +1428,7 @@ textarea:focus-visible {
 .feed-card.category-emergency { border-left-color: var(--red); }
 .feed-card.category-events { border-left-color: var(--green); }
 .feed-card.category-news { border-left-color: #6b5bd2; }
-.feed-card.category-community { border-left-color: var(--muted); }
+.feed-card.category-community { border-left-color: var(--teal); }
 
 .feed-card-top {
   display: flex;
@@ -1309,7 +1542,9 @@ textarea:focus-visible {
 .trust-card,
 .news-focus,
 .milestone,
-.places-card {
+.place-card,
+.source-card,
+.report-card {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
   border-radius: 12px;
 }
@@ -1318,7 +1553,9 @@ textarea:focus-visible {
 .alert-card:hover,
 .safety-card:hover,
 .trust-card:hover,
-.places-card:hover {
+.place-card:hover,
+.source-card:hover,
+.report-card:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: 0 16px 36px rgba(23, 32, 27, 0.12);
   border-color: rgba(33, 107, 78, 0.25);
@@ -1406,4 +1643,104 @@ textarea:focus-visible {
 .area-tabs::-webkit-scrollbar,
 .place-picker::-webkit-scrollbar {
   display: none;
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes rotate-wash {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes color-slide {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 260% 50%;
+  }
+}
+
+@keyframes float-signal {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: translate3d(18px, -18px, 0) scale(1.18);
+    opacity: 1;
+  }
+}
+
+@keyframes scan-line {
+  0%,
+  100% {
+    transform: translateX(0) rotate(-18deg);
+    opacity: 0.16;
+  }
+
+  50% {
+    transform: translateX(160px) rotate(-18deg);
+    opacity: 0.52;
+  }
+}
+
+@keyframes radar-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes map-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    filter: saturate(1);
+  }
+
+  50% {
+    opacity: 0.95;
+    filter: saturate(1.35);
+  }
+}
+
+@keyframes road-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: -80;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

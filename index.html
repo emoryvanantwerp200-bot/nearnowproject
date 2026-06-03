@@ -34,6 +34,13 @@
 
     <main id="home">
       <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-motion" aria-hidden="true">
+          <span class="signal-dot dot-weather"></span>
+          <span class="signal-dot dot-traffic"></span>
+          <span class="signal-dot dot-safety"></span>
+          <span class="signal-line line-one"></span>
+          <span class="signal-line line-two"></span>
+        </div>
         <div class="hero-copy">
           <p class="eyebrow">Everything free while NearNow earns daily trust</p>
           <h1 id="hero-title">Real-time alerts, news, weather, and events happening around you.</h1>
@@ -60,6 +67,20 @@
             <a class="primary-action" href="#feed">See the live feed</a>
             <button class="secondary-action" type="button" id="enableNotifications">Enable big alerts</button>
           </div>
+          <div class="live-ribbon" aria-label="Live local alert examples">
+            <div class="ribbon-track">
+              <span>Weather: Gulf storm watch</span>
+              <span>Traffic: I-10 delay reported</span>
+              <span>Safety: Official alerts monitored</span>
+              <span>Events: Tonight near you</span>
+              <span>News: Local sources embedded</span>
+              <span>Weather: Gulf storm watch</span>
+              <span>Traffic: I-10 delay reported</span>
+              <span>Safety: Official alerts monitored</span>
+              <span>Events: Tonight near you</span>
+              <span>News: Local sources embedded</span>
+            </div>
+          </div>
           <div class="free-strip" aria-label="Free features">
             <span>Local news feed</span>
             <span>Weather alerts</span>
@@ -83,6 +104,8 @@
             <button class="map-filter" type="button" data-filter="news">News</button>
           </div>
           <div class="map-canvas" id="mapCanvas">
+            <div class="map-glow" aria-hidden="true"></div>
+            <div class="radar-sweep" aria-hidden="true"></div>
             <svg class="street-map" viewBox="0 0 640 420" role="img" aria-label="Stylized neighborhood map with alert pins">
               <rect width="640" height="420" fill="#edf4eb"></rect>
               
