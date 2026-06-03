@@ -30,6 +30,21 @@ export const familyMembers = pgTable("family_members", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const feedItems = pgTable("feed_items", {
+  id: serial().primaryKey(),
+  category: varchar("category", { length: 20 }).notNull().default("community"),
+  title: varchar("title", { length: 200 }).notNull(),
+  body: text().notNull().default(""),
+  area: varchar("area", { length: 60 }).notNull().default("mobile"),
+  source: varchar("source", { length: 160 }).notNull().default("Community report"),
+  sourceUrl: text("source_url"),
+  trust: varchar("trust", { length: 20 }).notNull().default("unverified"),
+  status: varchar("status", { length: 20 }).notNull().default("published"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const newsletterSubscribers = pgTable("newsletter_subscribers", {
   id: serial().primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
