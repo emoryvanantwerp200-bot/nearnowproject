@@ -690,9 +690,9 @@ const categoryLabels = {
 };
 
 const trustBadges = {
-  official: { label: "Official source", icon: "✅", className: "trust-official" },
-  community: { label: "Community report", icon: "🟡", className: "trust-community" },
-  unverified: { label: "Unverified", icon: "🔴", className: "trust-unverified" }
+  official: { label: "Official source", icon: "âœ…", className: "trust-official" },
+  community: { label: "Community report", icon: "ðŸŸ¡", className: "trust-community" },
+  unverified: { label: "Unverified", icon: "ðŸ”´", className: "trust-unverified" }
 };
 
 function areaKeyFromLabel(value) {
@@ -760,7 +760,7 @@ function renderFeed(items) {
 }
 
 async function loadFeed() {
-  feedList.innerHTML = '<article class="feed-card loading">Loading the live local feed…</article>';
+  feedList.innerHTML = '<article class="feed-card loading">Loading the live local feedâ€¦</article>';
   const params = new URLSearchParams({ area: activeFeedArea, category: activeFeedCategory });
   const areaLabel = areaLabels[activeFeedArea] || "your area";
   const categoryLabel =
