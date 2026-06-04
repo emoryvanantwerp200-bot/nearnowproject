@@ -191,11 +191,6 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 12px 28px rgba(27, 154, 170, 0.13);
 }
 
-.signup-button.apple {
-  background: linear-gradient(135deg, #17201b, #30423a);
-  color: #fff;
-}
-
 .signup-button.google {
   background: linear-gradient(135deg, #fff, var(--teal-soft));
 }
@@ -216,11 +211,6 @@ h1, h2, h3, h4, h5, h6 {
   color: #fff;
   font-size: 0.78rem;
   font-weight: 900;
-}
-
-.signup-button.apple .signup-icon {
-  background: #fff;
-  color: #17201b;
 }
 
 .hero {
@@ -2539,7 +2529,7 @@ body.auth-locked .footer {
   }
 }
 
-/* Real Google and Apple OAuth Buttons inside modal */
+/* OAuth buttons inside modal */
 .btn-social {
   display: flex;
   align-items: center;
@@ -2569,15 +2559,4 @@ body.auth-locked .footer {
 .btn-social.google:hover {
   background-color: #f8f9fa;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.btn-social.apple {
-  background: #000000;
-  color: #ffffff;
-  border: none;
-}
-
-.btn-social.apple:hover {
-  background-color: #1c1c1e;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
