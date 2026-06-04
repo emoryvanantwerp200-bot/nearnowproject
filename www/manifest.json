@@ -1,8 +1,8 @@
 {
-  "name": "NearNow — Real-Time Local Alerts",
+  "name": "NearNow â€” Real-Time Local Alerts",
   "short_name": "NearNow",
-  "description": "Crime alerts, severe weather, breaking news, traffic, and community updates — all filtered by how close they are to you.",
-  "start_url": "/app.html",
+  "description": "Crime alerts, severe weather, breaking news, traffic, and community updates â€” all filtered by how close they are to you.",
+  "start_url": "/app.html?app=1",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -70,7 +70,7 @@
     {
       "name": "Nearby Alerts",
       "short_name": "Nearby",
-      "url": "/app.html",
+      "url": "/app.html?app=1",
       "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
     }
   ]
