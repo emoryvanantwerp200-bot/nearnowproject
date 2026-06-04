@@ -195,7 +195,16 @@ function displayArea(area: string) {
 
 function renderFeed(items: FeedItem[], area: string) {
   const now = new Date().toUTCString();
-  const renderedItems = items.slice(0, 25).map((item) => {
+  const safeItems = items.length ? items : [{
+    title: "NearNow local RSS feed is active",
+    link: "https://www.near-now.com/",
+    pubDate: now,
+    guid: `nearnow-${area}-rss-active`,
+    categories: [],
+    sourceName: "NearNow",
+    sourceUrl: "https://www.near-now.com/feed.xml",
+  }];
+  const renderedItems = safeItems.slice(0, 25).map((item) => {
     const guid = item.guid || item.link;
     const pubDate = item.pubDate || now;
     return `    <item>
@@ -223,10 +232,20 @@ ${renderedItems}
 </rss>`;
 }
 
+function requestArea(req: Request) {
+  try {
+    const requestUrl = req.url && req.url.startsWith("http")
+      ? req.url
+      : `https://www.near-now.com${req.url || "/feed.xml"}`;
+    return normalizeArea(new URL(requestUrl).searchParams.get("area"));
+  } catch {
+    return "mobile";
+  }
+}
+
 export default async (req: Request) => {
   try {
-    const url = new URL(req.url);
-    const area = normalizeArea(url.searchParams.get("area"));
+    const area = requestArea(req);
     const items = await loadAreaItems(area);
 
     return new Response(renderFeed(items, area), {
@@ -236,10 +255,13 @@ export default async (req: Request) => {
       },
     });
   } catch (error) {
-    return Response.json(
-      { error: error instanceof Error ? error.message : "Unable to generate RSS feed." },
-      { status: 500 }
-    );
+    return new Response(renderFeed([], "mobile"), {
+      headers: {
+        "Content-Type": "application/rss+xml; charset=utf-8",
+        "Cache-Control": "public, max-age=300",
+        "X-NearNow-RSS-Fallback": error instanceof Error ? error.message.slice(0, 120) : "unknown",
+      },
+    });
   }
 };
 
