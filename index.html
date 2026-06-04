@@ -930,7 +930,7 @@
 
     <script src="./home.js"></script>
     <script type="module">
-      import { login, signup, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
+      import { login, signup, logout, getUser, handleAuthCallback, onAuthChange, oauthLogin, AUTH_EVENTS } from '@netlify/identity';
 
       const authOverlay = document.getElementById('authOverlay');
       const authTitle = document.getElementById('authTitle');
@@ -1123,6 +1123,30 @@
           updateAuthUI();
         }
       });
+
+      // Google and Apple OAuth Sign In
+      const googleBtn = document.querySelector('.signup-button.google');
+      const appleBtn = document.querySelector('.signup-button.apple');
+
+      if (googleBtn) {
+        googleBtn.addEventListener('click', () => {
+          try {
+            oauthLogin('google');
+          } catch (err) {
+            // oauthLogin throws a 'Redirecting...' AuthError, which is expected behavior
+          }
+        });
+      }
+
+      if (appleBtn) {
+        appleBtn.addEventListener('click', () => {
+          try {
+            oauthLogin('apple');
+          } catch (err) {
+            // oauthLogin throws a 'Redirecting...' AuthError, which is expected behavior
+          }
+        });
+      }
 
       async function init() {
         updateAuthUI();
