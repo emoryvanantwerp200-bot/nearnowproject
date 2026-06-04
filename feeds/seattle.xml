@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NearNow Seattle Local News</title>
+    <link>https://www.near-now.com/</link>
+    <atom:link href="https://www.near-now.com/feeds/seattle.xml" rel="self" type="application/rss+xml" />
+    <description>Seattle local headlines source catalog for NearNow.</description>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 04 Jun 2026 00:00:00 GMT</lastBuildDate>
+    <ttl>60</ttl>
+    <item><title>The Seattle Times RSS</title><link>https://www.seattletimes.com/feed/</link><guid isPermaLink="false">nearnow-seattle-times-rss</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><source url="https://www.seattletimes.com/feed/">The Seattle Times</source><description>Seattle-area headlines from The Seattle Times.</description></item>
+  </channel>
+</rss>

@@ -12,6 +12,10 @@
   Content-Type: application/rss+xml; charset=utf-8
   Cache-Control: public, max-age=3600
 
+/feeds/*.xml
+  Content-Type: application/rss+xml; charset=utf-8
+  Cache-Control: public, max-age=3600
+
 # Icons - cache aggressively
 /icons/*
   Cache-Control: public, max-age=31536000, immutable

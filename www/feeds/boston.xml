@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NearNow Boston Local News</title>
+    <link>https://www.near-now.com/</link>
+    <atom:link href="https://www.near-now.com/feeds/boston.xml" rel="self" type="application/rss+xml" />
+    <description>Boston local headlines source catalog for NearNow.</description>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 04 Jun 2026 00:00:00 GMT</lastBuildDate>
+    <ttl>60</ttl>
+    <item><title>Boston.com RSS</title><link>https://www.boston.com/feed/</link><guid isPermaLink="false">nearnow-boston-com-rss</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><source url="https://www.boston.com/feed/">Boston.com</source><description>Boston-area headlines from Boston.com.</description></item>
+    <item><title>CBS Boston RSS</title><link>https://www.cbsnews.com/boston/latest/rss/main</link><guid isPermaLink="false">nearnow-cbs-boston-rss</guid><pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate><source url="https://www.cbsnews.com/boston/latest/rss/main">CBS Boston</source><description>Boston-area headlines from CBS Boston.</description></item>
+  </channel>
+</rss>
