@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NearNow Mobile Local News</title>
+    <link>https://www.near-now.com/</link>
+    <atom:link href="https://www.near-now.com/feed.xml" rel="self" type="application/rss+xml" />
+    <description>Area-aware local headlines sourced from public RSS feeds for NearNow readers. The live site generates this feed dynamically from AL.com Mobile and other local sources selected by area.</description>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 29 May 2026 18:45:00 GMT</lastBuildDate>
+    <generator>NearNow</generator>
+    <image>
+      <url>https://www.near-now.com/icons/icon-512.png</url>
+      <title>NearNow Mobile Local News</title>
+      <link>https://www.near-now.com/</link>
+    </image>
+    <item>
+      <title>NearNow RSS feed is area-aware</title>
+      <link>https://www.al.com/mobile/</link>
+      <guid isPermaLink="false">nearnow-area-aware-rss-2026-05-29</guid>
+      <pubDate>Fri, 29 May 2026 18:45:00 GMT</pubDate>
+      <description>The deployed NearNow RSS feed is generated from local RSS sources based on the area query. Mobile uses AL.com Mobile, with a fallback to AL.com headlines filtered for Mobile and Baldwin County terms.</description>
+    </item>
+  </channel>
+</rss>

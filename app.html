@@ -14,6 +14,7 @@
 <title>NearNow | Social + Neighborhood + Family Safety</title>
 <meta name="theme-color" content="#132330">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="alternate" type="application/rss+xml" title="NearNow Updates" href="https://www.near-now.com/feed.xml">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
@@ -28,20 +29,18 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
   :root {
-    --bg: #f4f7f5;
-    --panel: #ffffff;
-    --panel-soft: #f0f4f1;
-    --ink: #0d1311;
-    --ink-soft: #4e5c54;
-    --line: rgba(11, 99, 67, 0.12);
-    --accent: #0b6343;
-    --accent-soft: rgba(11, 99, 67, 0.08);
-    --coral: #d32f2f;
-    --gold: #cb6e03;
-    --blue: #1976d2;
-    --violet: #5e35b1;
-    --radius-lg: 24px;
-    --radius-md: 16px;
+    --bg: #f2eee4;
+    --panel: #fffdf7;
+    --panel-soft: #f8f4ea;
+    --ink: #212c34;
+    --ink-soft: #536270;
+    --line: rgba(33, 44, 52, 0.14);
+    --accent: #1f7a68;
+    --accent-soft: rgba(31, 122, 104, 0.12);
+    --coral: #ce5d44;
+    --gold: #c88a2f;
+    --radius-lg: 20px;
+    --radius-md: 14px;
     --radius-sm: 10px;
   }
 
@@ -52,13 +51,10 @@
     color: var(--ink);
     min-height: 100vh;
     background:
-      radial-gradient(circle at 8% 5%, rgba(11, 99, 67, 0.12), transparent 30%),
-      radial-gradient(circle at 90% 12%, rgba(25, 118, 210, 0.12), transparent 30%),
-      radial-gradient(circle at 50% 85%, rgba(203, 110, 3, 0.08), transparent 35%),
-      radial-gradient(rgba(11, 99, 67, 0.03) 1.5px, transparent 1.5px),
-      linear-gradient(160deg, #f5f8f5 0%, #edf3ee 50%, #eaeaea 100%);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 20px 20px, 100% 100%;
-    padding: clamp(12px, 2vw, 24px);
+      radial-gradient(circle at 12% 0%, rgba(200, 138, 47, 0.18), transparent 34%),
+      radial-gradient(circle at 92% 10%, rgba(31, 122, 104, 0.19), transparent 27%),
+      linear-gradient(160deg, #f2eee4 0%, #ece5d8 52%, #ece6dc 100%);
+    padding: clamp(14px, 2.4vw, 28px);
     -webkit-font-smoothing: antialiased;
   }
 
@@ -67,10 +63,10 @@
     margin: 0 auto;
     border: 1px solid var(--line);
     border-radius: 28px;
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(14px);
+    background: rgba(255, 253, 247, 0.84);
+    backdrop-filter: blur(9px);
     overflow: hidden;
-    box-shadow: 0 24px 64px -10px rgba(11, 99, 67, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 16px 40px rgba(21, 30, 37, 0.08);
   }
 
   .topbar {
@@ -80,8 +76,7 @@
     gap: 14px;
     padding: 16px 22px;
     border-bottom: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 251, 241, 0.85);
   }
 
   .brand {
@@ -91,11 +86,6 @@
   }
 
   .brand span { color: var(--accent); }
-
-  .brand-home {
-    text-decoration: none;
-    color: inherit;
-  }
 
   .status-row {
     display: inline-flex;
@@ -987,9 +977,8 @@
 
   <div class="app-shell" id="app" data-tab="mix">
     <header class="topbar">
-      <a class="brand-home" href="/" aria-label="NearNow home"><h1 class="brand">Near<span>Now</span> Circle</h1></a>
+      <h1 class="brand">Near<span>Now</span> Circle</h1>
       <div style="display:flex;align-items:center;gap:14px;">
-        <a class="btn btn-soft" href="/" style="font-size:0.72rem;text-decoration:none;">← Home</a>
         <div class="status-row"><span class="dot"></span> <span id="statusText">Loading...</span></div>
         <button class="btn btn-soft" id="authBtn" style="font-size:0.72rem;">Sign In</button>
       </div>

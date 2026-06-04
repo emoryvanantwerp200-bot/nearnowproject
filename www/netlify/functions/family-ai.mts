@@ -27,33 +27,40 @@ export default async (req: Request, context: Context) => {
     const existingNames = existing.map((m) => m.name);
 
     // 2. Query Netlify AI Gateway (OpenAI GPT-4o-mini)
-    const gatewayUrl = process.env.NETLIFY_AI_GATEWAY_BASE_URL || "https://58d5e047-9dd6-4852-910f-59642faa43df.netlify.app/.netlify/ai/";
+    let gatewayBaseUrl = (
+      process.env.OPENAI_BASE_URL ||
+      process.env.NETLIFY_AI_GATEWAY_BASE_URL ||
+      "https://58d5e047-9dd6-4852-910f-59642faa43df.netlify.app/.netlify/ai/openai/v1"
+    ).replace(/\/$/, "");
+    if (gatewayBaseUrl.endsWith("/.netlify/ai")) {
+      gatewayBaseUrl = `${gatewayBaseUrl}/openai/v1`;
+    }
     const gatewayKey = process.env.NETLIFY_AI_GATEWAY_KEY;
+    const aiHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
 
-    if (!gatewayKey) {
-      return Response.json({ error: "AI Gateway Key is missing in environment variables." }, { status: 500 });
+    if (gatewayKey) {
+      aiHeaders.Authorization = `Bearer ${gatewayKey}`;
     }
 
-    const aiResponse = await fetch(`${gatewayUrl}openai/v1/chat/completions`, {
+    const aiResponse = await fetch(`${gatewayBaseUrl}/chat/completions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${gatewayKey}`,
-      },
+      headers: aiHeaders,
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
-            content: `You are an AI tracking assistant for a family safety app.
-Analyze the user's message and extract the following details for a family member:
+            content: `You are the opt-in AI Quick Track assistant for NearNow Circle, a private family safety feature.
+Analyze the user's message and extract a family-circle update:
 1. Name (e.g. "Bobby", "Mom", "Dad"). Ensure proper capitalization.
-2. Status (e.g. "At soccer practice", "Driving home", "At the supermarket"). Keep it short and clear (max 100 characters).
-3. Note (e.g. "Arriving at 5:00 PM", "Buying groceries"). Keep it descriptive (max 200 characters).
-4. Latitude (a floating-point number, e.g. 37.7749).
-5. Longitude (a floating-point number, e.g. -122.4194).
+2. Status (e.g. "At soccer practice", "Driving home", "At the supermarket"). Keep it short and clear, max 100 characters.
+3. Note (e.g. "Arriving at 5:00 PM", "Buying groceries"). Keep it descriptive, max 200 characters.
+4. Latitude as a floating-point number.
+5. Longitude as a floating-point number.
 
-You MUST assign a latitude and longitude. Generate mock/simulated GPS coordinates near the San Francisco Bay Area (center at 37.7749, -122.4194) based on the location/status described. Make sure different locations have different coordinates (e.g. vary them by 0.01 to 0.1 degrees so they are spread out on the map).
+This feature is for trusted family-circle check-ins only. Do not imply public tracking, surveillance, or emergency dispatch. If the user provides a precise place, use an approximate coordinate for that context. If no precise place is provided, generate a simulated approximate coordinate near Mobile, Alabama, centered around 30.6954, -88.0399. Vary simulated points by 0.01 to 0.08 degrees so different members do not overlap.
 
 Existing family members are: ${JSON.stringify(existingNames)}.
 If the person mentioned matches one of the existing family members (case-insensitive), use that exact name. If not, extract the new name.
