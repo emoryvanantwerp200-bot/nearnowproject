@@ -919,14 +919,59 @@
     justify-content: center;
   }
 
-  .auth-overlay[hidden] { display: none; }
+  .auth-overlay[hidden],
+  .verification-overlay[hidden] { display: none; }
 
-  .auth-modal {
+  .auth-modal,
+  .verification-modal {
     background: var(--panel);
     border-radius: var(--radius-lg);
     padding: 28px;
     width: min(420px, 90vw);
     box-shadow: 0 20px 60px rgba(21, 30, 37, 0.2);
+  }
+
+  .verification-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(33, 44, 52, 0.58);
+    backdrop-filter: blur(5px);
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .verification-modal h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.45rem;
+    margin-bottom: 8px;
+  }
+
+  .verification-modal p {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    margin-bottom: 14px;
+  }
+
+  .verification-code {
+    display: grid;
+    place-items: center;
+    min-height: 82px;
+    margin: 16px 0 12px;
+    border: 1px solid rgba(11, 99, 67, 0.28);
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(11, 99, 67, 0.1), rgba(25, 118, 210, 0.1));
+    color: var(--accent);
+    font-size: 2.1rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+  }
+
+  .verification-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 
   .auth-modal h2 {
@@ -1140,6 +1185,19 @@
           </svg>
           <span>Continue with Apple</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="verification-overlay" id="verificationOverlay" hidden>
+    <div class="verification-modal" role="dialog" aria-modal="true" aria-labelledby="verificationTitle" aria-describedby="verificationSubtitle">
+      <h2 id="verificationTitle">Your NearNow verification code</h2>
+      <p id="verificationSubtitle">Use this code to verify your Google signup and finish opening NearNow Circle.</p>
+      <div class="verification-code" id="verificationCode" aria-live="polite">000000</div>
+      <p id="verificationEmail"></p>
+      <div class="verification-actions">
+        <button class="btn btn-soft" type="button" id="copyVerificationBtn">Copy Code</button>
+        <button class="btn" type="button" id="continueVerificationBtn">Continue</button>
       </div>
     </div>
   </div>
@@ -1368,6 +1426,11 @@
   const authSubtitle = document.getElementById('authSubtitle');
   const authMessage = document.getElementById('authMessage');
   const authBtn = document.getElementById('authBtn');
+  const verificationOverlay = document.getElementById('verificationOverlay');
+  const verificationCode = document.getElementById('verificationCode');
+  const verificationEmail = document.getElementById('verificationEmail');
+  const copyVerificationBtn = document.getElementById('copyVerificationBtn');
+  const continueVerificationBtn = document.getElementById('continueVerificationBtn');
   const profileName = document.getElementById('profileName');
   const profileDetail = document.getElementById('profileDetail');
   const statusText = document.getElementById('statusText');
@@ -1462,6 +1525,33 @@
     activeElementBeforeModal = null;
   }
 
+  function createVerificationCode(user) {
+    const identity = user?.id || user?.email || 'guest';
+    const key = `nearnow-verification:${identity}`;
+    const saved = JSON.parse(localStorage.getItem(key) || 'null');
+    if (saved?.code && saved.expiresAt > Date.now()) {
+      return saved.code;
+    }
+
+    const values = new Uint32Array(1);
+    crypto.getRandomValues(values);
+    const code = String(100000 + (values[0] % 900000));
+    localStorage.setItem(key, JSON.stringify({
+      code,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 15 * 60 * 1000
+    }));
+    return code;
+  }
+
+  function showVerificationCode(user) {
+    const code = createVerificationCode(user);
+    verificationCode.textContent = code;
+    verificationEmail.textContent = user?.email ? `Signed in as ${user.email}. This code expires in 15 minutes.` : 'This code expires in 15 minutes.';
+    verificationOverlay.hidden = false;
+    copyVerificationBtn.focus();
+  }
+
   authBtn.addEventListener('click', async () => {
     if (currentUser) {
       await logout();
@@ -1508,6 +1598,7 @@
   const modalAppleBtn = document.getElementById('modalAppleBtn');
   if (modalGoogleBtn) {
     modalGoogleBtn.addEventListener('click', () => {
+      sessionStorage.setItem('nearnow-google-auth-started', '1');
       oauthLogin('google');
     });
   }
@@ -1516,6 +1607,19 @@
       oauthLogin('apple');
     });
   }
+
+  copyVerificationBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(verificationCode.textContent);
+      copyVerificationBtn.textContent = 'Copied';
+    } catch {
+      copyVerificationBtn.textContent = 'Select Code';
+    }
+  });
+
+  continueVerificationBtn.addEventListener('click', () => {
+    verificationOverlay.hidden = true;
+  });
 
   onAuthChange((event, user) => {
     if (event === AUTH_EVENTS.LOGIN || event === AUTH_EVENTS.TOKEN_REFRESH) {
@@ -2351,6 +2455,10 @@
       if (callbackResult && callbackResult.user) {
         currentUser = callbackResult.user;
         updateAuthUI();
+        if (callbackResult.type === 'oauth' || sessionStorage.getItem('nearnow-google-auth-started') === '1') {
+          sessionStorage.removeItem('nearnow-google-auth-started');
+          showVerificationCode(currentUser);
+        }
       }
     } catch { /* no callback pending */ }
 

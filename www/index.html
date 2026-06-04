@@ -948,6 +948,19 @@
       </div>
     </div>
 
+    <div class="verification-overlay" id="verificationOverlay" hidden>
+      <div class="verification-modal" role="dialog" aria-modal="true" aria-labelledby="verificationTitle" aria-describedby="verificationSubtitle">
+        <h2 id="verificationTitle">Your NearNow verification code</h2>
+        <p id="verificationSubtitle">Use this code to verify your Google signup and finish unlocking your local feed.</p>
+        <div class="verification-code" id="verificationCode" aria-live="polite">000000</div>
+        <p class="verification-note" id="verificationEmail"></p>
+        <div class="auth-actions">
+          <button class="btn secondary" type="button" id="copyVerificationBtn">Copy Code</button>
+          <button class="btn" type="button" id="continueVerificationBtn">Continue</button>
+        </div>
+      </div>
+    </div>
+
     <script src="./home.js"></script>
     <script type="module">
       import { oauthLogin, login, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
@@ -961,6 +974,11 @@
       const authEmail = document.getElementById('authEmail');
       const authPassword = document.getElementById('authPassword');
       const authCreateBtn = document.getElementById('authCreateBtn');
+      const verificationOverlay = document.getElementById('verificationOverlay');
+      const verificationCode = document.getElementById('verificationCode');
+      const verificationEmail = document.getElementById('verificationEmail');
+      const copyVerificationBtn = document.getElementById('copyVerificationBtn');
+      const continueVerificationBtn = document.getElementById('continueVerificationBtn');
 
       let currentUser = null;
 
@@ -1004,6 +1022,33 @@
 
       function setAuthMessage(message, type = 'success') {
         authMessage.innerHTML = message ? `<p class="${type}">${escapeHtml(message)}</p>` : '';
+      }
+
+      function createVerificationCode(user) {
+        const identity = user?.id || user?.email || 'guest';
+        const key = `nearnow-verification:${identity}`;
+        const saved = JSON.parse(localStorage.getItem(key) || 'null');
+        if (saved?.code && saved.expiresAt > Date.now()) {
+          return saved.code;
+        }
+
+        const values = new Uint32Array(1);
+        crypto.getRandomValues(values);
+        const code = String(100000 + (values[0] % 900000));
+        localStorage.setItem(key, JSON.stringify({
+          code,
+          createdAt: Date.now(),
+          expiresAt: Date.now() + 15 * 60 * 1000
+        }));
+        return code;
+      }
+
+      function showVerificationCode(user) {
+        const code = createVerificationCode(user);
+        verificationCode.textContent = code;
+        verificationEmail.textContent = user?.email ? `Signed in as ${user.email}. This code expires in 15 minutes.` : 'This code expires in 15 minutes.';
+        verificationOverlay.hidden = false;
+        copyVerificationBtn.focus();
       }
 
       async function signInWithEmail() {
@@ -1075,6 +1120,7 @@
       document.querySelectorAll('[data-provider="google"]').forEach(btn => {
         btn.addEventListener('click', async () => {
           try {
+            sessionStorage.setItem('nearnow-google-auth-started', '1');
             await oauthLogin('google');
           } catch (error) {
             showAuthModal();
@@ -1087,12 +1133,26 @@
       if (modalGoogleBtn) {
         modalGoogleBtn.addEventListener('click', async () => {
           try {
+            sessionStorage.setItem('nearnow-google-auth-started', '1');
             await oauthLogin('google');
           } catch (error) {
             setAuthMessage(error?.message || 'Google sign-in is not enabled yet. Use email sign-in for now.', 'error');
           }
         });
       }
+
+      copyVerificationBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(verificationCode.textContent);
+          copyVerificationBtn.textContent = 'Copied';
+        } catch {
+          copyVerificationBtn.textContent = 'Select Code';
+        }
+      });
+
+      continueVerificationBtn.addEventListener('click', () => {
+        verificationOverlay.hidden = true;
+      });
 
       onAuthChange((event, user) => {
         if (event === AUTH_EVENTS.LOGIN || event === AUTH_EVENTS.TOKEN_REFRESH) {
@@ -1112,6 +1172,10 @@
           if (callbackResult && callbackResult.user) {
             currentUser = callbackResult.user;
             updateAuthUI();
+            if (callbackResult.type === 'oauth' || sessionStorage.getItem('nearnow-google-auth-started') === '1') {
+              sessionStorage.removeItem('nearnow-google-auth-started');
+              showVerificationCode(currentUser);
+            }
           }
         } catch { /* no callback */ }
 

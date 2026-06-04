@@ -2367,11 +2367,13 @@ body.auth-locked .footer {
   animation: modal-fadeIn 0.25s ease-out;
 }
 
-.auth-overlay[hidden] {
+.auth-overlay[hidden],
+.verification-overlay[hidden] {
   display: none;
 }
 
-.auth-modal {
+.auth-modal,
+.verification-modal {
   background: var(--panel);
   border-radius: 16px;
   padding: 28px;
@@ -2382,15 +2384,47 @@ body.auth-locked .footer {
   border: 1px solid var(--line);
 }
 
-.auth-modal h2 {
+.auth-modal h2,
+.verification-modal h2 {
   font-size: 1.5rem;
   margin-bottom: 6px;
 }
 
-.auth-modal p {
+.auth-modal p,
+.verification-modal p {
   color: var(--muted);
   font-size: 0.88rem;
   margin-bottom: 16px;
+}
+
+.verification-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 19, 17, 0.68);
+  backdrop-filter: blur(5px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modal-fadeIn 0.25s ease-out;
+}
+
+.verification-code {
+  display: grid;
+  place-items: center;
+  min-height: 82px;
+  margin: 18px 0 12px;
+  border: 1px solid rgba(13, 148, 103, 0.3);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(13, 148, 103, 0.1), rgba(27, 154, 170, 0.11));
+  color: var(--green);
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+
+.verification-note {
+  text-align: center;
 }
 
 .auth-modal .form-group {
