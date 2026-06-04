@@ -599,7 +599,7 @@ textarea:focus-visible {
 }
 
 .free-strip span::before {
-  content: "â€¢";
+  content: "Ã¢â‚¬Â¢";
   font-size: 1.1rem;
   color: var(--green);
   line-height: 1;
@@ -2356,6 +2356,15 @@ textarea:focus-visible {
 }
 
 /* Auth Modal overlay */
+body.auth-locked {
+  overflow: hidden;
+}
+
+body.auth-locked #home,
+body.auth-locked .footer {
+  display: none;
+}
+
 .auth-overlay {
   position: fixed;
   inset: 0;
@@ -2376,7 +2385,9 @@ textarea:focus-visible {
   background: var(--panel);
   border-radius: 16px;
   padding: 28px;
-  width: min(420px, 90vw);
+  width: min(460px, 90vw);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
   box-shadow: var(--shadow);
   border: 1px solid var(--line);
 }
@@ -2433,8 +2444,39 @@ textarea:focus-visible {
   width: 100%;
 }
 
+.auth-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.auth-modal .btn.secondary {
+  color: var(--green);
+  background: rgba(13, 148, 103, 0.12);
+  border: 1px solid rgba(13, 148, 103, 0.3);
+}
+
 .auth-modal .btn:hover {
   transform: translateY(-1px);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--line);
 }
 
 .auth-toggle {
@@ -2486,6 +2528,14 @@ textarea:focus-visible {
   }
   .promo-text {
     font-size: 0.9rem;
+  }
+
+  .auth-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-modal {
+    padding: 22px;
   }
 }
 

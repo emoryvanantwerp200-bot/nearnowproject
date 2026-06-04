@@ -28,14 +28,14 @@
     }
     </script>
   </head>
-  <body>
+  <body class="auth-locked">
     <header class="topbar" aria-label="NearNow navigation">
       <a class="brand" href="#home" aria-label="NearNow home">
         <span class="brand-mark" aria-hidden="true">N</span>
         <span>NearNow</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href='/app' style='color: var(--green); font-weight: 800; border-bottom: 2px solid var(--green); display: flex; align-items: center; gap: 4px;'>📱 Launch Mobile App</a>
+        <a href='/app' style='color: var(--green); font-weight: 800; border-bottom: 2px solid var(--green); display: flex; align-items: center; gap: 4px;'>ðŸ“± Launch Mobile App</a>
         <a href="#feed">Live feed</a>
         <a href="#brief">Daily brief</a>
         <a href="#safety">Safety</a>
@@ -68,7 +68,7 @@
       </a>
     </header>
 
-    <main id="home">
+    <main id="home" aria-hidden="true">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-motion" aria-hidden="true">
           <span class="signal-dot dot-weather"></span>
@@ -297,7 +297,7 @@
                 <line x1="-12" y1="0" x2="12" y2="0" stroke="#475569" stroke-width="1"></line>
                 <polygon points="0,-12 -3.5,-3 0,-1" fill="#ce5d44"></polygon>
                 <polygon points="0,12 3.5,3 0,1" fill="#475569"></polygon>
-                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954Â° N / 88.0399Â° W</text>
+                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954Ã‚Â° N / 88.0399Ã‚Â° W</text>
               </g>
             </svg>
             <button class="pin weather visible" style="left: 26%; top: 24%" data-type="weather" data-title="Dense fog advisory">
@@ -341,13 +341,13 @@
       <section class="mobile-app-promo" id="mobile-app" aria-labelledby="promo-title">
         <div class="promo-card">
           <div class="promo-badge">Mobile-Friendly Option</div>
-          <h2 id="promo-title">📱 Switch to NearNow Mobile Web App</h2>
+          <h2 id="promo-title">ðŸ“± Switch to NearNow Mobile Web App</h2>
           <p class="promo-text">
             On a phone or tablet? Use the lightweight NearNow Circle web app, built specifically for touch interfaces. It includes neighborhood threads, real-time family safety tracking on an interactive map, and modern offline support.
           </p>
           <div class="promo-actions">
             <a class='btn-promo-primary' href='/app'>Open Mobile App</a>
-            <span class="promo-info">⚡ Runs instantly in your browser • No installation required</span>
+            <span class="promo-info">âš¡ Runs instantly in your browser â€¢ No installation required</span>
           </div>
         </div>
       </section>
@@ -913,13 +913,33 @@
     </footer>
 
     <!-- Auth overlay -->
-    <div class="auth-overlay" id="authOverlay" hidden>
+    <div class="auth-overlay" id="authOverlay">
       <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
-        <h2 id="authTitle">Sign In / Sign Up</h2>
-        <p id="authSubtitle">Access NearNow Circle using your Google or Apple account.</p>
+        <h2 id="authTitle">Sign in to see what is going on</h2>
+        <p id="authSubtitle">NearNow local alerts, daily briefs, family circles, reports, and live feeds are available after you sign in.</p>
         <div id="authMessage"></div>
+
+        <form class="auth-form" id="authForm">
+          <div class="form-group">
+            <label for="authName">Name</label>
+            <input class="text-input" id="authName" name="name" autocomplete="name" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label for="authEmail">Email</label>
+            <input class="text-input" id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="authPassword">Password</label>
+            <input class="text-input" id="authPassword" name="password" type="password" autocomplete="current-password" minlength="6" placeholder="Password" required>
+          </div>
+          <div class="auth-actions">
+            <button class="btn" type="submit" id="authSignInBtn">Sign In</button>
+            <button class="btn secondary" type="button" id="authCreateBtn">Create Account</button>
+          </div>
+        </form>
         
         <!-- Social Auth Buttons -->
+        <div class="auth-divider"><span>or continue with</span></div>
         <div class="social-auth-container" style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0 10px;">
           <button class="btn-social google" id="modalGoogleBtn">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
@@ -943,13 +963,17 @@
 
     <script src="./home.js"></script>
     <script type="module">
-      import { oauthLogin, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
+      import { oauthLogin, login, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
 
       const authOverlay = document.getElementById('authOverlay');
-      const authTitle = document.getElementById('authTitle');
-      const authSubtitle = document.getElementById('authSubtitle');
       const authMessage = document.getElementById('authMessage');
       const homepageAuthBtn = document.getElementById('homepageAuthBtn');
+      const home = document.getElementById('home');
+      const authForm = document.getElementById('authForm');
+      const authName = document.getElementById('authName');
+      const authEmail = document.getElementById('authEmail');
+      const authPassword = document.getElementById('authPassword');
+      const authCreateBtn = document.getElementById('authCreateBtn');
 
       let currentUser = null;
 
@@ -965,10 +989,18 @@
       function updateAuthUI() {
         if (currentUser) {
           const name = currentUser.user_metadata?.full_name || currentUser.email;
+          document.body.classList.remove('auth-locked');
+          document.body.classList.add('auth-ready');
+          home.removeAttribute('aria-hidden');
+          hideAuthModal();
           homepageAuthBtn.innerHTML = `<span>Sign Out (${escapeHtml(name)})</span>`;
           homepageAuthBtn.style.background = 'var(--red)';
           homepageAuthBtn.style.borderColor = 'var(--red)';
         } else {
+          document.body.classList.add('auth-locked');
+          document.body.classList.remove('auth-ready');
+          home.setAttribute('aria-hidden', 'true');
+          showAuthModal();
           homepageAuthBtn.innerHTML = '<span>Sign In / Sign Up</span>';
           homepageAuthBtn.style.background = 'var(--green)';
           homepageAuthBtn.style.borderColor = 'var(--green)';
@@ -976,12 +1008,41 @@
       }
 
       function showAuthModal() {
-        authMessage.innerHTML = '';
         authOverlay.hidden = false;
       }
 
       function hideAuthModal() {
         authOverlay.hidden = true;
+      }
+
+      function setAuthMessage(message, type = 'success') {
+        authMessage.innerHTML = message ? `<p class="${type}">${escapeHtml(message)}</p>` : '';
+      }
+
+      async function signInWithEmail() {
+        setAuthMessage('Signing you in...');
+        const user = await login(authEmail.value.trim(), authPassword.value);
+        currentUser = user;
+        updateAuthUI();
+      }
+
+      async function createAccount() {
+        setAuthMessage('Creating your NearNow account...');
+        const response = await fetch('/api/auth-bypass', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'register',
+            name: authName.value.trim(),
+            email: authEmail.value.trim(),
+            password: authPassword.value
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || 'Could not create that account.');
+        }
+        await signInWithEmail();
       }
 
       homepageAuthBtn.addEventListener('click', async () => {
@@ -990,30 +1051,56 @@
           currentUser = null;
           updateAuthUI();
         } else {
+          setAuthMessage('');
           showAuthModal();
+          authEmail.focus();
         }
       });
 
       authOverlay.addEventListener('click', (e) => {
-        if (e.target === authOverlay) hideAuthModal();
+        if (e.target === authOverlay && currentUser) hideAuthModal();
       });
 
       authOverlay.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && currentUser) {
           hideAuthModal();
+        }
+      });
+
+      authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          await signInWithEmail();
+        } catch (error) {
+          setAuthMessage(error?.message || 'Could not sign in. Check your email and password.', 'error');
+        }
+      });
+
+      authCreateBtn.addEventListener('click', async () => {
+        if (!authForm.reportValidity()) return;
+        try {
+          await createAccount();
+        } catch (error) {
+          setAuthMessage(error?.message || 'Could not create that account.', 'error');
         }
       });
 
       // Bind OAuth Click Handlers on the page top-signup and in modal
       document.querySelectorAll('[data-provider="google"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          oauthLogin('google');
+        btn.addEventListener('click', async () => {
+          try {
+            await oauthLogin('google');
+          } catch (error) {
+            showAuthModal();
+            setAuthMessage(error?.message || 'Google sign-in is not enabled yet. Use email sign-in for now.', 'error');
+          }
         });
       });
 
       document.querySelectorAll('[data-provider="apple"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          oauthLogin('apple');
+        btn.addEventListener('click', async () => {
+          showAuthModal();
+          setAuthMessage('Apple sign-in needs to be enabled in Netlify Identity. Use email sign-in for now.', 'error');
         });
       });
 
@@ -1021,13 +1108,17 @@
       const modalGoogleBtn = document.getElementById('modalGoogleBtn');
       const modalAppleBtn = document.getElementById('modalAppleBtn');
       if (modalGoogleBtn) {
-        modalGoogleBtn.addEventListener('click', () => {
-          oauthLogin('google');
+        modalGoogleBtn.addEventListener('click', async () => {
+          try {
+            await oauthLogin('google');
+          } catch (error) {
+            setAuthMessage(error?.message || 'Google sign-in is not enabled yet. Use email sign-in for now.', 'error');
+          }
         });
       }
       if (modalAppleBtn) {
         modalAppleBtn.addEventListener('click', () => {
-          oauthLogin('apple');
+          setAuthMessage('Apple sign-in needs to be enabled in Netlify Identity. Use email sign-in for now.', 'error');
         });
       }
 
