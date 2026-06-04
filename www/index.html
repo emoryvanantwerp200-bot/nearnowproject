@@ -57,9 +57,6 @@
           <span>Sign In / Sign Up</span>
         </button>
       </div>
-      <a class="status-link" href="https://app.netlify.com/projects/nearnowproject/deploys">
-        Netlify status
-      </a>
     </header>
 
     <main id="home" aria-hidden="true">
@@ -903,7 +900,6 @@
 
     <footer class="footer">
       <span>NearNow is free for local residents.</span>
-      <span>Deploys tracked on Netlify.</span>
     </footer>
 
     <!-- Auth overlay -->
@@ -950,12 +946,12 @@
 
     <div class="verification-overlay" id="verificationOverlay" hidden>
       <div class="verification-modal" role="dialog" aria-modal="true" aria-labelledby="verificationTitle" aria-describedby="verificationSubtitle">
-        <h2 id="verificationTitle">Your NearNow verification code</h2>
-        <p id="verificationSubtitle">Use this code to verify your Google signup and finish unlocking your local feed.</p>
-        <div class="verification-code" id="verificationCode" aria-live="polite">000000</div>
+        <h2 id="verificationTitle">Check your inbox</h2>
+        <p id="verificationSubtitle">We sent your NearNow verification code to the email connected to your Google account.</p>
+        <div class="verification-status" id="verificationStatus" aria-live="polite">Sending code...</div>
         <p class="verification-note" id="verificationEmail"></p>
         <div class="auth-actions">
-          <button class="btn secondary" type="button" id="copyVerificationBtn">Copy Code</button>
+          <button class="btn secondary" type="button" id="resendVerificationBtn">Resend Code</button>
           <button class="btn" type="button" id="continueVerificationBtn">Continue</button>
         </div>
       </div>
@@ -975,9 +971,9 @@
       const authPassword = document.getElementById('authPassword');
       const authCreateBtn = document.getElementById('authCreateBtn');
       const verificationOverlay = document.getElementById('verificationOverlay');
-      const verificationCode = document.getElementById('verificationCode');
+      const verificationStatus = document.getElementById('verificationStatus');
       const verificationEmail = document.getElementById('verificationEmail');
-      const copyVerificationBtn = document.getElementById('copyVerificationBtn');
+      const resendVerificationBtn = document.getElementById('resendVerificationBtn');
       const continueVerificationBtn = document.getElementById('continueVerificationBtn');
 
       let currentUser = null;
@@ -1024,31 +1020,37 @@
         authMessage.innerHTML = message ? `<p class="${type}">${escapeHtml(message)}</p>` : '';
       }
 
-      function createVerificationCode(user) {
-        const identity = user?.id || user?.email || 'guest';
-        const key = `nearnow-verification:${identity}`;
-        const saved = JSON.parse(localStorage.getItem(key) || 'null');
-        if (saved?.code && saved.expiresAt > Date.now()) {
-          return saved.code;
+      async function sendVerificationCode(user) {
+        const response = await fetch('/api/send-verification-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user?.email,
+            name: user?.user_metadata?.full_name || user?.email || 'NearNow user'
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || 'Could not send verification email.');
         }
-
-        const values = new Uint32Array(1);
-        crypto.getRandomValues(values);
-        const code = String(100000 + (values[0] % 900000));
-        localStorage.setItem(key, JSON.stringify({
-          code,
-          createdAt: Date.now(),
-          expiresAt: Date.now() + 15 * 60 * 1000
-        }));
-        return code;
+        return data;
       }
 
-      function showVerificationCode(user) {
-        const code = createVerificationCode(user);
-        verificationCode.textContent = code;
-        verificationEmail.textContent = user?.email ? `Signed in as ${user.email}. This code expires in 15 minutes.` : 'This code expires in 15 minutes.';
+      async function showVerificationSent(user) {
+        verificationStatus.textContent = 'Sending code...';
+        verificationStatus.className = 'verification-status';
+        verificationEmail.textContent = user?.email ? `Sending to ${user.email}.` : 'Sending to your Google account email.';
         verificationOverlay.hidden = false;
-        copyVerificationBtn.focus();
+        resendVerificationBtn.focus();
+        try {
+          await sendVerificationCode(user);
+          verificationStatus.textContent = 'Code sent. Check your inbox.';
+          verificationEmail.textContent = user?.email ? `Sent to ${user.email}. The code expires in 15 minutes.` : 'The code expires in 15 minutes.';
+        } catch (error) {
+          verificationStatus.textContent = error?.message || 'Could not send the verification email.';
+          verificationStatus.classList.add('error');
+          verificationEmail.textContent = 'Email delivery needs RESEND_API_KEY configured in Netlify.';
+        }
       }
 
       async function startGoogleAuth() {
@@ -1147,12 +1149,21 @@
         });
       }
 
-      copyVerificationBtn.addEventListener('click', async () => {
+      resendVerificationBtn.addEventListener('click', async () => {
+        if (!currentUser) return;
+        resendVerificationBtn.disabled = true;
+        resendVerificationBtn.textContent = 'Sending...';
         try {
-          await navigator.clipboard.writeText(verificationCode.textContent);
-          copyVerificationBtn.textContent = 'Copied';
+          await sendVerificationCode(currentUser);
+          verificationStatus.textContent = 'Code sent again. Check your inbox.';
+          verificationStatus.classList.remove('error');
+          resendVerificationBtn.textContent = 'Sent';
         } catch {
-          copyVerificationBtn.textContent = 'Select Code';
+          verificationStatus.textContent = 'Could not resend the code yet.';
+          verificationStatus.classList.add('error');
+          resendVerificationBtn.textContent = 'Try Again';
+        } finally {
+          resendVerificationBtn.disabled = false;
         }
       });
 
@@ -1180,7 +1191,7 @@
             updateAuthUI();
             if (callbackResult.type === 'oauth' || sessionStorage.getItem('nearnow-google-auth-started') === '1') {
               sessionStorage.removeItem('nearnow-google-auth-started');
-              showVerificationCode(currentUser);
+              showVerificationSent(currentUser);
             }
           }
         } catch { /* no callback */ }

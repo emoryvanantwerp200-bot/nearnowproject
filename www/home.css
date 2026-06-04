@@ -2409,18 +2409,24 @@ body.auth-locked .footer {
   animation: modal-fadeIn 0.25s ease-out;
 }
 
-.verification-code {
+.verification-status {
   display: grid;
   place-items: center;
-  min-height: 82px;
+  min-height: 76px;
   margin: 18px 0 12px;
   border: 1px solid rgba(13, 148, 103, 0.3);
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(13, 148, 103, 0.1), rgba(27, 154, 170, 0.11));
   color: var(--green);
-  font-size: 2.2rem;
+  font-size: 1rem;
   font-weight: 900;
-  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+.verification-status.error {
+  color: var(--red);
+  border-color: rgba(211, 47, 47, 0.28);
+  background: rgba(211, 47, 47, 0.08);
 }
 
 .verification-note {
