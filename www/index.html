@@ -1051,6 +1051,11 @@
         copyVerificationBtn.focus();
       }
 
+      async function startGoogleAuth() {
+        sessionStorage.setItem('nearnow-google-auth-started', '1');
+        await oauthLogin('google');
+      }
+
       async function signInWithEmail() {
         setAuthMessage('Signing you in...');
         const user = await login(authEmail.value.trim(), authPassword.value);
@@ -1083,9 +1088,12 @@
           currentUser = null;
           updateAuthUI();
         } else {
-          setAuthMessage('');
-          showAuthModal();
-          authEmail.focus();
+          try {
+            await startGoogleAuth();
+          } catch (error) {
+            showAuthModal();
+            setAuthMessage(error?.message || 'Google sign-in needs to be enabled in Netlify Identity.', 'error');
+          }
         }
       });
 
@@ -1120,8 +1128,7 @@
       document.querySelectorAll('[data-provider="google"]').forEach(btn => {
         btn.addEventListener('click', async () => {
           try {
-            sessionStorage.setItem('nearnow-google-auth-started', '1');
-            await oauthLogin('google');
+            await startGoogleAuth();
           } catch (error) {
             showAuthModal();
             setAuthMessage(error?.message || 'Google sign-in needs to be enabled in Netlify Identity.', 'error');
@@ -1133,8 +1140,7 @@
       if (modalGoogleBtn) {
         modalGoogleBtn.addEventListener('click', async () => {
           try {
-            sessionStorage.setItem('nearnow-google-auth-started', '1');
-            await oauthLogin('google');
+            await startGoogleAuth();
           } catch (error) {
             setAuthMessage(error?.message || 'Google sign-in is not enabled yet. Use email sign-in for now.', 'error');
           }

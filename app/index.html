@@ -1552,6 +1552,11 @@
     copyVerificationBtn.focus();
   }
 
+  async function startGoogleAuth() {
+    sessionStorage.setItem('nearnow-google-auth-started', '1');
+    await oauthLogin('google');
+  }
+
   authBtn.addEventListener('click', async () => {
     if (currentUser) {
       await logout();
@@ -1559,7 +1564,12 @@
       updateAuthUI();
       loadFamilyMembers();
     } else {
-      showAuthModal();
+      try {
+        await startGoogleAuth();
+      } catch (error) {
+        showAuthModal();
+        authMessage.innerHTML = `<p class="error">${escapeHtml(error?.message || 'Google sign-in needs to be enabled in Netlify Identity.')}</p>`;
+      }
     }
   });
 
@@ -1598,8 +1608,7 @@
   const modalAppleBtn = document.getElementById('modalAppleBtn');
   if (modalGoogleBtn) {
     modalGoogleBtn.addEventListener('click', () => {
-      sessionStorage.setItem('nearnow-google-auth-started', '1');
-      oauthLogin('google');
+      startGoogleAuth();
     });
   }
   if (modalAppleBtn) {
