@@ -19,6 +19,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./home.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "@netlify/identity": "/www/vendor/netlify-identity.js",
+        "gotrue-js": "/www/vendor/gotrue-js.js"
+      }
+    }
+    </script>
   </head>
   <body>
     <header class="topbar" aria-label="NearNow navigation">
@@ -27,6 +35,7 @@
         <span>NearNow</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
+        <a href="/app.html" style="color: var(--green); font-weight: 800; border-bottom: 2px solid var(--green); display: flex; align-items: center; gap: 4px;">📱 Launch Mobile App</a>
         <a href="#feed">Live feed</a>
         <a href="#brief">Daily brief</a>
         <a href="#safety">Safety</a>
@@ -42,6 +51,9 @@
         <button class="signup-button apple" type="button" data-provider="Apple">
           <span class="signup-icon" aria-hidden="true">A</span>
           <span>Sign up with Apple</span>
+        </button>
+        <button class="signup-button" type="button" id="homepageAuthBtn" style="background: var(--green); color: white; border-color: var(--green); font-weight: 800; cursor: pointer;">
+          <span>Sign In / Sign Up</span>
         </button>
       </div>
       <a class="status-link" href="https://app.netlify.com/projects/nearnowproject/deploys">
@@ -315,6 +327,20 @@
               <strong>Tap a marker</strong>
               <span>See the alert, source, and posted time.</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mobile-app-promo" id="mobile-app" aria-labelledby="promo-title">
+        <div class="promo-card">
+          <div class="promo-badge">Mobile-Friendly Option</div>
+          <h2 id="promo-title">📱 Switch to NearNow Mobile Web App</h2>
+          <p class="promo-text">
+            On a phone or tablet? Use the lightweight NearNow Circle web app, built specifically for touch interfaces. It includes neighborhood threads, real-time family safety tracking on an interactive map, and modern offline support.
+          </p>
+          <div class="promo-actions">
+            <a class="btn-promo-primary" href="/app.html">Open Mobile App</a>
+            <span class="promo-info">⚡ Runs instantly in your browser • No installation required</span>
           </div>
         </div>
       </section>
@@ -879,6 +905,245 @@
       <span>Deploys tracked on Netlify.</span>
     </footer>
 
+    <!-- Auth overlay -->
+    <div class="auth-overlay" id="authOverlay" hidden>
+      <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
+        <h2 id="authTitle">Sign In</h2>
+        <p id="authSubtitle">Sign in to your NearNow account.</p>
+        <div id="authMessage"></div>
+        <div class="form-group">
+          <label for="authName" id="authNameLabel" hidden>Full Name</label>
+          <input class="text-input" id="authName" type="text" placeholder="Your full name" hidden>
+          <label for="authEmail">Email</label>
+          <input class="text-input" id="authEmail" type="email" placeholder="you@example.com">
+          <label for="authPassword">Password</label>
+          <input class="text-input" id="authPassword" type="password" placeholder="Password">
+        </div>
+        <button class="btn" id="authSubmit" style="width:100%">Sign In</button>
+        <button class="btn" id="authBypassSubmit" style="width:100%; margin-top: 10px; background: linear-gradient(135deg, var(--green) 0%, #2e9d80 100%); color: #fff; font-weight: 800; border: none; box-shadow: 0 4px 15px rgba(11, 122, 104, 0.25);">⚡ Instant Guest Sign-In (No Code)</button>
+        <div class="auth-toggle">
+          <span id="authToggleText">No account?</span>
+          <button id="authToggleBtn">Sign up</button>
+        </div>
+      </div>
+    </div>
+
     <script src="./home.js"></script>
+    <script type="module">
+      import { login, signup, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
+
+      const authOverlay = document.getElementById('authOverlay');
+      const authTitle = document.getElementById('authTitle');
+      const authSubtitle = document.getElementById('authSubtitle');
+      const authEmail = document.getElementById('authEmail');
+      const authPassword = document.getElementById('authPassword');
+      const authName = document.getElementById('authName');
+      const authNameLabel = document.getElementById('authNameLabel');
+      const authSubmit = document.getElementById('authSubmit');
+      const authBypassSubmit = document.getElementById('authBypassSubmit');
+      const authToggleText = document.getElementById('authToggleText');
+      const authToggleBtn = document.getElementById('authToggleBtn');
+      const authMessage = document.getElementById('authMessage');
+      const homepageAuthBtn = document.getElementById('homepageAuthBtn');
+
+      let currentUser = null;
+      let authMode = 'login';
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function updateAuthUI() {
+        if (currentUser) {
+          const name = currentUser.user_metadata?.full_name || currentUser.email;
+          homepageAuthBtn.innerHTML = `<span>Sign Out (${escapeHtml(name)})</span>`;
+          homepageAuthBtn.style.background = 'var(--red)';
+          homepageAuthBtn.style.borderColor = 'var(--red)';
+        } else {
+          homepageAuthBtn.innerHTML = '<span>Sign In / Sign Up</span>';
+          homepageAuthBtn.style.background = 'var(--green)';
+          homepageAuthBtn.style.borderColor = 'var(--green)';
+        }
+      }
+
+      function showAuthModal(mode) {
+        authMode = mode;
+        authMessage.innerHTML = '';
+        authEmail.value = '';
+        authPassword.value = '';
+        authName.value = '';
+
+        if (mode === 'signup') {
+          authTitle.textContent = 'Create Account';
+          authSubtitle.textContent = 'Join NearNow for free and connect with neighbors.';
+          authSubmit.textContent = 'Create Account';
+          authToggleText.textContent = 'Already have an account?';
+          authToggleBtn.textContent = 'Sign in';
+          authName.hidden = false;
+          authNameLabel.hidden = false;
+        } else {
+          authTitle.textContent = 'Sign In';
+          authSubtitle.textContent = 'Sign in to your NearNow account.';
+          authSubmit.textContent = 'Sign In';
+          authToggleText.textContent = 'No account?';
+          authToggleBtn.textContent = 'Sign up';
+          authName.hidden = true;
+          authNameLabel.hidden = true;
+        }
+
+        authOverlay.hidden = false;
+      }
+
+      function hideAuthModal() {
+        authOverlay.hidden = true;
+      }
+
+      homepageAuthBtn.addEventListener('click', async () => {
+        if (currentUser) {
+          await logout();
+          currentUser = null;
+          updateAuthUI();
+        } else {
+          showAuthModal('login');
+        }
+      });
+
+      authToggleBtn.addEventListener('click', () => {
+        showAuthModal(authMode === 'login' ? 'signup' : 'login');
+      });
+
+      authOverlay.addEventListener('click', (e) => {
+        if (e.target === authOverlay) hideAuthModal();
+      });
+
+      authOverlay.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          hideAuthModal();
+        }
+      });
+
+      // Instant Guest Sign-In
+      authBypassSubmit.addEventListener('click', async () => {
+        authMessage.innerHTML = '<p style="color: var(--green); font-weight: bold;">Generating guest account...</p>';
+        authBypassSubmit.disabled = true;
+        authSubmit.disabled = true;
+
+        try {
+          const randNum = Math.floor(Math.random() * 100000);
+          const email = `guest.${randNum}@nearnow.app`;
+          const password = `GuestPass.${randNum}!`;
+          const name = `Guest Neighbor ${randNum}`;
+
+          const res = await fetch('/api/auth-bypass', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'register', email, password, name })
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || 'Failed to initialize instant sign-in.');
+          }
+
+          authMessage.innerHTML = '<p style="color: var(--green); font-weight: bold;">Logging you in...</p>';
+          currentUser = await login(email, password);
+          hideAuthModal();
+          updateAuthUI();
+        } catch (err) {
+          authMessage.innerHTML = `<p class="error">${escapeHtml(err.message || 'Bypass sign-in failed.')}</p>`;
+        } finally {
+          authBypassSubmit.disabled = false;
+          authSubmit.disabled = false;
+        }
+      });
+
+      authSubmit.addEventListener('click', async () => {
+        const email = authEmail.value.trim();
+        const password = authPassword.value;
+        authMessage.innerHTML = '';
+
+        if (!email || !password) {
+          authMessage.innerHTML = '<p class="error">Email and password are required.</p>';
+          return;
+        }
+
+        authSubmit.disabled = true;
+        authBypassSubmit.disabled = true;
+        authSubmit.textContent = 'Please wait...';
+
+        try {
+          if (authMode === 'signup') {
+            const name = authName.value.trim();
+            authMessage.innerHTML = '<p style="color: var(--green); font-weight: bold;">Creating your account instantly (no code needed)...</p>';
+            
+            const res = await fetch('/api/auth-bypass', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'register', email, password, name })
+            });
+            
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || 'Failed to create account.');
+            }
+
+            authMessage.innerHTML = '<p style="color: var(--green); font-weight: bold;">Logging you in...</p>';
+            currentUser = await login(email, password);
+            hideAuthModal();
+            updateAuthUI();
+          } else {
+            currentUser = await login(email, password);
+            hideAuthModal();
+            updateAuthUI();
+          }
+        } catch (err) {
+          const msg = err.status === 401 ? 'Invalid email or password.' :
+                      err.status === 403 ? 'Signups are not currently allowed.' :
+                      err.status === 422 ? 'Check your email and password format.' :
+                      (err.message || 'Something went wrong.');
+          authMessage.innerHTML = `<p class="error">${escapeHtml(msg)}</p>`;
+        } finally {
+          authSubmit.disabled = false;
+          authBypassSubmit.disabled = false;
+          authSubmit.textContent = authMode === 'signup' ? 'Create Account' : 'Sign In';
+        }
+      });
+
+      onAuthChange((event, user) => {
+        if (event === AUTH_EVENTS.LOGIN || event === AUTH_EVENTS.TOKEN_REFRESH) {
+          currentUser = user;
+          updateAuthUI();
+        } else if (event === AUTH_EVENTS.LOGOUT) {
+          currentUser = null;
+          updateAuthUI();
+        }
+      });
+
+      async function init() {
+        updateAuthUI();
+
+        try {
+          const callbackResult = await handleAuthCallback();
+          if (callbackResult && callbackResult.user) {
+            currentUser = callbackResult.user;
+            updateAuthUI();
+          }
+        } catch { /* no callback */ }
+
+        if (!currentUser) {
+          try {
+            currentUser = await getUser();
+            updateAuthUI();
+          } catch { /* not logged in */ }
+        }
+      }
+
+      init();
+    </script>
   </body>
 </html>

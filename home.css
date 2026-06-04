@@ -2279,3 +2279,212 @@ textarea:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Custom Mobile Promo & Authentication overlay */
+.mobile-app-promo {
+  padding: 30px clamp(18px, 5vw, 64px);
+  background: linear-gradient(135deg, rgba(11, 99, 67, 0.08) 0%, rgba(0, 131, 143, 0.08) 100%);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+
+.promo-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+.promo-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--green);
+  background: var(--green-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.promo-card h2 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+.promo-text {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 750px;
+  margin: 0 auto 20px;
+}
+
+.promo-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-promo-primary {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--green) 0%, #1c8859 100%);
+  padding: 12px 28px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(11, 99, 67, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-promo-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(11, 99, 67, 0.35);
+}
+
+.promo-info {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* Auth Modal overlay */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 19, 17, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modal-fadeIn 0.25s ease-out;
+}
+
+.auth-overlay[hidden] {
+  display: none;
+}
+
+.auth-modal {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 28px;
+  width: min(420px, 90vw);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+}
+
+.auth-modal h2 {
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+}
+
+.auth-modal p {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+}
+
+.auth-modal .form-group {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.auth-modal .form-group label {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.auth-modal .text-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--field);
+}
+
+.auth-modal .text-input:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 1px;
+}
+
+.auth-modal .btn {
+  border: 0;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 12px 14px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--green);
+  width: 100%;
+}
+
+.auth-modal .btn:hover {
+  transform: translateY(-1px);
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.auth-toggle button {
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#authMessage p.error {
+  color: var(--red);
+  background: rgba(211, 47, 47, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+#authMessage p.success {
+  color: var(--green);
+  background: rgba(11, 99, 67, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+@keyframes modal-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .promo-card {
+    padding: 20px;
+  }
+  .promo-card h2 {
+    font-size: 1.4rem;
+  }
+  .promo-text {
+    font-size: 0.9rem;
+  }
+}
