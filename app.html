@@ -919,6 +919,14 @@
     justify-content: center;
   }
 
+  body.auth-locked {
+    overflow: hidden;
+  }
+
+  body.auth-locked .app-shell {
+    display: none;
+  }
+
   .auth-overlay[hidden],
   .verification-overlay[hidden] { display: none; }
 
@@ -997,6 +1005,54 @@
     font-size: 0.82rem;
   }
 
+  .auth-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .auth-actions .btn {
+    width: 100%;
+  }
+
+  #authMessage p.error {
+    color: var(--coral);
+    background: rgba(211, 47, 47, 0.08);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+  }
+
+  #authMessage p.success {
+    color: var(--accent);
+    background: rgba(11, 99, 67, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+  }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0 0;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .auth-divider::before,
+  .auth-divider::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: var(--line);
+  }
+
   .auth-toggle {
     text-align: center;
     margin-top: 12px;
@@ -1014,7 +1070,7 @@
     text-decoration: underline;
   }
 
-  /* Real Google and Apple OAuth Buttons inside modal */
+  /* OAuth button inside modal */
   .btn-social {
     display: flex;
     align-items: center;
@@ -1044,17 +1100,6 @@
   .btn-social.google:hover {
     background-color: #f8f9fa;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);
-  }
-
-  .btn-social.apple {
-    background: #000000;
-    color: #ffffff;
-    border: none;
-  }
-
-  .btn-social.apple:hover {
-    background-color: #1c1c1e;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   }
 
   /* Add family form */
@@ -1159,15 +1204,35 @@
   }
 </style>
 </head>
-<body>
+<body class="auth-locked">
   <!-- Auth overlay -->
   <div class="auth-overlay" id="authOverlay" hidden>
     <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
-      <h2 id="authTitle">Sign In / Sign Up</h2>
-      <p id="authSubtitle">Access NearNow Circle using your Google or Apple account.</p>
+      <h2 id="authTitle">Sign in to NearNow Circle</h2>
+      <p id="authSubtitle">Create an account or sign in to see your local feed, family circle, reports, and neighborhood tools.</p>
       <div id="authMessage"></div>
+
+      <form class="auth-form" id="authForm">
+        <div class="form-group">
+          <label for="authName">Name</label>
+          <input class="text-input" id="authName" name="name" autocomplete="name" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label for="authEmail">Email</label>
+          <input class="text-input" id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="authPassword">Password</label>
+          <input class="text-input" id="authPassword" name="password" type="password" autocomplete="current-password" minlength="6" placeholder="Password" required>
+        </div>
+        <div class="auth-actions">
+          <button class="btn" type="submit" id="authSignInBtn">Sign In</button>
+          <button class="btn btn-soft" type="button" id="authCreateBtn">Create Account</button>
+        </div>
+      </form>
       
       <!-- Social Auth Buttons -->
+      <div class="auth-divider"><span>or continue with</span></div>
       <div class="social-auth-container" style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0 10px;">
         <button class="btn-social google" id="modalGoogleBtn">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
@@ -1177,13 +1242,6 @@
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
           <span>Continue with Google</span>
-        </button>
-        
-        <button class="btn-social apple" id="modalAppleBtn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
-            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.07 2.47.3 3.64 2.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .05-2.23.67-2.95 1.48-.63.72-1.19 1.86-1.04 2.96 1.12.09 2.27-.56 3-1.38z"/>
-          </svg>
-          <span>Continue with Apple</span>
         </button>
       </div>
     </div>
@@ -1401,7 +1459,7 @@
   </div>
 
 <script type="module">
-  import { oauthLogin, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
+  import { oauthLogin, login, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
 
   const feed = document.getElementById('feed');
   const filters = document.getElementById('filters');
@@ -1426,6 +1484,11 @@
   const authSubtitle = document.getElementById('authSubtitle');
   const authMessage = document.getElementById('authMessage');
   const authBtn = document.getElementById('authBtn');
+  const authForm = document.getElementById('authForm');
+  const authName = document.getElementById('authName');
+  const authEmail = document.getElementById('authEmail');
+  const authPassword = document.getElementById('authPassword');
+  const authCreateBtn = document.getElementById('authCreateBtn');
   const verificationOverlay = document.getElementById('verificationOverlay');
   const verificationCode = document.getElementById('verificationCode');
   const verificationEmail = document.getElementById('verificationEmail');
@@ -1485,17 +1548,21 @@
   function updateAuthUI() {
     if (currentUser) {
       const name = currentUser.user_metadata?.full_name || currentUser.email;
+      document.body.classList.remove('auth-locked');
       profileName.textContent = name;
       profileDetail.textContent = viewerArea || 'Set your area below';
       authBtn.textContent = 'Sign Out';
+      hideAuthModal();
       composerSection.style.display = '';
       reelCompose.style.display = '';
       addBoardForm.style.display = '';
       addFamilyForm.style.display = '';
     } else {
+      document.body.classList.add('auth-locked');
       profileName.textContent = 'Not signed in';
       profileDetail.textContent = 'Sign in to participate';
       authBtn.textContent = 'Sign In';
+      showAuthModal();
       composerSection.style.display = 'none';
       reelCompose.style.display = 'none';
       addBoardForm.style.display = 'none';
@@ -1507,7 +1574,6 @@
 
   function showAuthModal() {
     activeElementBeforeModal = document.activeElement;
-    authMessage.innerHTML = '';
     authOverlay.hidden = false;
 
     // Focus Google login button for accessibility/keyboard convenience
@@ -1552,6 +1618,37 @@
     copyVerificationBtn.focus();
   }
 
+  function setAuthMessage(message, type = 'success') {
+    authMessage.innerHTML = message ? `<p class="${type}">${escapeHtml(message)}</p>` : '';
+  }
+
+  async function signInWithEmail() {
+    setAuthMessage('Signing you in...');
+    const user = await login(authEmail.value.trim(), authPassword.value);
+    currentUser = user;
+    updateAuthUI();
+    await loadAll();
+  }
+
+  async function createAccount() {
+    setAuthMessage('Creating your NearNow account...');
+    const response = await fetch('/api/auth-bypass', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'register',
+        name: authName.value.trim(),
+        email: authEmail.value.trim(),
+        password: authPassword.value
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || 'Could not create that account.');
+    }
+    await signInWithEmail();
+  }
+
   async function startGoogleAuth() {
     sessionStorage.setItem('nearnow-google-auth-started', '1');
     await oauthLogin('google');
@@ -1574,13 +1671,13 @@
   });
 
   authOverlay.addEventListener('click', (e) => {
-    if (e.target === authOverlay) hideAuthModal();
+    if (e.target === authOverlay && currentUser) hideAuthModal();
   });
 
   // Close with escape key and trap focus inside the modal for accessibility
   authOverlay.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      hideAuthModal();
+      if (currentUser) hideAuthModal();
       e.preventDefault();
     } else if (e.key === 'Tab') {
       const focusableElements = authOverlay.querySelectorAll('button:not([hidden])');
@@ -1603,17 +1700,33 @@
     }
   });
 
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmail();
+    } catch (error) {
+      setAuthMessage(error?.message || 'Could not sign in. Check your email and password.', 'error');
+    }
+  });
+
+  authCreateBtn.addEventListener('click', async () => {
+    if (!authForm.reportValidity()) return;
+    try {
+      await createAccount();
+    } catch (error) {
+      setAuthMessage(error?.message || 'Could not create that account.', 'error');
+    }
+  });
+
   // Bind OAuth Click Handlers in modal
   const modalGoogleBtn = document.getElementById('modalGoogleBtn');
-  const modalAppleBtn = document.getElementById('modalAppleBtn');
   if (modalGoogleBtn) {
-    modalGoogleBtn.addEventListener('click', () => {
-      startGoogleAuth();
-    });
-  }
-  if (modalAppleBtn) {
-    modalAppleBtn.addEventListener('click', () => {
-      oauthLogin('apple');
+    modalGoogleBtn.addEventListener('click', async () => {
+      try {
+        await startGoogleAuth();
+      } catch (error) {
+        setAuthMessage(error?.message || 'Google sign-in needs to be enabled in Netlify Identity.', 'error');
+      }
     });
   }
 
