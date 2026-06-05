@@ -1,7 +1,7 @@
 {
-  "name": "NearNow â€” Real-Time Local Alerts",
+  "name": "NearNow — Real-Time Local Alerts",
   "short_name": "NearNow",
-  "description": "Crime alerts, severe weather, breaking news, traffic, and community updates â€” all filtered by how close they are to you.",
+  "description": "Crime alerts, severe weather, breaking news, traffic, and community updates — all filtered by how close they are to you.",
   "start_url": "/app.html?app=1",
   "scope": "/",
   "display": "standalone",

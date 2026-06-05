@@ -775,25 +775,43 @@
       min-height: auto;
     }
 
-    aside,
+    aside {
+      display: none !important;
+    }
+
     main,
     .right-rail {
       border: 0;
       display: none;
     }
 
-    .app-shell[data-tab="mix"] main,
-    .app-shell[data-tab="mix"] .right-rail,
-    .app-shell[data-tab="mix"] aside { display: block; }
+    .app-shell[data-tab="mix"] main {
+      display: block;
+    }
 
-    .app-shell[data-tab="neighbors"] .right-rail { display: grid; }
+    .app-shell[data-tab="newsletter"] main {
+      display: block;
+    }
 
-    .app-shell[data-tab="family"] .right-rail,
-    .app-shell[data-tab="family"] aside { display: block; }
+    .app-shell[data-tab="neighbors"] .right-rail {
+      display: block;
+    }
+    .app-shell[data-tab="neighbors"] .right-rail > .module:nth-child(1) {
+      display: block;
+    }
+    .app-shell[data-tab="neighbors"] .right-rail > .module:nth-child(2) {
+      display: none;
+    }
 
-    .app-shell[data-tab="family"] .module:first-child { order: 2; }
-
-    .app-shell[data-tab="newsletter"] main { display: block; }
+    .app-shell[data-tab="family"] .right-rail {
+      display: block;
+    }
+    .app-shell[data-tab="family"] .right-rail > .module:nth-child(1) {
+      display: none;
+    }
+    .app-shell[data-tab="family"] .right-rail > .module:nth-child(2) {
+      display: block;
+    }
 
     .mobile-tabs { display: grid; }
 
@@ -837,7 +855,10 @@
     min-height: auto;
   }
 
-  html.webapp-mobile aside,
+  html.webapp-mobile aside {
+    display: none !important;
+  }
+
   html.webapp-mobile main,
   html.webapp-mobile .right-rail {
     border: 0;
@@ -848,26 +869,31 @@
     padding: 14px;
   }
 
-  html.webapp-mobile .app-shell[data-tab="mix"] main,
-  html.webapp-mobile .app-shell[data-tab="mix"] .right-rail,
-  html.webapp-mobile .app-shell[data-tab="mix"] aside {
+  html.webapp-mobile .app-shell[data-tab="mix"] main {
+    display: block;
+  }
+
+  html.webapp-mobile .app-shell[data-tab="newsletter"] main {
     display: block;
   }
 
   html.webapp-mobile .app-shell[data-tab="neighbors"] .right-rail {
-    display: grid;
-  }
-
-  html.webapp-mobile .app-shell[data-tab="family"] .right-rail,
-  html.webapp-mobile .app-shell[data-tab="family"] aside {
     display: block;
   }
-
-  html.webapp-mobile .app-shell[data-tab="family"] .module:first-child {
-    order: 2;
+  html.webapp-mobile .app-shell[data-tab="neighbors"] .right-rail > .module:nth-child(1) {
+    display: block;
+  }
+  html.webapp-mobile .app-shell[data-tab="neighbors"] .right-rail > .module:nth-child(2) {
+    display: none;
   }
 
-  html.webapp-mobile .app-shell[data-tab="newsletter"] main {
+  html.webapp-mobile .app-shell[data-tab="family"] .right-rail {
+    display: block;
+  }
+  html.webapp-mobile .app-shell[data-tab="family"] .right-rail > .module:nth-child(1) {
+    display: none;
+  }
+  html.webapp-mobile .app-shell[data-tab="family"] .right-rail > .module:nth-child(2) {
     display: block;
   }
 
@@ -1270,7 +1296,7 @@
     <header class="topbar">
       <a class="brand-home" href="/" aria-label="NearNow home"><h1 class="brand">Near<span>Now</span> Circle</h1></a>
       <div style="display:flex;align-items:center;gap:14px;">
-        <a class="btn btn-soft" href="/" style="font-size:0.72rem;text-decoration:none;">â† Home</a>
+        <a class="btn btn-soft" href="/" style="font-size:0.72rem;text-decoration:none;">← Home</a>
         <div class="status-row"><span class="dot"></span> <span id="statusText">Loading...</span></div>
         <button class="btn btn-soft" id="authBtn" style="font-size:0.72rem;">Sign In</button>
       </div>
@@ -1284,7 +1310,7 @@
         </div>
         <ul class="menu" id="sidebarMenu" role="tablist" aria-label="Feed Navigation">
           <li role="presentation"><button role="tab" aria-selected="true" class="active" data-tab="mix">Mixed Home Feed</button></li>
-          <li role="presentation"><button role="tab" aria-selected="false" data-tab="newsletter" style="border-left: 3px solid var(--accent); padding-left: 8px;">ðŸ“¬ Weekly Newsletter</button></li>
+          <li role="presentation"><button role="tab" aria-selected="false" data-tab="newsletter" style="border-left: 3px solid var(--accent); padding-left: 8px;">📬 Weekly Newsletter</button></li>
           <li role="presentation"><button role="tab" aria-selected="false" data-tab="mix">Street Threads</button></li>
           <li role="presentation"><button role="tab" aria-selected="false" data-tab="mix">Garage Sale Board</button></li>
           <li role="presentation"><button role="tab" aria-selected="false" data-tab="mix">Emergency Check-in</button></li>
@@ -1354,27 +1380,27 @@
               <div class="editorial-header">
                 <span class="editorial-category">NearNow Pulse Weekly</span>
                 <h2 class="editorial-title">The Cedar Grove Safety & Transit Briefing</h2>
-                <p class="editorial-meta">Compiled Friday, May 29, 2026 â€¢ Issue #12 â€¢ Verified Radius: 10 miles</p>
+                <p class="editorial-meta">Compiled Friday, May 29, 2026 • Issue #12 • Verified Radius: 10 miles</p>
               </div>
               
               <div class="editorial-body">
                 <div class="editorial-section">
-                  <h3><span class="emoji-icon">ðŸš¨</span> Safety & Incident Alerts</h3>
+                  <h3><span class="emoji-icon">🚨</span> Safety & Incident Alerts</h3>
                   <p>Increased safety patrols are scheduled along the <strong>Government Street Corridor</strong> after three verified reports of package thefts. Neighbors are advised to request signature confirmations for valuable deliveries. No physical safety incidents reported this week.</p>
                 </div>
                 
                 <div class="editorial-section">
-                  <h3><span class="emoji-icon">ðŸš§</span> Traffic & Transit Disruptions</h3>
+                  <h3><span class="emoji-icon">🚧</span> Traffic & Transit Disruptions</h3>
                   <p>Major municipal utility maintenance begins Monday on <strong>Broad Street</strong>. Lane closures will be active from 7:00 AM to 4:00 PM daily. Expect delays of 10-15 minutes during the morning peak hour. Alternate route: Maple Avenue.</p>
                 </div>
                 
                 <div class="editorial-section">
-                  <h3><span class="emoji-icon">â›ˆï¸</span> Weather & Incident Advisory</h3>
+                  <h3><span class="emoji-icon">⛈️</span> Weather & Incident Advisory</h3>
                   <p>A severe weather front is tracking towards the district with localized thunderstorms predicted for Saturday evening. Neighbors planning weekend garage sales are encouraged to secure loose outdoor items by 5:00 PM.</p>
                 </div>
 
                 <div class="editorial-section">
-                  <h3><span class="emoji-icon">ðŸ’¡</span> Neighborhood Spotlight</h3>
+                  <h3><span class="emoji-icon">💡</span> Neighborhood Spotlight</h3>
                   <p>The Cedar Grove PTA is hosting a community-wide bicycle safety workshop this Saturday, May 30, at the regional library starting at 10:00 AM. Refreshments and free reflective wheel stickers will be provided for all kids.</p>
                 </div>
               </div>
@@ -1434,11 +1460,11 @@
 
           <!-- AI Tracker element -->
           <div class="ai-tracker-box" id="aiFamilyTracker" style="display: none;">
-            <h3><span>âœ¨</span> AI Quick Track</h3>
+            <h3><span>✨</span> AI Quick Track</h3>
             <p style="font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 4px;">Type or paste an update to track automatically with AI:</p>
             <label for="aiFamilyInput" class="sr-only">AI Quick Track Update</label>
             <textarea class="text-input" id="aiFamilyInput" placeholder="e.g. Mom just arrived at the grocery store" rows="2" style="font-family: inherit; font-size: 0.86rem; padding: 8px; resize: vertical; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--line);"></textarea>
-            <button class="btn btn-soft" id="aiFamilyBtn" type="button" style="margin-top: 4px; width: 100%;">Track with AI âœ¨</button>
+            <button class="btn btn-soft" id="aiFamilyBtn" type="button" style="margin-top: 4px; width: 100%;">Track with AI ✨</button>
             <div class="ai-tracker-status" id="aiFamilyStatus" style="display: none; margin-top: 6px; padding: 6px; border-radius: 6px; font-size: 0.8rem;"></div>
           </div>
 
@@ -2223,7 +2249,7 @@
       article.className = 'family-item';
       
       const hasCoords = row.latitude !== null && row.longitude !== null;
-      const coordsBadge = hasCoords ? ` <span class="tag tag-family" style="font-size:0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">ðŸ“ Map Pin</span>` : '';
+      const coordsBadge = hasCoords ? ` <span class="tag tag-family" style="font-size:0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700;">📍 Map Pin</span>` : '';
 
       article.innerHTML = `
         <div class="line-1"><span>${escapeHtml(row.name)}${coordsBadge}</span><span>${escapeHtml(row.status)}</span></div>
@@ -2317,7 +2343,7 @@
     aiStatus.className = 'ai-tracker-status';
     aiStatus.style.background = 'rgba(31, 122, 104, 0.1)';
     aiStatus.style.color = 'var(--accent)';
-    aiStatus.innerText = 'Analyzing with AI tracking... âœ¨';
+    aiStatus.innerText = 'Analyzing with AI tracking... ✨';
     document.getElementById('aiFamilyBtn').disabled = true;
 
     try {
@@ -2485,7 +2511,7 @@
             widgetStatusBox.innerHTML = `
               <div class="status-indicator active">
                 <span class="dot" style="display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px;"></span>
-                <span class="status-lbl" style="color: var(--accent); font-weight: bold;">âœ“ Subscribed & Active</span>
+                <span class="status-lbl" style="color: var(--accent); font-weight: bold;">✓ Subscribed & Active</span>
               </div>
             `;
             widgetSubmitBtn.textContent = 'Unsubscribe';

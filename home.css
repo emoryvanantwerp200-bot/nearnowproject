@@ -1782,13 +1782,42 @@ textarea:focus-visible {
     position: static;
     align-items: flex-start;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+    padding: 16px 20px;
   }
 
   .nav-links {
     width: 100%;
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 16px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links a {
+    flex-shrink: 0;
+  }
+
+  .top-signup {
+    width: 100%;
+    display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .top-signup button {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .status-link {
