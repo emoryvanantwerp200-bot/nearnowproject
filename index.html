@@ -102,6 +102,9 @@
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href='/app' style='color: var(--green); font-weight: 800; border-bottom: 2px solid var(--green); display: flex; align-items: center; gap: 4px;'>📱 Launch Mobile App</a>
+        <button id="enterMobileBtn" style="color: var(--accent); font-weight: 800; border: 1.5px solid var(--accent); background: transparent; padding: 4px 12px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; font-size: 0.85rem; margin-right: 8px;">
+          📱 Mobile Mode
+        </button>
         <a href="#feed">Live feed</a>
         <a href="#brief">Daily brief</a>
         <a href="#safety">Safety</a>
@@ -121,6 +124,14 @@
         </button>
         <button class="signup-button" type="button" id="homepageAuthBtn" style="background: var(--green); color: white; border-color: var(--green); font-weight: 800; cursor: pointer;">
           <span>Sign In / Sign Up</span>
+        </button>
+      </div>
+      <div class="mobile-topbar-controls" style="display: none; align-items: center; gap: 8px;">
+        <button id="exitMobileBtn" style="background: var(--accent-soft); color: var(--accent); border: 1.5px solid var(--line); border-radius: 20px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+          🖥️ Desktop View
+        </button>
+        <button id="mobileAuthBtn" style="background: var(--green); color: white; border: none; border-radius: 20px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: all 0.2s;">
+          Sign In
         </button>
       </div>
     </header>
@@ -408,8 +419,11 @@
             <p class="promo-text" style="font-size: 1.05rem; line-height: 1.5; color: var(--ink-soft); margin-bottom: 24px;">
               On a phone or tablet? Use the lightweight NearNow Circle web app, optimized specifically for touch interfaces. It includes neighborhood threads, real-time family safety tracking on an interactive map, and modern offline support.
             </p>
-            <div class="promo-actions" style="display: flex; flex-direction: column; gap: 8px;">
-              <a class='btn-promo-primary' href='/app' style="background: var(--accent); color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; text-align: center; max-width: 250px; transition: transform 0.2s ease;">Open Mobile App</a>
+            <div class="promo-actions" style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a class='btn-promo-primary' href='/app' style="background: var(--accent); color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; text-align: center; min-width: 180px; transition: transform 0.2s ease;">Open Mobile App</a>
+                <button id="promoMobileModeBtn" style="background: white; color: var(--accent); border: 2px solid var(--accent); padding: 10px 32px; border-radius: 12px; font-weight: 800; cursor: pointer; min-width: 180px; transition: transform 0.2s ease; display: inline-block;">📱 Try Mobile Layout</button>
+              </div>
               <span class="promo-info" style="font-size: 0.8rem; color: var(--ink-soft);">⚡ Runs instantly in your browser • No installation required</span>
             </div>
           </div>
@@ -1117,6 +1131,44 @@
         </div>
       </div>
     </div>
+
+    <!-- Bottom Mobile Navigation Bar for Site-wide Mobile First Mode -->
+    <nav class="site-mobile-tabs" aria-label="Site sections" role="tablist" style="display: none;">
+      <button class="tab-btn active" data-tab="home" role="tab" aria-selected="true" aria-controls="homeTabContent">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Home</span>
+      </button>
+      <button class="tab-btn" data-tab="brief" role="tab" aria-selected="false" aria-controls="briefTabContent">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+          <path d="M6 6h10"/>
+          <path d="M6 10h10"/>
+        </svg>
+        <span>Brief</span>
+      </button>
+      <button class="tab-btn" data-tab="feed" role="tab" aria-selected="false" aria-controls="feedTabContent">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Feed</span>
+      </button>
+      <button class="tab-btn" data-tab="safety" role="tab" aria-selected="false" aria-controls="safetyTabContent">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span>Safety</span>
+      </button>
+      <button class="tab-btn" data-tab="places" role="tab" aria-selected="false" aria-controls="placesTabContent">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+        </svg>
+        <span>Places</span>
+      </button>
+    </nav>
 
     <script src="./home.js"></script>
     <script type="module">

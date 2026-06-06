@@ -925,3 +925,121 @@ function initPhoneSimulator() {
 // Initialize on page load
 loadHeroStats();
 initPhoneSimulator();
+
+/* ---------- Site-Wide Mobile-First Mode Controller ---------- */
+
+function initSiteMobileFirstMode() {
+  const enterMobileBtn = document.getElementById('enterMobileBtn');
+  const exitMobileBtn = document.getElementById('exitMobileBtn');
+  const promoMobileModeBtn = document.getElementById('promoMobileModeBtn');
+  const mobileAuthBtn = document.getElementById('mobileAuthBtn');
+  const homepageAuthBtn = document.getElementById('homepageAuthBtn');
+  const tabButtons = document.querySelectorAll('.site-mobile-tabs .tab-btn');
+  const mainScrollContainer = document.getElementById('home');
+
+  // Toggle View Modes
+  function setSiteViewMode(mode) {
+    if (mode === 'mobile') {
+      document.body.classList.add('site-mobile-first');
+      if (!document.body.getAttribute('data-site-tab')) {
+        document.body.setAttribute('data-site-tab', 'home');
+      }
+      localStorage.setItem('nn-view-mode', 'mobile');
+      
+      // Render floating layout helper for desktop simulation
+      let hint = document.querySelector('.mobile-layout-hint');
+      if (!hint && window.innerWidth >= 768) {
+        hint = document.createElement('div');
+        hint.className = 'mobile-layout-hint';
+        hint.innerHTML = '<strong>📱 Mobile Simulator Mode</strong><span>Experience the mobile app layout on desktop.</span>';
+        document.body.appendChild(hint);
+      }
+    } else {
+      document.body.classList.remove('site-mobile-first');
+      localStorage.setItem('nn-view-mode', 'desktop');
+      const hint = document.querySelector('.mobile-layout-hint');
+      if (hint) hint.remove();
+    }
+  }
+
+  if (enterMobileBtn) {
+    enterMobileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      setSiteViewMode('mobile');
+    });
+  }
+
+  if (exitMobileBtn) {
+    exitMobileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      setSiteViewMode('desktop');
+    });
+  }
+
+  if (promoMobileModeBtn) {
+    promoMobileModeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      setSiteViewMode('mobile');
+      // Scroll to top of simulated view
+      if (mainScrollContainer) mainScrollContainer.scrollTop = 0;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Hook tab buttons
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.body.setAttribute('data-site-tab', tab);
+      
+      // Set active tab class
+      tabButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+
+      // Scroll view back to top
+      if (mainScrollContainer) {
+        mainScrollContainer.scrollTop = 0;
+      }
+      window.scrollTo({ top: 0 });
+    });
+  });
+
+  // DOM Authentication State Mirroring
+  if (mobileAuthBtn && homepageAuthBtn) {
+    mobileAuthBtn.addEventListener('click', () => {
+      homepageAuthBtn.click();
+    });
+
+    // Observer to track Sign In / Sign Out changes on homepageAuthBtn
+    const authObserver = new MutationObserver(() => {
+      const isLoggedOut = homepageAuthBtn.textContent.includes('Sign In');
+      mobileAuthBtn.textContent = isLoggedOut ? 'Sign In' : 'Sign Out';
+      mobileAuthBtn.style.background = isLoggedOut ? 'var(--green)' : 'var(--red)';
+    });
+
+    authObserver.observe(homepageAuthBtn, { childList: true, characterData: true, subtree: true });
+    
+    // Initial sync
+    const isLoggedOut = homepageAuthBtn.textContent.includes('Sign In');
+    mobileAuthBtn.textContent = isLoggedOut ? 'Sign In' : 'Sign Out';
+    mobileAuthBtn.style.background = isLoggedOut ? 'var(--green)' : 'var(--red)';
+  }
+
+  // Load initial view mode from localStorage or URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const modeParam = urlParams.get('mode') || urlParams.get('view');
+  
+  if (modeParam === 'mobile' || modeParam === 'app') {
+    setSiteViewMode('mobile');
+  } else if (localStorage.getItem('nn-view-mode') === 'mobile') {
+    setSiteViewMode('mobile');
+  }
+}
+
+// Initialize Mobile-First Mode Controller
+initSiteMobileFirstMode();
+
