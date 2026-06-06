@@ -1352,7 +1352,8 @@
             updateAuthUI();
             if (callbackResult.type === 'oauth' || sessionStorage.getItem('nearnow-google-auth-started') === '1') {
               sessionStorage.removeItem('nearnow-google-auth-started');
-              showVerificationSent(currentUser);
+              // Users sign up without verification codes
+              // showVerificationSent(currentUser);
             }
           }
         } catch { /* no callback */ }
