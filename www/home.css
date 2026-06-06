@@ -2855,32 +2855,32 @@ body.site-mobile-first main#home > section {
 }
 
 /* Active tab sections mapping */
-body.site-mobile-first[data-site-tab="home"] .hero,
-body.site-mobile-first[data-site-tab="home"] .community-section,
-body.site-mobile-first[data-site-tab="home"] .growth-section {
+body.site-mobile-first[data-site-tab="home"] main#home > .hero,
+body.site-mobile-first[data-site-tab="home"] main#home > .community-section,
+body.site-mobile-first[data-site-tab="home"] main#home > .growth-section {
   display: block !important;
 }
 
-body.site-mobile-first[data-site-tab="brief"] .brief-section,
-body.site-mobile-first[data-site-tab="brief"] .news-section,
-body.site-mobile-first[data-site-tab="brief"] .emergency-mode-section {
+body.site-mobile-first[data-site-tab="brief"] main#home > .brief-section,
+body.site-mobile-first[data-site-tab="brief"] main#home > .news-section,
+body.site-mobile-first[data-site-tab="brief"] main#home > .emergency-mode-section {
   display: block !important;
 }
 
-body.site-mobile-first[data-site-tab="feed"] .feed-section {
+body.site-mobile-first[data-site-tab="feed"] main#home > .feed-section {
   display: block !important;
 }
 
-body.site-mobile-first[data-site-tab="safety"] .safety-section,
-body.site-mobile-first[data-site-tab="safety"] .notification-section,
-body.site-mobile-first[data-site-tab="safety"] .reputation-section {
+body.site-mobile-first[data-site-tab="safety"] main#home > .safety-section,
+body.site-mobile-first[data-site-tab="safety"] main#home > .notification-section,
+body.site-mobile-first[data-site-tab="safety"] main#home > .reputation-section {
   display: block !important;
 }
 
-body.site-mobile-first[data-site-tab="places"] .places-section,
-body.site-mobile-first[data-site-tab="places"] .local-pages-section,
-body.site-mobile-first[data-site-tab="places"] .business-section,
-body.site-mobile-first[data-site-tab="places"] .rewards-section {
+body.site-mobile-first[data-site-tab="places"] main#home > .places-section,
+body.site-mobile-first[data-site-tab="places"] main#home > .local-pages-section,
+body.site-mobile-first[data-site-tab="places"] main#home > .business-section,
+body.site-mobile-first[data-site-tab="places"] main#home > .rewards-section {
   display: block !important;
 }
 
