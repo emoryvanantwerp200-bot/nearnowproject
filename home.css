@@ -1830,7 +1830,13 @@ textarea:focus-visible {
     padding-top: 34px;
   }
 
-  .input-row,
+  .hero,
+  .notification-panel,
+  .community-section,
+.hero,
+     .notification-panel,
+     .community-section,
+.input-row,
   .dashboard-grid,
   .safety-grid,
   .trust-grid,
@@ -2790,7 +2796,7 @@ body.site-mobile-first {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    width: 100vw !important;
+    width: 100% !important;
     height: 56px !important;
     z-index: 1000 !important;
     background: rgba(255, 255, 255, 0.95) !important;
@@ -2807,9 +2813,11 @@ body.site-mobile-first {
     position: fixed !important;
     top: 56px !important;
     left: 0 !important;
-    width: 100vw !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: calc(100vh - 56px - 60px) !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     padding: 12px 16px 40px !important;
     box-sizing: border-box !important;
     z-index: 998 !important;
@@ -2819,7 +2827,7 @@ body.site-mobile-first {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
-    width: 100vw !important;
+    width: 100% !important;
     height: 60px !important;
     z-index: 1000 !important;
     background: rgba(255, 255, 255, 0.95) !important;
@@ -3039,4 +3047,3 @@ body.site-mobile-first .map-container {
     gap: 4px;
   }
 }
-
