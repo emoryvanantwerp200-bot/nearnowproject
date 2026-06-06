@@ -1029,14 +1029,24 @@ function initSiteMobileFirstMode() {
     mobileAuthBtn.style.background = isLoggedOut ? 'var(--green)' : 'var(--red)';
   }
 
-  // Load initial view mode from localStorage or URL parameter
+  // Load initial view mode from localStorage, URL parameter, or auto-detect small screen size
   const urlParams = new URLSearchParams(window.location.search);
   const modeParam = urlParams.get('mode') || urlParams.get('view');
   
   if (modeParam === 'mobile' || modeParam === 'app') {
     setSiteViewMode('mobile');
-  } else if (localStorage.getItem('nn-view-mode') === 'mobile') {
-    setSiteViewMode('mobile');
+  } else if (modeParam === 'desktop') {
+    setSiteViewMode('desktop');
+  } else {
+    const savedMode = localStorage.getItem('nn-view-mode');
+    if (savedMode === 'mobile') {
+      setSiteViewMode('mobile');
+    } else if (savedMode === 'desktop') {
+      setSiteViewMode('desktop');
+    } else if (window.innerWidth < 768) {
+      // Default to mobile view on small screens if no preference is saved yet
+      setSiteViewMode('mobile');
+    }
   }
 }
 
