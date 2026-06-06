@@ -6,10 +6,15 @@ const outputDir = path.join(projectRoot, "www");
 
 const staticEntries = [
   "_headers",
+  "app",
   "app.html",
   "favicon.png",
+  "favicon.svg",
+  "feed.xml",
+  "feeds",
   "index.html",
   "manifest.json",
+  "nearnow-banner.svg",
   "service-worker.js",
   "icons",
   "netlify",

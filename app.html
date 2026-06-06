@@ -3,6 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+  (function() {
+    function createSafeStorage(type) {
+      let original;
+      try {
+        original = window[type];
+      } catch (e) {
+        // Access is denied
+      }
+      if (original) {
+        try {
+          original.setItem('__nearnow_test__', '1');
+          original.removeItem('__nearnow_test__');
+          return original;
+        } catch (e) {
+          // Fall through to mock
+        }
+      }
+      const store = {};
+      return {
+        getItem(key) {
+          return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
+        },
+        setItem(key, value) {
+          store[key] = String(value);
+        },
+        removeItem(key) {
+          delete store[key];
+        },
+        clear() {
+          for (const k in store) delete store[k];
+        },
+        key(i) {
+          return Object.keys(store)[i] || null;
+        },
+        get length() {
+          return Object.keys(store).length;
+        }
+      };
+    }
+    const safeLocal = createSafeStorage('localStorage');
+    const safeSession = createSafeStorage('sessionStorage');
+
+    try {
+      Object.defineProperty(window, 'localStorage', {
+        value: safeLocal,
+        writable: true,
+        configurable: true,
+        enumerable: true
+      });
+    } catch (e) {
+      try { window.localStorage = safeLocal; } catch (err) {}
+    }
+
+    try {
+      Object.defineProperty(window, 'sessionStorage', {
+        value: safeSession,
+        writable: true,
+        configurable: true,
+        enumerable: true
+      });
+    } catch (e) {
+      try { window.sessionStorage = safeSession; } catch (err) {}
+    }
+  })();
+</script>
 <script type="importmap">
 {
   "imports": {
@@ -1234,6 +1300,98 @@
     outline: 3px solid var(--accent);
     outline-offset: 2px;
   }
+
+  /* User Accounts & Business Specials Styling */
+  .user-status-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .user-status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(11, 99, 67, 0.08);
+  }
+  .deal-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    border-left: 4px solid var(--accent);
+  }
+  .deal-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(11, 99, 67, 0.08);
+    border-color: var(--accent);
+  }
+  .deal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+  .deal-biz {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .deal-tag {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+  .deal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin: 4px 0 2px;
+  }
+  .deal-body {
+    font-size: 0.84rem;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .deal-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+    color: var(--ink-soft);
+  }
+  .verify-sparkle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #15803d, #0b6343);
+    color: white;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    box-shadow: 0 2px 4px rgba(21, 128, 61, 0.2);
+  }
+
+  /* Distinct Feed Item Categories borders and glows */
+  .feed-item.cat-social {
+    border-left: 4px solid var(--blue);
+  }
+  .feed-item.cat-neighbor {
+    border-left: 4px solid var(--gold);
+  }
+  .feed-item.cat-family {
+    border-left: 4px solid var(--coral);
+  }
+  .feed-item.cat-deal {
+    border-left: 4px solid var(--accent);
+    background: linear-gradient(180deg, rgba(11, 99, 67, 0.01) 0%, rgba(255, 255, 255, 1) 100%);
+  }
 </style>
 </head>
 <body class="auth-locked">
@@ -1308,9 +1466,32 @@
           <strong id="profileName">Not signed in</strong>
           <p id="profileDetail">Sign in to participate</p>
         </div>
+
+        <!-- My Live Vibe Card (User Accounts Feature) -->
+        <div class="user-status-card" id="myStatusCard" style="display:none; margin: 12px 0; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: rgba(11, 99, 67, 0.04); font-size: 0.82rem;">
+          <div style="font-weight:800; margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center; color: var(--accent);">
+            <span>My Vibe Status</span>
+            <span id="myVibeStatusBadge" style="font-size:0.65rem; padding: 1px 6px; border-radius: 4px; background:var(--accent); color:white; font-weight:700;">Active</span>
+          </div>
+          <div style="display:flex; gap: 6px; margin-bottom: 6px;">
+            <select id="myVibeEmoji" style="font-size:1.1rem; padding: 2px; width:52px; border-radius:4px; border:1px solid var(--line); text-align:center; background:var(--panel);">
+              <option value="🏠">🏠 Home</option>
+              <option value="🏃">🏃 Out</option>
+              <option value="☕">☕ Coffee</option>
+              <option value="🛍️">🛍️ Shop</option>
+              <option value="🚗">🚗 Drive</option>
+              <option value="🏢">🏢 Office</option>
+              <option value="🚨">🚨 Alert</option>
+            </select>
+            <input type="text" id="myStatusText" placeholder="Current vibe?" style="flex:1; padding: 4px 8px; border-radius:4px; border:1px solid var(--line); font-size:0.8rem; background:var(--panel); color:var(--ink);" maxlength="100">
+          </div>
+          <button class="btn btn-soft" id="saveMyStatusBtn" type="button" style="width:100%; font-size:0.75rem; padding: 5px; font-weight:700;">Update Live Status</button>
+        </div>
+
         <ul class="menu" id="sidebarMenu" role="tablist" aria-label="Feed Navigation">
           <li role="presentation"><button role="tab" aria-selected="true" class="active" data-tab="mix">Mixed Home Feed</button></li>
           <li role="presentation"><button role="tab" aria-selected="false" data-tab="newsletter" style="border-left: 3px solid var(--accent); padding-left: 8px;">📬 Weekly Newsletter</button></li>
+          <li role="presentation"><button role="tab" aria-selected="false" data-tab="deals">💼 Local Shop Specials</button></li>
           <li role="presentation"><button role="tab" aria-selected="false" data-tab="mix">Street Threads</button></li>
           <li role="presentation"><button role="tab" aria-selected="false" data-tab="mix">Garage Sale Board</button></li>
           <li role="presentation"><button role="tab" aria-selected="false" data-tab="mix">Emergency Check-in</button></li>
@@ -1433,6 +1614,62 @@
               <div id="widgetFeedback" class="error" style="margin-top: 10px; font-size: 0.85rem;" hidden></div>
             </div>
             
+          </div>
+        </section>
+
+        <!-- Local Business Deals Panel (Local Business Features) -->
+        <section class="newsletter-panel" id="dealsTabSection" style="display: none;">
+          <div class="newsletter-inner" style="grid-template-columns: 1fr;">
+            <div class="newsletter-editorial" style="border-right: 0; padding-right: 0;">
+              <div class="editorial-header" style="border-bottom: 2px solid var(--accent-soft); padding-bottom: 12px; margin-bottom: 18px;">
+                <span class="editorial-category" style="background: var(--accent-soft); color: var(--accent); padding: 4px 10px; border-radius: 12px; font-weight: 800; font-size: 0.75rem;">BUSINESS PARTNERSHIPS</span>
+                <h2 class="editorial-title" style="margin-top: 8px; font-size: 1.8rem; color: var(--accent);">💼 Local Business Specials & Deals</h2>
+                <p class="editorial-meta">Directly support verified shops, cafes, and restaurants in your neighborhood.</p>
+              </div>
+
+              <!-- Deal Submission Form for Business Owners -->
+              <div class="user-status-card" id="businessDealFormBox" style="margin-bottom: 24px; padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--accent); background: rgba(11, 99, 67, 0.02);">
+                <h3 style="font-family: 'Fraunces', serif; color: var(--accent); font-size: 1.1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                  <span>✨</span> Post a Local Special or Deal (For Shop Owners)
+                </h3>
+                <p style="font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 12px;">Boost your neighborhood foot traffic! Post your daily promo, flash sale, or storm-hour closing here. It will display on this deals tab and in the main community feed with a verified badge.</p>
+                
+                <form id="postDealForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div class="form-group-app" style="grid-column: span 1;">
+                    <label for="dealBizName" style="font-weight: 700; font-size: 0.75rem;">Business Name</label>
+                    <input type="text" id="dealBizName" placeholder="e.g. Serda's Coffee Co." class="text-input" style="width:100%;" required>
+                  </div>
+                  <div class="form-group-app" style="grid-column: span 1;">
+                    <label for="dealType" style="font-weight: 700; font-size: 0.75rem;">Deal Category</label>
+                    <select id="dealType" class="text-input" style="width:100%; padding: 8px 10px;">
+                      <option value="Special">🎁 Special Offer / BOGO</option>
+                      <option value="Event">🎉 Store Event</option>
+                      <option value="Notice">📢 Hour Change / Announcement</option>
+                    </select>
+                  </div>
+                  <div class="form-group-app" style="grid-column: span 2;">
+                    <label for="dealTitle" style="font-weight: 700; font-size: 0.75rem;">Headline / Special</label>
+                    <input type="text" id="dealTitle" placeholder="e.g. Buy One Get One Free Lattes from 2-4 PM!" class="text-input" style="width:100%;" required>
+                  </div>
+                  <div class="form-group-app" style="grid-column: span 2;">
+                    <label for="dealDesc" style="font-weight: 700; font-size: 0.75rem;">Details & Description</label>
+                    <textarea id="dealDesc" placeholder="Describe the offer, active hours, or terms for neighbors..." rows="2" style="width:100%; font-family: inherit; font-size: 0.85rem; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--line);" required></textarea>
+                  </div>
+                  <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 4px;">
+                    <button type="submit" class="btn" id="submitDealBtn" style="padding: 8px 24px;">Post Verified Deal 🚀</button>
+                  </div>
+                </form>
+                <div id="dealFormFeedback" style="margin-top: 10px; font-size: 0.85rem; font-weight: 700; color: var(--accent);" hidden></div>
+              </div>
+
+              <!-- Local Deals Grid -->
+              <h3 style="font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px;">
+                <span>🛒</span> Active Neighborhood Specials
+              </h3>
+              <div id="localDealsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <!-- Dynamically loaded deals go here -->
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -1581,7 +1818,14 @@
     if (currentUser) {
       const name = currentUser.user_metadata?.full_name || currentUser.email;
       document.body.classList.remove('auth-locked');
-      profileName.textContent = name;
+      
+      // Dynamic Greeting based on time of day (User Accounts Feature)
+      const hour = new Date().getHours();
+      let greeting = 'Good morning';
+      if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
+      else if (hour >= 17) greeting = 'Good evening';
+      
+      profileName.textContent = `${greeting}, ${name.split(' ')[0]}!`;
       profileDetail.textContent = viewerArea || 'Set your area below';
       authBtn.textContent = 'Sign Out';
       hideAuthModal();
@@ -1589,6 +1833,22 @@
       reelCompose.style.display = '';
       addBoardForm.style.display = '';
       addFamilyForm.style.display = '';
+      
+      const myStatusCard = document.getElementById('myStatusCard');
+      if (myStatusCard) {
+        myStatusCard.style.display = 'block';
+        // Prepopulate if we already have our vibe status in family members
+        const meMember = familyMembers.find(m => m.name.startsWith('Me ('));
+        if (meMember && meMember.status) {
+          const emojiMatch = meMember.status.match(/^([\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Emoji})/u);
+          if (emojiMatch) {
+            document.getElementById('myVibeEmoji').value = emojiMatch[0];
+            document.getElementById('myStatusText').value = meMember.status.replace(emojiMatch[0], '').trim();
+          } else {
+            document.getElementById('myStatusText').value = meMember.status;
+          }
+        }
+      }
     } else {
       document.body.classList.add('auth-locked');
       profileName.textContent = 'Not signed in';
@@ -1599,6 +1859,9 @@
       reelCompose.style.display = 'none';
       addBoardForm.style.display = 'none';
       addFamilyForm.style.display = 'none';
+      
+      const myStatusCard = document.getElementById('myStatusCard');
+      if (myStatusCard) myStatusCard.style.display = 'none';
     }
   }
 
@@ -2414,6 +2677,7 @@
   // --- Sidebar & Mobile Tabs Switcher ---
 
   const newsletterTabSection = document.getElementById('newsletterTabSection');
+  const dealsTabSection = document.getElementById('dealsTabSection');
   const sidebarButtons = document.querySelectorAll('#sidebarMenu button');
   const mobileTabButtons = document.querySelectorAll('.mobile-tabs button');
 
@@ -2448,13 +2712,25 @@
       filters.style.display = 'none';
       if (reelsPanel) reelsPanel.style.display = 'none';
       newsletterTabSection.style.display = 'block';
+      if (dealsTabSection) dealsTabSection.style.display = 'none';
       loadWidgetSubscriptionStatus();
+    } else if (tab === 'deals') {
+      composerSection.style.display = 'none';
+      feed.style.display = 'none';
+      filters.style.display = 'none';
+      if (reelsPanel) reelsPanel.style.display = 'none';
+      newsletterTabSection.style.display = 'none';
+      if (dealsTabSection) {
+        dealsTabSection.style.display = 'block';
+        loadDeals();
+      }
     } else {
       composerSection.style.display = currentUser ? '' : 'none';
       feed.style.display = '';
       filters.style.display = '';
       if (reelsPanel) reelsPanel.style.display = '';
       newsletterTabSection.style.display = 'none';
+      if (dealsTabSection) dealsTabSection.style.display = 'none';
     }
     app.dataset.tab = tab;
   }
@@ -2472,6 +2748,225 @@
       switchTab(tab);
     });
   });
+
+  // --- Local Deals Integration (Local Business Features) ---
+
+  const mockDeals = [
+    {
+      source: "Serda's Coffee Co.",
+      title: "☕ Morning Coffee Rush",
+      body: "Get 20% off any espresso drink between 8:00 AM and 10:00 AM. Mention 'NearNow Circle' to redeem!",
+      category: "Special",
+      published: "Active Today"
+    },
+    {
+      source: "Wintzell's Oyster House",
+      title: "🦪 Oyster Hour Special",
+      body: "Half-price oysters on the half shell! Every Monday through Thursday, 3:00 PM to 6:00 PM.",
+      category: "Special",
+      published: "Active Daily"
+    },
+    {
+      source: "Callaghan's Irish Social Club",
+      title: "🍔 Lower Alabama Burger Night",
+      body: "Order our famous LA burger tonight and get a free soft drink or side upgrade on us!",
+      category: "Special",
+      published: "Tonight Only"
+    },
+    {
+      source: "The Noble South",
+      title: "🌾 Farm-to-Table Dinner Feature",
+      body: "Fresh heirloom tomato and burrata board, sourced locally this morning. Sells out quickly!",
+      category: "Event",
+      published: "Weekend Special"
+    }
+  ];
+
+  async function loadDeals() {
+    const dealsGrid = document.getElementById('localDealsGrid');
+    if (!dealsGrid) return;
+    dealsGrid.innerHTML = '<div class="skeleton" style="min-height:100px; grid-column:1/-1;"></div>';
+
+    try {
+      const response = await fetch('/api/feed?area=all&category=events');
+      const data = await response.json();
+      const dbDeals = (data.items || []).filter(item => item.title.includes('[') || item.source.includes('Partner') || item.source.includes('Spotlight'));
+      
+      const parsedDbDeals = dbDeals.map(item => {
+        let type = 'Special';
+        let bizName = item.source.replace(' (Verified Partner)', '').replace(' (Partner)', '');
+        let displayTitle = item.title;
+        const typeMatch = item.title.match(/^\[(.*?)\]\s*(.*)$/);
+        if (typeMatch) {
+          type = typeMatch[1];
+          displayTitle = typeMatch[2];
+        }
+        return {
+          source: bizName,
+          title: displayTitle,
+          body: item.body,
+          category: type,
+          published: formatTime(item.createdAt) || 'Recent'
+        };
+      });
+
+      const allDeals = [...parsedDbDeals, ...mockDeals];
+      dealsGrid.innerHTML = allDeals.map(deal => `
+        <article class="deal-card">
+          <div class="deal-header">
+            <span class="deal-biz">${escapeHtml(deal.source)}</span>
+            <span class="deal-tag">${escapeHtml(deal.category)}</span>
+          </div>
+          <h4 class="deal-title">${escapeHtml(deal.title)}</h4>
+          <p class="deal-body">${escapeHtml(deal.body)}</p>
+          <div class="deal-footer">
+            <span class="verify-sparkle"><span>✨</span> Verified Partner</span>
+            <span>${escapeHtml(deal.published)}</span>
+          </div>
+        </article>
+      `).join('');
+    } catch (err) {
+      dealsGrid.innerHTML = mockDeals.map(deal => `
+        <article class="deal-card">
+          <div class="deal-header">
+            <span class="deal-biz">${escapeHtml(deal.source)}</span>
+            <span class="deal-tag">${escapeHtml(deal.category)}</span>
+          </div>
+          <h4 class="deal-title">${escapeHtml(deal.title)}</h4>
+          <p class="deal-body">${escapeHtml(deal.body)}</p>
+          <div class="deal-footer">
+            <span class="verify-sparkle"><span>✨</span> Verified Partner</span>
+            <span>${escapeHtml(deal.published)}</span>
+          </div>
+        </article>
+      `).join('');
+    }
+  }
+
+  const postDealForm = document.getElementById('postDealForm');
+  if (postDealForm) {
+    postDealForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const bizName = document.getElementById('dealBizName').value.trim();
+      const dealType = document.getElementById('dealType').value;
+      const title = document.getElementById('dealTitle').value.trim();
+      const desc = document.getElementById('dealDesc').value.trim();
+      const feedback = document.getElementById('dealFormFeedback');
+      const submitBtn = document.getElementById('submitDealBtn');
+
+      feedback.hidden = false;
+      feedback.textContent = 'Verifying and posting your deal...';
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/feed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: `[${dealType}] ${title}`,
+            body: desc,
+            category: 'events',
+            area: viewerArea || 'mobile',
+            source: `${bizName} (Verified Partner)`,
+            trust: 'official'
+          })
+        });
+
+        if (!response.ok) throw new Error('Could not submit deal.');
+        
+        feedback.textContent = '✨ Deal published successfully! It is now active on the Deals board and the live local feed.';
+        postDealForm.reset();
+        loadDeals();
+        setTimeout(() => { feedback.hidden = true; }, 5000);
+      } catch (err) {
+        feedback.textContent = '❌ Error publishing deal. Please try again.';
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // --- Live Vibe / Status Updater (User Accounts Feature) ---
+
+  const saveMyStatusBtn = document.getElementById('saveMyStatusBtn');
+  if (saveMyStatusBtn) {
+    saveMyStatusBtn.addEventListener('click', async () => {
+      if (!currentUser) return;
+      const select = document.getElementById('myVibeEmoji');
+      const textInput = document.getElementById('myStatusText');
+      const emoji = select.value;
+      const statusText = textInput.value.trim();
+      const fullStatus = `${emoji} ${statusText || 'Active'}`;
+      
+      saveMyStatusBtn.disabled = true;
+      saveMyStatusBtn.textContent = 'Saving vibe...';
+
+      try {
+        const meMember = familyMembers.find(m => m.name.startsWith('Me ('));
+        const name = `Me (${currentUser.user_metadata?.full_name || currentUser.email.split('@')[0]})`;
+        
+        let response;
+        if (meMember) {
+          response = await fetch('/api/family', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: meMember.id,
+              name: name,
+              status: fullStatus,
+              note: `Vibe status updated ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+            })
+          });
+        } else {
+          // Get mock random coordinates near Mobile, AL to show them on map!
+          const mockLat = 30.69 + (Math.random() - 0.5) * 0.05;
+          const mockLng = -88.04 + (Math.random() - 0.5) * 0.05;
+          
+          response = await fetch('/api/family', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: name,
+              status: fullStatus,
+              note: 'Current active location',
+              latitude: mockLat,
+              longitude: mockLng
+            })
+          });
+        }
+
+        if (!response.ok) throw new Error('Failed to update status.');
+        const data = await response.json();
+        
+        // Update familyMembers state array
+        if (meMember) {
+          const idx = familyMembers.findIndex(m => m.id === meMember.id);
+          if (idx !== -1) familyMembers[idx] = data.member;
+        } else {
+          familyMembers.push(data.member);
+        }
+
+        renderFamily();
+        
+        const badge = document.getElementById('myVibeStatusBadge');
+        if (badge) {
+          badge.textContent = 'Updated!';
+          badge.style.background = 'var(--accent)';
+          badge.style.color = 'white';
+          setTimeout(() => {
+            badge.textContent = 'Active';
+            badge.style.background = 'var(--accent-soft)';
+            badge.style.color = 'var(--accent)';
+          }, 3000);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        saveMyStatusBtn.disabled = false;
+        saveMyStatusBtn.textContent = 'Update Live Status';
+      }
+    });
+  }
 
   // --- Newsletter Widget Integration ---
   
@@ -2626,7 +3121,8 @@
         updateAuthUI();
         if (callbackResult.type === 'oauth' || sessionStorage.getItem('nearnow-google-auth-started') === '1') {
           sessionStorage.removeItem('nearnow-google-auth-started');
-          showVerificationSent(currentUser);
+          // Users sign up without verification codes
+          // showVerificationSent(currentUser);
         }
       }
     } catch { /* no callback pending */ }

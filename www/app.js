@@ -1,3 +1,25 @@
+// Safe storage shadow for environments with blocked localStorage/sessionStorage
+const getSafeStorage = (type) => {
+  try {
+    const s = window[type];
+    s.setItem("__test_safe__", "1");
+    s.removeItem("__test_safe__");
+    return s;
+  } catch (e) {
+    const mem = {};
+    return {
+      getItem(k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; },
+      setItem(k, v) { mem[k] = String(v); },
+      removeItem(k) { delete mem[k]; },
+      clear() { for (const k in mem) delete mem[k]; },
+      key(i) { return Object.keys(mem)[i] || null; },
+      get length() { return Object.keys(mem).length; }
+    };
+  }
+};
+const localStorage = getSafeStorage("localStorage");
+const sessionStorage = getSafeStorage("sessionStorage");
+
 // Real, hand-curated places to visit in and just outside Mobile, Alabama.
 // Distances are approximate miles from downtown Mobile (ZIP 36602). This list
 // is the default showcase; entering a ZIP swaps in live OpenStreetMap results.

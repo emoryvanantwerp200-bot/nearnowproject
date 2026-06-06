@@ -1,3 +1,25 @@
+// Safe storage shadow for environments with blocked localStorage/sessionStorage
+const getSafeStorage = (type) => {
+  try {
+    const s = window[type];
+    s.setItem("__test_safe__", "1");
+    s.removeItem("__test_safe__");
+    return s;
+  } catch (e) {
+    const mem = {};
+    return {
+      getItem(k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; },
+      setItem(k, v) { mem[k] = String(v); },
+      removeItem(k) { delete mem[k]; },
+      clear() { for (const k in mem) delete mem[k]; },
+      key(i) { return Object.keys(mem)[i] || null; },
+      get length() { return Object.keys(mem).length; }
+    };
+  }
+};
+const localStorage = getSafeStorage("localStorage");
+const sessionStorage = getSafeStorage("sessionStorage");
+
 const briefData = {
   "Mobile County": {
     time: "Updated 6:40 AM",
@@ -842,3 +864,64 @@ if (refreshFeedButton) {
 activeFeedArea = areaKeyFromLabel(locationInput.value);
 loadFeed();
 loadDailySummary();
+
+/* ---------- Home Stats and Phone Simulator (Mobile Apps Feature) ---------- */
+
+async function loadHeroStats() {
+  try {
+    const res = await fetch('/api/stats');
+    if (!res.ok) return;
+    const data = await res.json();
+    const total = (data.postsToday || 0) + (data.neighborNotices || 0);
+    if (total > 0) {
+      const badge = document.getElementById('heroStatsBadge');
+      const postsCount = document.getElementById('heroStatsPosts');
+      if (badge && postsCount) {
+        postsCount.textContent = total;
+        badge.style.display = 'inline-flex';
+      }
+    }
+  } catch (err) {
+    console.error("Error loading hero stats:", err);
+  }
+}
+
+function initPhoneSimulator() {
+  const tFeed = document.getElementById('mockTabFeed');
+  const tMap = document.getElementById('mockTabMap');
+  const tSafety = document.getElementById('mockTabSafety');
+
+  const pFeed = document.getElementById('phoneFeedTab');
+  const pMap = document.getElementById('phoneMapTab');
+  const pSafety = document.getElementById('phoneSafetyTab');
+
+  if (!tFeed || !tMap || !tSafety) return;
+
+  function setPhoneTab(tab) {
+    [tFeed, tMap, tSafety].forEach(btn => {
+      btn.style.color = '#888';
+    });
+    [pFeed, pMap, pSafety].forEach(screen => {
+      if (screen) screen.style.display = 'none';
+    });
+
+    if (tab === 'feed') {
+      tFeed.style.color = 'var(--accent)';
+      if (pFeed) pFeed.style.display = 'block';
+    } else if (tab === 'map') {
+      tMap.style.color = 'var(--accent)';
+      if (pMap) pMap.style.display = 'block';
+    } else if (tab === 'safety') {
+      tSafety.style.color = 'var(--accent)';
+      if (pSafety) pSafety.style.display = 'block';
+    }
+  }
+
+  tFeed.addEventListener('click', () => setPhoneTab('feed'));
+  tMap.addEventListener('click', () => setPhoneTab('map'));
+  tSafety.addEventListener('click', () => setPhoneTab('safety'));
+}
+
+// Initialize on page load
+loadHeroStats();
+initPhoneSimulator();
