@@ -1689,7 +1689,19 @@
 
         <article class="module">
           <h2>Family Safety</h2>
-          
+
+          <!-- Share My Location (Circle live tracking — Phase 1, on this device) -->
+          <div id="shareLocationCard" style="margin: 6px 0 12px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(25,118,210,0.04);">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+              <div style="flex:1;">
+                <strong style="font-size:0.95rem;">📍 Share my location</strong>
+                <p id="shareLocationHint" style="font-size:0.78rem; color:var(--ink-soft); margin:3px 0 0;">Let your Circle see where you are. Off by default.</p>
+              </div>
+              <button class="btn btn-soft" id="shareLocationToggle" type="button" style="flex-shrink:0;">Turn on</button>
+            </div>
+            <div id="shareLocationStatus" style="display:none; margin-top:8px; padding:6px 8px; border-radius:6px; font-size:0.78rem; font-weight:700; background:rgba(11,99,67,0.08); color:var(--accent);"></div>
+          </div>
+
           <!-- Google Map element -->
           <div id="familyMap" style="display: none;"></div>
 
@@ -2410,52 +2422,51 @@
   let familyMapInstance = null;
   let familyMapMarkers = [];
 
-  function updateFamilyMap() {
+  // Make sure the family map exists and is visible
+  function ensureFamilyMap() {
     const mapEl = document.getElementById('familyMap');
-    if (!currentUser || !familyMembers.length) {
-      mapEl.style.display = 'none';
-      if (familyMapInstance) {
-        familyMapInstance.remove();
-        familyMapInstance = null;
-      }
-      return;
-    }
-
-    const membersWithCoords = familyMembers.filter(m => m.latitude !== null && m.longitude !== null);
-
-    if (membersWithCoords.length === 0) {
-      mapEl.style.display = 'none';
-      if (familyMapInstance) {
-        familyMapInstance.remove();
-        familyMapInstance = null;
-      }
-      return;
-    }
-
     mapEl.style.display = 'block';
-
     if (!familyMapInstance) {
       familyMapInstance = L.map('familyMap', {
         zoomControl: true,
         scrollWheelZoom: false
       });
-
       L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         maxZoom: 20,
         attribution: 'Map data &copy; Google'
       }).addTo(familyMapInstance);
-    } else {
-      familyMapMarkers.forEach(marker => familyMapInstance.removeLayer(marker));
-      familyMapMarkers = [];
     }
+    return familyMapInstance;
+  }
+
+  function updateFamilyMap() {
+    const mapEl = document.getElementById('familyMap');
+
+    const membersWithCoords = (currentUser && familyMembers.length)
+      ? familyMembers.filter(m => m.latitude !== null && m.longitude !== null)
+      : [];
+    const showMe = myShare.sharing && myShare.pos;
+
+    if (membersWithCoords.length === 0 && !showMe) {
+      mapEl.style.display = 'none';
+      if (familyMapInstance) {
+        familyMapInstance.remove();
+        familyMapInstance = null;
+        myLocationMarker = null;
+      }
+      return;
+    }
+
+    ensureFamilyMap();
+
+    // Rebuild family-member markers each refresh
+    familyMapMarkers.forEach(marker => familyMapInstance.removeLayer(marker));
+    familyMapMarkers = [];
 
     const bounds = [];
     membersWithCoords.forEach((member) => {
-      const lat = parseFloat(member.latitude);
-      const lng = parseFloat(member.longitude);
-      const latlng = [lat, lng];
+      const latlng = [parseFloat(member.latitude), parseFloat(member.longitude)];
       bounds.push(latlng);
-
       const marker = L.marker(latlng).addTo(familyMapInstance);
       marker.bindPopup(`
         <div style="font-family:'Manrope',sans-serif; min-width:120px;">
@@ -2467,18 +2478,159 @@
       familyMapMarkers.push(marker);
     });
 
+    // Your own live location — a distinct blue dot
+    if (showMe) {
+      const latlng = [myShare.pos.lat, myShare.pos.lng];
+      bounds.push(latlng);
+      if (!myLocationMarker) {
+        myLocationMarker = L.circleMarker(latlng, {
+          radius: 9, color: '#ffffff', weight: 3, fillColor: '#1976d2', fillOpacity: 1
+        }).addTo(familyMapInstance);
+        myLocationMarker.bindPopup('<div style="font-family:\'Manrope\',sans-serif;"><strong style="color:#1976d2;">You</strong><div style="font-size:0.75rem;">Sharing live</div></div>');
+      } else {
+        myLocationMarker.setLatLng(latlng);
+      }
+    } else if (myLocationMarker) {
+      familyMapInstance.removeLayer(myLocationMarker);
+      myLocationMarker = null;
+    }
+
     if (bounds.length > 0) {
       setTimeout(() => {
         if (!familyMapInstance) return;
         familyMapInstance.invalidateSize();
         if (bounds.length === 1) {
-          familyMapInstance.setView(bounds[0], 14);
+          familyMapInstance.setView(bounds[0], 15);
         } else {
           familyMapInstance.fitBounds(bounds, { padding: [30, 30] });
         }
       }, 100);
     }
   }
+
+  // ===== Share My Location (Phase 1: this device only) =====
+  // Saved locally for now. In the Circle phase, startShareWatch() will also
+  // POST myShare.pos to /api/my-location so invited members can see it live.
+  let myShare = { sharing: false, pos: null };
+  let myShareWatchId = null;
+  let myLocationMarker = null;
+  const MY_SHARE_KEY = 'nn-circle-my-share';
+
+  function loadMyShare() {
+    try {
+      const raw = localStorage.getItem(MY_SHARE_KEY);
+      if (raw) myShare = JSON.parse(raw) || { sharing: false, pos: null };
+    } catch { myShare = { sharing: false, pos: null }; }
+  }
+
+  function persistMyShare() {
+    try { localStorage.setItem(MY_SHARE_KEY, JSON.stringify(myShare)); } catch {}
+  }
+
+  function shareTimeAgo(ts) {
+    if (!ts) return '';
+    const s = Math.max(1, Math.round((Date.now() - ts) / 1000));
+    if (s < 60) return s + 's ago';
+    const m = Math.round(s / 60);
+    if (m < 60) return m + 'm ago';
+    return Math.round(m / 60) + 'h ago';
+  }
+
+  function updateShareUI() {
+    const toggle = document.getElementById('shareLocationToggle');
+    const status = document.getElementById('shareLocationStatus');
+    const hint = document.getElementById('shareLocationHint');
+    const card = document.getElementById('shareLocationCard');
+    if (!toggle || !status || !card || !hint) return;
+
+    if (myShare.sharing) {
+      card.style.background = 'rgba(11,99,67,0.06)';
+      card.style.borderColor = 'rgba(11,99,67,0.35)';
+      toggle.textContent = 'Stop sharing';
+      hint.textContent = 'Your Circle can see your live location.';
+      const acc = myShare.pos && myShare.pos.accuracy ? ' • ±' + Math.round(myShare.pos.accuracy) + 'm' : '';
+      const when = myShare.pos ? ' • updated ' + shareTimeAgo(myShare.pos.ts) : ' • waiting for GPS…';
+      status.style.display = 'block';
+      status.style.color = 'var(--accent)';
+      status.innerHTML = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#0b6343;margin-right:5px;vertical-align:middle;"></span>Sharing on' + when + acc;
+    } else {
+      card.style.background = 'rgba(25,118,210,0.04)';
+      card.style.borderColor = 'var(--line)';
+      toggle.textContent = 'Turn on';
+      hint.textContent = 'Let your Circle see where you are. Off by default.';
+      status.style.display = 'none';
+      status.innerHTML = '';
+    }
+  }
+
+  function showShareError(msg) {
+    const status = document.getElementById('shareLocationStatus');
+    if (!status) return;
+    status.style.display = 'block';
+    status.style.color = 'var(--bad, #d32f2f)';
+    status.innerHTML = escapeHtml(msg);
+  }
+
+  function startShareWatch() {
+    if (!('geolocation' in navigator)) {
+      showShareError('Location isn’t available on this device.');
+      return;
+    }
+    myShare.sharing = true;
+    persistMyShare();
+    updateShareUI();
+
+    if (myShareWatchId !== null) navigator.geolocation.clearWatch(myShareWatchId);
+    myShareWatchId = navigator.geolocation.watchPosition(
+      (p) => {
+        myShare.pos = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude,
+          accuracy: p.coords.accuracy,
+          ts: Date.now()
+        };
+        persistMyShare();
+        updateShareUI();
+        updateFamilyMap();
+        // Circle phase: POST myShare.pos to /api/my-location here.
+      },
+      (err) => {
+        stopShareWatch();
+        showShareError(
+          err && err.code === 1
+            ? 'Location permission was blocked. Allow location for this site in your browser settings, then try again.'
+            : 'Couldn’t get your location. Make sure location/GPS is on, then try again.'
+        );
+      },
+      { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
+    );
+  }
+
+  function stopShareWatch() {
+    if (myShareWatchId !== null) {
+      navigator.geolocation.clearWatch(myShareWatchId);
+      myShareWatchId = null;
+    }
+    myShare.sharing = false;
+    persistMyShare();
+    updateShareUI();
+    updateFamilyMap();
+  }
+
+  function initMyShare() {
+    loadMyShare();
+    const toggle = document.getElementById('shareLocationToggle');
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        if (myShare.sharing) stopShareWatch();
+        else startShareWatch();
+      });
+    }
+    updateShareUI();
+    if (myShare.sharing) startShareWatch(); // resume if it was on (permission persists once granted)
+    setInterval(() => { if (myShare.sharing) updateShareUI(); }, 15000);
+  }
+  initMyShare();
 
   function renderFamily() {
     const target = document.getElementById('familyList');
@@ -2733,6 +2885,7 @@
       if (dealsTabSection) dealsTabSection.style.display = 'none';
     }
     app.dataset.tab = tab;
+    if (tab === 'family') setTimeout(() => { try { updateFamilyMap(); } catch {} }, 80);
   }
 
   sidebarButtons.forEach(btn => {
