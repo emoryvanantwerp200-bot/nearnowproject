@@ -301,6 +301,34 @@ export const newsletterSubscribers = pgTable("newsletter_subscribers", {
   status: varchar("status", { length: 50 }).notNull().default("active"),
   createdAt: timestamp("created_at").defaultNow(),
 });
+export const businesses = pgTable("businesses", {
+  id: serial().primaryKey(),
+  ownerId: text("owner_id").notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  category: varchar("category", { length: 100 }),
+  description: text("description"),
+  verified: boolean("verified").notNull().default(false),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const reputationEvents = pgTable("reputation_events", {
+  id: serial().primaryKey(),
+  userId: text("user_id").notNull(),
+  delta: integer("delta").notNull(),
+  reason: varchar("reason", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const misinformationReports = pgTable("misinformation_reports", {
+  id: serial().primaryKey(),
+  reporterId: text("reporter_id").notNull(),
+  targetType: varchar("target_type", { length: 30 }).notNull(),
+  targetId: text("target_id").notNull(),
+  reason: text("reason"),
+  status: varchar("status", { length: 20 }).notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 -- NearNow: friend system tables
 -- Run this once against your Netlify DB (Neon SQL console), OR regenerate the
 -- tracked Drizzle migration with:  npx drizzle-kit generate
