@@ -17,7 +17,6 @@ const staticEntries = [
   "nearnow-banner.svg",
   "service-worker.js",
   "icons",
-  "netlify",
   "vendor"
 ];
 
