@@ -225,7 +225,7 @@ export default async (req: Request, context: Context) => {
 export const config: Config = {
   path: "/api/friends",
 };
-import { pgTable, serial, text, timestamp, integer, varchar, doublePrecision } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer, varchar, doublePrecision, boolean } from "drizzle-orm/pg-core";
 
 export const posts = pgTable("posts", {
   id: serial().primaryKey(),
