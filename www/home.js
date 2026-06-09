@@ -1,25 +1,3 @@
-// Safe storage shadow for environments with blocked localStorage/sessionStorage
-const getSafeStorage = (type) => {
-  try {
-    const s = window[type];
-    s.setItem("__test_safe__", "1");
-    s.removeItem("__test_safe__");
-    return s;
-  } catch (e) {
-    const mem = {};
-    return {
-      getItem(k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; },
-      setItem(k, v) { mem[k] = String(v); },
-      removeItem(k) { delete mem[k]; },
-      clear() { for (const k in mem) delete mem[k]; },
-      key(i) { return Object.keys(mem)[i] || null; },
-      get length() { return Object.keys(mem).length; }
-    };
-  }
-};
-const localStorage = getSafeStorage("localStorage");
-const sessionStorage = getSafeStorage("sessionStorage");
-
 const briefData = {
   "Mobile County": {
     time: "Updated 6:40 AM",
@@ -68,6 +46,8 @@ const feedList = document.querySelector("#feedList");
 const feedChips = document.querySelectorAll(".feed-chip");
 const feedContext = document.querySelector("#feedContext");
 const refreshFeedButton = document.querySelector("#refreshFeed");
+const radiusSelect = document.querySelector("#radiusSelect");
+const useMyLocationButton = document.querySelector("#useMyLocation");
 const reportTitleInput = document.querySelector("#reportTitle");
 const reportTypeSelect = document.querySelector("#reportType");
 const reportAreaSelect = document.querySelector("#reportArea");
@@ -580,13 +560,51 @@ async function enableNotifications() {
     : Notification.permission;
 
   if (permission === "granted") {
-    notificationStatus.textContent = `Notifications enabled for major alerts in ${areas.join(", ") || "your selected areas"}.`;
+    const subscribed = await subscribeForPush(areas);
+    notificationStatus.textContent = subscribed
+      ? `Push notifications enabled for urgent alerts in ${areas.join(", ") || "your selected areas"}.`
+      : `Browser notifications enabled for major alerts in ${areas.join(", ") || "your selected areas"}. Add VAPID_PUBLIC_KEY in Netlify to turn on background push delivery.`;
     new Notification("NearNow big alerts enabled", {
       body: "You will be notified about major weather, AMBER, crime, traffic, and breaking alerts for your selected areas."
     });
   } else {
     notificationStatus.textContent = "Notification permission was not granted. Your area preferences were still saved.";
   }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+}
+
+async function subscribeForPush(areas) {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
+
+  const registration = await navigator.serviceWorker.register("/service-worker.js");
+  const configResponse = await fetch("/api/push-config");
+  if (!configResponse.ok) return false;
+  const config = await configResponse.json();
+  if (!config.publicKey) return false;
+
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(config.publicKey)
+  });
+
+  await fetch("/api/push-subscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      subscription,
+      areas,
+      radius: activeRadius,
+      location: userPosition
+    })
+  });
+
+  return true;
 }
 
 enableNotificationsButton.addEventListener("click", enableNotifications);
@@ -718,6 +736,8 @@ renderPlaces("baldwin");
 
 let activeFeedArea = "mobile";
 let activeFeedCategory = "all";
+let activeRadius = "10";
+let userPosition = { lat: 30.6954, lng: -88.0399, label: "Mobile County center" };
 
 const areaLabels = {
   baldwin: "Baldwin County",
@@ -737,10 +757,15 @@ const categoryLabels = {
 };
 
 const trustBadges = {
-  official: { label: "Official source", icon: "✅", className: "trust-official" },
-  community: { label: "Community report", icon: "🟡", className: "trust-community" },
-  unverified: { label: "Unverified", icon: "🔴", className: "trust-unverified" }
+  official: { label: "Official source", icon: "âœ…", className: "trust-official" },
+  community: { label: "Community report", icon: "ðŸŸ¡", className: "trust-community" },
+  unverified: { label: "Unverified", icon: "ðŸ”´", className: "trust-unverified" }
 };
+
+trustBadges.official.icon = "Verified";
+trustBadges.community.icon = "Local";
+trustBadges.unverified.icon = "Review";
+trustBadges.unverified.label = "Needs review";
 
 function areaKeyFromLabel(value) {
   const v = (value || "").toLowerCase();
@@ -773,6 +798,24 @@ function relativeTime(value) {
   return `${diffDay} day${diffDay > 1 ? "s" : ""} ago`;
 }
 
+function verifiedUserBadge(item) {
+  const badge = trustBadges[item.trust] || trustBadges.unverified;
+  return `<span class="verified-user-badge ${badge.className}">${badge.icon}: ${badge.label}</span>`;
+}
+
+function reportButtonMarkup(item) {
+  const title = escapeHtml(item.title || "Local alert");
+  const category = escapeHtml(item.category || "community");
+  const area = escapeHtml(item.area || activeFeedArea);
+  return `<button class="feed-report-button" type="button" data-title="${title}" data-category="${category}" data-area="${area}">Report update</button>`;
+}
+
+function distanceLabel(item) {
+  if (typeof item.distanceMiles !== "number") return "";
+  const rounded = item.distanceMiles < 1 ? item.distanceMiles.toFixed(1) : Math.round(item.distanceMiles).toString();
+  return `<span>${rounded} mi away</span>`;
+}
+
 function renderFeed(items) {
   if (!items.length) {
     feedList.innerHTML =
@@ -798,21 +841,44 @@ function renderFeed(items) {
           <div class="feed-card-meta">
             <span>${escapeHtml(item.source || "Local source")}</span>
             <span>${relativeTime(item.createdAt)}</span>
+            ${distanceLabel(item)}
+            ${verifiedUserBadge(item)}
             ${link}
+          </div>
+          <div class="feed-card-actions">
+            ${reportButtonMarkup(item)}
           </div>
         </article>
       `;
     })
     .join("");
+
+  feedList.querySelectorAll(".feed-report-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      reportTitleInput.value = `Update on: ${button.dataset.title || "local alert"}`;
+      reportTypeSelect.value = button.dataset.category || "community";
+      reportAreaSelect.value = button.dataset.area || activeFeedArea;
+      reportTextInput.value = "I have an update, correction, or confirmation for this alert: ";
+      reportStatus.textContent = "Add what you know, then submit. Community reports stay unverified until reviewed.";
+      reportTitleInput.focus();
+    });
+  });
 }
 
 async function loadFeed() {
   feedList.innerHTML = '<article class="feed-card loading">Loading the live local feed...</article>';
-  const params = new URLSearchParams({ area: activeFeedArea, category: activeFeedCategory });
+  const params = new URLSearchParams({
+    area: activeFeedArea,
+    category: activeFeedCategory,
+    radius: activeRadius,
+    lat: String(userPosition.lat),
+    lng: String(userPosition.lng)
+  });
   const areaLabel = areaLabels[activeFeedArea] || "your area";
   const categoryLabel =
     activeFeedCategory === "all" ? "all categories" : (categoryLabels[activeFeedCategory] || activeFeedCategory).toLowerCase();
-  feedContext.textContent = `Showing ${categoryLabel} for ${areaLabel}.`;
+  const radiusLabel = activeRadius === "all" ? "all nearby alerts" : `within ${activeRadius} miles`;
+  feedContext.textContent = `Showing ${categoryLabel} for ${areaLabel}, ${radiusLabel} of ${userPosition.label}.`;
 
   try {
     const response = await fetch(`/api/feed?${params.toString()}`);
@@ -860,196 +926,44 @@ if (refreshFeedButton) {
   });
 }
 
+if (radiusSelect) {
+  radiusSelect.addEventListener("change", () => {
+    activeRadius = radiusSelect.value;
+    loadFeed();
+  });
+}
+
+if (useMyLocationButton) {
+  useMyLocationButton.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      feedContext.textContent = "Location sharing is not available in this browser.";
+      return;
+    }
+
+    useMyLocationButton.disabled = true;
+    useMyLocationButton.textContent = "Locating...";
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userPosition = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          label: "your current location"
+        };
+        useMyLocationButton.textContent = "Using my location";
+        useMyLocationButton.disabled = false;
+        loadFeed();
+      },
+      () => {
+        useMyLocationButton.textContent = "Use my location";
+        useMyLocationButton.disabled = false;
+        feedContext.textContent = "Location permission was not granted. Showing Mobile County center instead.";
+      },
+      { enableHighAccuracy: false, timeout: 9000, maximumAge: 300000 }
+    );
+  });
+}
+
 // Initialize the feed and AI summary from the default location on first load.
 activeFeedArea = areaKeyFromLabel(locationInput.value);
 loadFeed();
 loadDailySummary();
-
-/* ---------- Home Stats and Phone Simulator (Mobile Apps Feature) ---------- */
-
-async function loadHeroStats() {
-  try {
-    const res = await fetch('/api/stats');
-    if (!res.ok) return;
-    const data = await res.json();
-    const total = (data.postsToday || 0) + (data.neighborNotices || 0);
-    if (total > 0) {
-      const badge = document.getElementById('heroStatsBadge');
-      const postsCount = document.getElementById('heroStatsPosts');
-      if (badge && postsCount) {
-        postsCount.textContent = total;
-        badge.style.display = 'inline-flex';
-      }
-    }
-  } catch (err) {
-    console.error("Error loading hero stats:", err);
-  }
-}
-
-function initPhoneSimulator() {
-  const tFeed = document.getElementById('mockTabFeed');
-  const tMap = document.getElementById('mockTabMap');
-  const tSafety = document.getElementById('mockTabSafety');
-
-  const pFeed = document.getElementById('phoneFeedTab');
-  const pMap = document.getElementById('phoneMapTab');
-  const pSafety = document.getElementById('phoneSafetyTab');
-
-  if (!tFeed || !tMap || !tSafety) return;
-
-  function setPhoneTab(tab) {
-    [tFeed, tMap, tSafety].forEach(btn => {
-      btn.style.color = '#888';
-    });
-    [pFeed, pMap, pSafety].forEach(screen => {
-      if (screen) screen.style.display = 'none';
-    });
-
-    if (tab === 'feed') {
-      tFeed.style.color = 'var(--accent)';
-      if (pFeed) pFeed.style.display = 'block';
-    } else if (tab === 'map') {
-      tMap.style.color = 'var(--accent)';
-      if (pMap) pMap.style.display = 'block';
-    } else if (tab === 'safety') {
-      tSafety.style.color = 'var(--accent)';
-      if (pSafety) pSafety.style.display = 'block';
-    }
-  }
-
-  tFeed.addEventListener('click', () => setPhoneTab('feed'));
-  tMap.addEventListener('click', () => setPhoneTab('map'));
-  tSafety.addEventListener('click', () => setPhoneTab('safety'));
-}
-
-// Initialize on page load
-loadHeroStats();
-initPhoneSimulator();
-
-/* ---------- Site-Wide Mobile-First Mode Controller ---------- */
-
-function initSiteMobileFirstMode() {
-  const enterMobileBtn = document.getElementById('enterMobileBtn');
-  const exitMobileBtn = document.getElementById('exitMobileBtn');
-  const promoMobileModeBtn = document.getElementById('promoMobileModeBtn');
-  const mobileAuthBtn = document.getElementById('mobileAuthBtn');
-  const homepageAuthBtn = document.getElementById('homepageAuthBtn');
-  const tabButtons = document.querySelectorAll('.site-mobile-tabs .tab-btn');
-  const mainScrollContainer = document.getElementById('home');
-
-  // Toggle View Modes
-  function setSiteViewMode(mode) {
-    if (mode === 'mobile') {
-      document.body.classList.add('site-mobile-first');
-      if (!document.body.getAttribute('data-site-tab')) {
-        document.body.setAttribute('data-site-tab', 'home');
-      }
-      localStorage.setItem('nn-view-mode', 'mobile');
-      
-      // Render floating layout helper for desktop simulation
-      let hint = document.querySelector('.mobile-layout-hint');
-      if (!hint && window.innerWidth >= 768) {
-        hint = document.createElement('div');
-        hint.className = 'mobile-layout-hint';
-        hint.innerHTML = '<strong>📱 Mobile Simulator Mode</strong><span>Experience the mobile app layout on desktop.</span>';
-        document.body.appendChild(hint);
-      }
-    } else {
-      document.body.classList.remove('site-mobile-first');
-      localStorage.setItem('nn-view-mode', 'desktop');
-      const hint = document.querySelector('.mobile-layout-hint');
-      if (hint) hint.remove();
-    }
-  }
-
-  if (enterMobileBtn) {
-    enterMobileBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      setSiteViewMode('mobile');
-    });
-  }
-
-  if (exitMobileBtn) {
-    exitMobileBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      setSiteViewMode('desktop');
-    });
-  }
-
-  if (promoMobileModeBtn) {
-    promoMobileModeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      setSiteViewMode('mobile');
-      // Scroll to top of simulated view
-      if (mainScrollContainer) mainScrollContainer.scrollTop = 0;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  // Hook tab buttons
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tab = btn.dataset.tab;
-      document.body.setAttribute('data-site-tab', tab);
-      
-      // Set active tab class
-      tabButtons.forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-selected', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-
-      // Scroll view back to top
-      if (mainScrollContainer) {
-        mainScrollContainer.scrollTop = 0;
-      }
-      window.scrollTo({ top: 0 });
-    });
-  });
-
-  // DOM Authentication State Mirroring
-  if (mobileAuthBtn && homepageAuthBtn) {
-    mobileAuthBtn.addEventListener('click', () => {
-      homepageAuthBtn.click();
-    });
-
-    // Observer to track Sign In / Sign Out changes on homepageAuthBtn
-    const authObserver = new MutationObserver(() => {
-      const isLoggedOut = homepageAuthBtn.textContent.includes('Sign In');
-      mobileAuthBtn.textContent = isLoggedOut ? 'Sign In' : 'Sign Out';
-      mobileAuthBtn.style.background = isLoggedOut ? 'var(--green)' : 'var(--red)';
-    });
-
-    authObserver.observe(homepageAuthBtn, { childList: true, characterData: true, subtree: true });
-    
-    // Initial sync
-    const isLoggedOut = homepageAuthBtn.textContent.includes('Sign In');
-    mobileAuthBtn.textContent = isLoggedOut ? 'Sign In' : 'Sign Out';
-    mobileAuthBtn.style.background = isLoggedOut ? 'var(--green)' : 'var(--red)';
-  }
-
-  // Load initial view mode from localStorage, URL parameter, or auto-detect small screen size
-  const urlParams = new URLSearchParams(window.location.search);
-  const modeParam = urlParams.get('mode') || urlParams.get('view');
-  
-  if (modeParam === 'mobile' || modeParam === 'app') {
-    setSiteViewMode('mobile');
-  } else if (modeParam === 'desktop') {
-    setSiteViewMode('desktop');
-  } else {
-    const savedMode = localStorage.getItem('nn-view-mode');
-    if (savedMode === 'mobile') {
-      setSiteViewMode('mobile');
-    } else if (savedMode === 'desktop') {
-      setSiteViewMode('desktop');
-    } else if (window.innerWidth < 768) {
-      // Default to mobile view on small screens if no preference is saved yet
-      setSiteViewMode('mobile');
-    }
-  }
-}
-
-// Initialize Mobile-First Mode Controller
-initSiteMobileFirstMode();
-

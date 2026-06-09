@@ -589,7 +589,7 @@ textarea:focus-visible {
 }
 
 .free-strip span::before {
-  content: "Ã¢â‚¬Â¢";
+  content: "â€¢";
   font-size: 1.1rem;
   color: var(--green);
   line-height: 1;
@@ -1782,42 +1782,13 @@ textarea:focus-visible {
     position: static;
     align-items: flex-start;
     flex-direction: column;
-    gap: 14px;
-    padding: 16px 20px;
+    gap: 12px;
   }
 
   .nav-links {
     width: 100%;
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    gap: 16px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .nav-links::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav-links a {
-    flex-shrink: 0;
-  }
-
-  .top-signup {
-    width: 100%;
-    display: flex;
     justify-content: space-between;
-    gap: 8px;
-    margin-top: 4px;
-  }
-
-  .top-signup button {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    gap: 12px;
   }
 
   .status-link {
@@ -1896,6 +1867,27 @@ textarea:focus-visible {
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.proximity-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.proximity-controls select {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
 }
 
 .feed-filters {
@@ -2028,6 +2020,38 @@ textarea:focus-visible {
   color: var(--green);
   font-weight: 800;
   text-decoration: none;
+}
+
+.feed-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.feed-card-actions button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: var(--field);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.verified-user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(11, 99, 67, 0.1);
+  color: var(--green);
+  font-size: 0.72rem;
+  font-weight: 900;
 }
 
 .report-panel input[type="text"] {
@@ -2629,415 +2653,3 @@ body.auth-locked .footer {
   background-color: #f8f9fa;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
-
-/* ==========================================================================
-   MOBILE-FIRST SITE-WIDE OPTION (Responsive App Frame & Layout Switcher)
-   ========================================================================== */
-
-/* 1. View Toggles (Desktop vs Mobile layout header buttons) */
-#enterMobileBtn {
-  display: inline-flex !important;
-  align-items: center;
-  transition: all 0.2s ease-in-out;
-}
-#enterMobileBtn:hover {
-  background: var(--accent-soft);
-  transform: translateY(-1px);
-}
-
-/* 2. Global adjustments for Mobile-First layout mode */
-body.site-mobile-first {
-  transition: background 0.3s ease;
-}
-
-/* 3. Desktop Mockup Container Mode (Centering and Frame Simulation) */
-@media (min-width: 768px) {
-  body.site-mobile-first {
-    background: linear-gradient(135deg, #162a1e 0%, #0d1a11 50%, #080f0a 100%) !important;
-    background-size: cover !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    min-height: 100vh !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 20px 0 !important;
-  }
-
-  /* Simulated Mobile Device Frame */
-  body.site-mobile-first::before {
-    content: "";
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 395px;
-    height: 840px;
-    border: 14px solid #1a231d;
-    border-radius: 48px;
-    background: transparent;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.8), 
-                inset 0 0 12px rgba(0,0,0,0.6),
-                0 0 0 1px rgba(255,255,255,0.05);
-    pointer-events: none;
-    z-index: 10000;
-  }
-
-  /* Device Notch */
-  body.site-mobile-first::after {
-    content: "";
-    position: fixed;
-    top: calc(50% - 420px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 22px;
-    background: #1a231d;
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-    pointer-events: none;
-    z-index: 10001;
-  }
-
-  /* Confining header.topbar inside simulated phone screen */
-  body.site-mobile-first .topbar {
-    width: 367px !important;
-    height: 64px !important;
-    position: fixed !important;
-    top: calc(50% - 398px) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    border-top-left-radius: 34px !important;
-    border-top-right-radius: 34px !important;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    border-bottom: 1px solid var(--line) !important;
-    z-index: 999 !important;
-    padding: 10px 16px !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03) !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-  }
-
-  /* Confining main#home inside simulated phone screen */
-  body.site-mobile-first main#home {
-    width: 367px !important;
-    height: calc(840px - 28px - 64px - 60px) !important; /* Total height minus borders, header, tabs */
-    position: fixed !important;
-    top: calc(50% - 398px + 64px) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    border-radius: 0 !important;
-    overflow-y: auto !important;
-    background: #fcfdfc !important;
-    z-index: 998 !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-    padding: 12px 14px 40px !important;
-    /* Custom thin scrollbar */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(11,99,67,0.2) transparent;
-  }
-  body.site-mobile-first main#home::-webkit-scrollbar {
-    width: 4px;
-  }
-  body.site-mobile-first main#home::-webkit-scrollbar-thumb {
-    background: rgba(11,99,67,0.2);
-    border-radius: 4px;
-  }
-
-  /* Hiding standard footer in simulated phone screen */
-  body.site-mobile-first .footer {
-    display: none !important;
-  }
-
-  /* Confining Bottom Tabs within simulated phone screen */
-  body.site-mobile-first .site-mobile-tabs {
-    width: 367px !important;
-    height: 60px !important;
-    position: fixed !important;
-    bottom: calc(50% - 398px + 2px) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    border-bottom-left-radius: 34px !important;
-    border-bottom-right-radius: 34px !important;
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-    border-top: 1px solid var(--line) !important;
-    z-index: 1000 !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    box-sizing: border-box !important;
-  }
-}
-
-/* 4. Full Viewport App Mode for Actual Mobile Devices (Screen < 768px) */
-@media (max-width: 767px) {
-  body.site-mobile-first {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #fcfdfc !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-  }
-
-  body.site-mobile-first .topbar {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 56px !important;
-    z-index: 1000 !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(12px) !important;
-    border-bottom: 1px solid var(--line) !important;
-    padding: 10px 16px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-  }
-
-  body.site-mobile-first main#home {
-    position: fixed !important;
-    top: 56px !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: calc(100vh - 56px - 60px) !important;
-    overflow-y: auto !important;
-    padding: 12px 16px 40px !important;
-    box-sizing: border-box !important;
-    z-index: 998 !important;
-  }
-
-  body.site-mobile-first .site-mobile-tabs {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 60px !important;
-    z-index: 1000 !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(12px) !important;
-    border-top: 1px solid var(--line) !important;
-    box-sizing: border-box !important;
-  }
-
-  body.site-mobile-first .footer {
-    display: none !important;
-  }
-}
-
-/* 5. Header Control Switcher Visibility & Compact Overrides */
-body.site-mobile-first .topbar .nav-links,
-body.site-mobile-first .topbar .top-signup {
-  display: none !important;
-}
-
-body.site-mobile-first .mobile-topbar-controls {
-  display: flex !important;
-}
-
-/* 6. Section Visibility Logic driven by data-site-tab on Body */
-body.site-mobile-first main#home > section {
-  display: none !important;
-  animation: tabFadeIn 0.2s ease-out;
-}
-
-@keyframes tabFadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Active tab sections mapping */
-body.site-mobile-first[data-site-tab="home"] main#home > .hero,
-body.site-mobile-first[data-site-tab="home"] main#home > .community-section,
-body.site-mobile-first[data-site-tab="home"] main#home > .growth-section {
-  display: block !important;
-}
-
-body.site-mobile-first[data-site-tab="brief"] main#home > .brief-section,
-body.site-mobile-first[data-site-tab="brief"] main#home > .news-section,
-body.site-mobile-first[data-site-tab="brief"] main#home > .emergency-mode-section {
-  display: block !important;
-}
-
-body.site-mobile-first[data-site-tab="feed"] main#home > .feed-section {
-  display: block !important;
-}
-
-body.site-mobile-first[data-site-tab="safety"] main#home > .safety-section,
-body.site-mobile-first[data-site-tab="safety"] main#home > .notification-section,
-body.site-mobile-first[data-site-tab="safety"] main#home > .reputation-section {
-  display: block !important;
-}
-
-body.site-mobile-first[data-site-tab="places"] main#home > .places-section,
-body.site-mobile-first[data-site-tab="places"] main#home > .local-pages-section,
-body.site-mobile-first[data-site-tab="places"] main#home > .business-section,
-body.site-mobile-first[data-site-tab="places"] main#home > .rewards-section {
-  display: block !important;
-}
-
-/* 7. Bottom Navigation Tabs styling */
-.site-mobile-tabs {
-  grid-template-columns: repeat(5, 1fr) !important;
-  align-items: center !important;
-  justify-items: center !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-body.site-mobile-first .site-mobile-tabs {
-  display: grid !important;
-}
-
-.site-mobile-tabs .tab-btn {
-  background: none !important;
-  border: none !important;
-  color: var(--ink-soft) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 0.68rem !important;
-  font-weight: 700 !important;
-  gap: 3px !important;
-  cursor: pointer !important;
-  width: 100% !important;
-  height: 100% !important;
-  transition: color 0.15s ease, transform 0.1s ease !important;
-  padding: 0 !important;
-  font-family: var(--font-body) !important;
-}
-
-.site-mobile-tabs .tab-btn svg {
-  width: 18px !important;
-  height: 18px !important;
-  stroke: currentColor !important;
-  transition: transform 0.15s ease, stroke-width 0.15s ease !important;
-}
-
-.site-mobile-tabs .tab-btn:hover {
-  color: var(--accent) !important;
-}
-
-.site-mobile-tabs .tab-btn:active {
-  transform: scale(0.92) !important;
-}
-
-.site-mobile-tabs .tab-btn.active {
-  color: var(--accent) !important;
-}
-
-.site-mobile-tabs .tab-btn.active svg {
-  stroke-width: 2.5px !important;
-  transform: translateY(-1px) !important;
-}
-
-/* 8. Component Overrides for Compact Mobile Rendering */
-body.site-mobile-first .hero {
-  padding: 16px 10px !important;
-  background: none !important;
-  border: none !important;
-  margin-bottom: 12px !important;
-  border-radius: 0 !important;
-}
-
-body.site-mobile-first .hero-copy {
-  padding: 0 !important;
-  max-width: 100% !important;
-}
-
-body.site-mobile-first .hero-copy h1 {
-  font-size: 1.45rem !important;
-  line-height: 1.25 !important;
-  margin-bottom: 12px !important;
-}
-
-body.site-mobile-first .hero-text {
-  font-size: 0.88rem !important;
-  line-height: 1.45 !important;
-  margin-bottom: 16px !important;
-}
-
-body.site-mobile-first .hero-actions {
-  flex-direction: column !important;
-  gap: 8px !important;
-  width: 100% !important;
-}
-
-body.site-mobile-first .hero-actions button,
-body.site-mobile-first .hero-actions a {
-  width: 100% !important;
-  box-sizing: border-box !important;
-  text-align: center !important;
-}
-
-body.site-mobile-first .hero-motion {
-  display: none !important;
-}
-
-body.site-mobile-first .section-heading h2 {
-  font-size: 1.4rem !important;
-}
-
-body.site-mobile-first .feed-section {
-  padding: 12px 0 !important;
-}
-
-body.site-mobile-first .brief-section {
-  padding: 12px 0 !important;
-}
-
-body.site-mobile-first .safety-section {
-  padding: 12px 0 !important;
-}
-
-body.site-mobile-first .places-section {
-  padding: 12px 0 !important;
-}
-
-body.site-mobile-first .brand {
-  font-size: 1.1rem !important;
-}
-
-body.site-mobile-first .site-banner {
-  margin-bottom: 12px !important;
-}
-
-body.site-mobile-first .map-container {
-  height: 220px !important;
-}
-
-/* Helper device outline style for desktop view context */
-.mobile-layout-hint {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  body.site-mobile-first .mobile-layout-hint {
-    display: flex;
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: rgba(11, 99, 67, 0.95);
-    color: white;
-    padding: 12px 18px;
-    border-radius: 16px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    z-index: 10000;
-    border: 1px solid rgba(255,255,255,0.1);
-    flex-direction: column;
-    gap: 4px;
-  }
-}
-
-

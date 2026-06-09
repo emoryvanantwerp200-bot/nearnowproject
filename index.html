@@ -3,73 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script>
-      (function() {
-        function createSafeStorage(type) {
-          let original;
-          try {
-            original = window[type];
-          } catch (e) {
-            // Access is denied
-          }
-          if (original) {
-            try {
-              original.setItem('__nearnow_test__', '1');
-              original.removeItem('__nearnow_test__');
-              return original;
-            } catch (e) {
-              // Fall through to mock
-            }
-          }
-          const store = {};
-          return {
-            getItem(key) {
-              return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
-            },
-            setItem(key, value) {
-              store[key] = String(value);
-            },
-            removeItem(key) {
-              delete store[key];
-            },
-            clear() {
-              for (const k in store) delete store[k];
-            },
-            key(i) {
-              return Object.keys(store)[i] || null;
-            },
-            get length() {
-              return Object.keys(store).length;
-            }
-          };
-        }
-        const safeLocal = createSafeStorage('localStorage');
-        const safeSession = createSafeStorage('sessionStorage');
-
-        try {
-          Object.defineProperty(window, 'localStorage', {
-            value: safeLocal,
-            writable: true,
-            configurable: true,
-            enumerable: true
-          });
-        } catch (e) {
-          try { window.localStorage = safeLocal; } catch (err) {}
-        }
-
-        try {
-          Object.defineProperty(window, 'sessionStorage', {
-            value: safeSession,
-            writable: true,
-            configurable: true,
-            enumerable: true
-          });
-        } catch (e) {
-          try { window.sessionStorage = safeSession; } catch (err) {}
-        }
-      })();
-    </script>
-    <title>NearNow | Real-time local alerts for the Gulf Coast</title>
+    <title>NearNow | Your morning local briefing</title>
     <meta
       name="description"
       content="NearNow brings free local alerts, weather, traffic, events, verified sources, and AI summaries into one daily community briefing."
@@ -93,18 +27,8 @@
       }
     }
     </script>
-  <style>
-.nn-badge { display:inline-flex; align-items:center; gap:.2rem; font-size:.72rem;
-  font-weight:600; padding:.1rem .45rem; border-radius:999px; vertical-align:middle; }
-.nn-badge--user { background:#e0f2fe; color:#0369a1; }
-.nn-badge--biz  { background:#dcfce7; color:#15803d; }
-.nn-rep { font-weight:600; color:#b45309; }
-.nn-report-btn { background:none; border:none; color:#9ca3af; cursor:pointer;
-  font-size:.78rem; padding:.15rem .35rem; }
-.nn-report-btn:hover { color:#dc2626; }
-.nn-report-btn.flagged { color:#dc2626; font-weight:600; }
-</style></head>
-  <body>
+  </head>
+  <body class="auth-locked">
     <header class="topbar" aria-label="NearNow navigation">
       <a class="brand" href="#home" aria-label="NearNow home">
         <span class="brand-mark" aria-hidden="true">N</span>
@@ -120,21 +44,22 @@
         <a href="#trust">Trust</a>
       </nav>
       <div class="top-signup" aria-label="Create a NearNow account">
+        <button class="signup-button google" type="button" data-provider="google">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" style="margin-right: 2px; vertical-align: middle;">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Sign in with Google</span>
+        </button>
         <button class="signup-button" type="button" id="homepageAuthBtn" style="background: var(--green); color: white; border-color: var(--green); font-weight: 800; cursor: pointer;">
           <span>Sign In / Sign Up</span>
         </button>
       </div>
-      <div class="mobile-topbar-controls" style="display: none; align-items: center; gap: 8px;">
-        <button id="exitMobileBtn" style="background: var(--accent-soft); color: var(--accent); border: 1.5px solid var(--line); border-radius: 20px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
-          🖥️ Desktop View
-        </button>
-        <button id="mobileAuthBtn" style="background: var(--green); color: white; border: none; border-radius: 20px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: all 0.2s;">
-          Sign In
-        </button>
-      </div>
     </header>
 
-    <main id="home">
+    <main id="home" aria-hidden="true">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-motion" aria-hidden="true">
           <span class="signal-dot dot-weather"></span>
@@ -147,12 +72,7 @@
           <div class="site-banner">
             <img src="./nearnow-banner.svg" alt="NearNow live local intelligence banner">
           </div>
-          <p class="eyebrow" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span>Everything free while NearNow earns daily trust</span>
-            <span id="heroStatsBadge" style="background: var(--accent); color: white; padding: 2px 10px; border-radius: 99px; font-weight: 800; font-size: 0.72rem; display: none;">
-              ⚡ <span id="heroStatsPosts">0</span> active reports & notices today
-            </span>
-          </p>
+          <p class="eyebrow">Everything free while NearNow earns daily trust</p>
           <h1 id="hero-title">Real-time alerts, news, weather, and events happening around you.</h1>
           <p class="hero-text">
             NearNow is the first thing to check before you leave the house. One live local
@@ -368,7 +288,7 @@
                 <line x1="-12" y1="0" x2="12" y2="0" stroke="#475569" stroke-width="1"></line>
                 <polygon points="0,-12 -3.5,-3 0,-1" fill="#ce5d44"></polygon>
                 <polygon points="0,12 3.5,3 0,1" fill="#475569"></polygon>
-                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954° N / 88.0399° W</text>
+                <text x="20" y="3" font-family="'Manrope', monospace" font-size="8" fill="#475569" font-weight="800" letter-spacing="0.05em">30.6954Â° N / 88.0399Â° W</text>
               </g>
             </svg>
             <button class="pin weather visible" style="left: 26%; top: 24%" data-type="weather" data-title="Dense fog advisory">
@@ -409,109 +329,16 @@
         </div>
       </section>
 
-      <section class="mobile-app-promo" id="mobile-app" aria-labelledby="promo-title" style="padding: 40px 24px; background: rgba(11, 99, 67, 0.03); border-radius: var(--radius-lg); border: 1px solid var(--line); overflow: hidden;">
-        <div class="promo-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; align-items: center; max-width: 1200px; margin: 0 auto;">
-          <div class="promo-left">
-            <div class="promo-badge" style="background: var(--accent-soft); color: var(--accent); padding: 4px 12px; border-radius: 99px; display: inline-block; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; margin-bottom: 12px; border: 1px solid var(--line);">Mobile-Friendly Option</div>
-            <h2 id="promo-title" style="font-family: 'Fraunces', serif; font-size: 2.2rem; color: var(--accent); margin-bottom: 16px; line-height: 1.15;">📱 Switch to NearNow Circle Web App</h2>
-            <p class="promo-text" style="font-size: 1.05rem; line-height: 1.5; color: var(--ink-soft); margin-bottom: 24px;">
-              On a phone or tablet? Use the lightweight NearNow Circle web app, optimized specifically for touch interfaces. It includes neighborhood threads, real-time family safety tracking on an interactive map, and modern offline support.
-            </p>
-            <div class="promo-actions" style="display: flex; flex-direction: column; gap: 12px;">
-              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <a class='btn-promo-primary' href='/app' style="background: var(--accent); color: white; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; text-align: center; min-width: 180px; transition: transform 0.2s ease;">Open Mobile App</a>
-                <button id="promoMobileModeBtn" style="background: white; color: var(--accent); border: 2px solid var(--accent); padding: 10px 32px; border-radius: 12px; font-weight: 800; cursor: pointer; min-width: 180px; transition: transform 0.2s ease; display: inline-block;">📱 Try Mobile Layout</button>
-              </div>
-              <span class="promo-info" style="font-size: 0.8rem; color: var(--ink-soft);">⚡ Runs instantly in your browser • No installation required</span>
-            </div>
-          </div>
-          
-          <!-- CSS Phone Simulator (Mobile Apps Feature) -->
-          <div class="promo-right" style="display: flex; justify-content: center; position: relative;">
-            <div class="phone-mockup" style="width: 280px; height: 500px; border-radius: 40px; border: 12px solid #1a1a1a; background: #fff; box-shadow: 0 20px 40px rgba(0,0,0,0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif;">
-              <!-- Phone Notch -->
-              <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 18px; background: #1a1a1a; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 10;"></div>
-              
-              <!-- App Top Bar -->
-              <div style="background: var(--accent); color: white; padding: 24px 12px 10px; text-align: center; font-size: 0.82rem; font-weight: 800; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                NearNow Circle
-              </div>
-              
-              <!-- Mock App Screen Screen Content -->
-              <div id="phoneScreenContent" style="flex: 1; overflow-y: auto; padding: 12px; background: #f8faf7; font-size: 0.72rem;">
-                <!-- Default Content: Feed -->
-                <div id="phoneFeedTab">
-                  <div style="background: white; border: 1px solid rgba(0,0,0,0.06); border-radius: 8px; padding: 8px; margin-bottom: 8px; border-left: 3px solid var(--accent); text-align: left;">
-                    <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent); font-size:0.6rem; margin-bottom:4px;">
-                      <span>TRAFFIC</span>
-                      <span>12m ago</span>
-                    </div>
-                    <strong style="display:block; margin-bottom:2px; font-weight: 700;">Airport Blvd Lane Cleared</strong>
-                    <span style="color:#666; font-size:0.68rem; line-height:1.3;">Crews have resolved the lane obstruction near Schillinger Road. Traffic flow returning to normal.</span>
-                  </div>
-                  <div style="background: white; border: 1px solid rgba(0,0,0,0.06); border-radius: 8px; padding: 8px; margin-bottom: 8px; border-left: 3px solid #cb6e03; text-align: left;">
-                    <div style="display:flex; justify-content:space-between; font-weight:800; color:#cb6e03; font-size:0.6rem; margin-bottom:4px;">
-                      <span>NEIGHBORS</span>
-                      <span>1h ago</span>
-                    </div>
-                    <strong style="display:block; margin-bottom:2px; font-weight: 700;">Found Golden Retriever</strong>
-                    <span style="color:#666; font-size:0.68rem; line-height:1.3;">Friendly male dog running near Pine Street. Red collar with a tag. Safe in our backyard now.</span>
-                  </div>
-                </div>
-                
-                <!-- Map Content (Hidden initially) -->
-                <div id="phoneMapTab" style="display:none; height: 100%; position: relative;">
-                  <div style="width: 100%; height: 160px; background: #edf4eb; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid rgba(0,0,0,0.06);">
-                    <!-- Mini Sinuous Scenic River -->
-                    <path d="M-10 100 C 50 80, 80 120, 150 70 S 200 10, 250 5" fill="none" stroke="#add8e6" stroke-width="12" opacity="0.6" style="position: absolute;"></path>
-                    <!-- Pulse Pins -->
-                    <div style="position: absolute; left: 35%; top: 35%; width: 8px; height: 8px; background: #ce5d44; border-radius: 50%;"></div>
-                    <div style="position: absolute; left: 35%; top: 35%; width: 24px; height: 24px; border: 2px solid #ce5d44; border-radius: 50%; transform: translate(-8px, -8px); animation: rise 1.8s infinite; opacity: 0.8;"></div>
-                    
-                    <div style="position: absolute; left: 70%; top: 65%; width: 8px; height: 8px; background: #0b6343; border-radius: 50%;"></div>
-                    <div style="position: absolute; left: 70%; top: 65%; width: 24px; height: 24px; border: 2px solid #0b6343; border-radius: 50%; transform: translate(-8px, -8px); animation: rise 1.8s infinite; animation-delay: 0.6s; opacity: 0.8;"></div>
-                  </div>
-                  <div style="margin-top: 10px; background: white; border-radius: 8px; padding: 10px; border: 1px solid rgba(0,0,0,0.06); text-align: left;">
-                    <strong style="font-weight: 700;">📍 Live Map Pins</strong>
-                    <p style="color:#666; margin-top:2px; font-size:0.65rem; line-height: 1.3;">Visual coordinate-linked safety advisories, neighborhood alerts, and real-time family safety circles.</p>
-                  </div>
-                </div>
-
-                <!-- Safety Content (Hidden initially) -->
-                <div id="phoneSafetyTab" style="display:none; text-align: left;">
-                  <div style="display:flex; align-items:center; gap:8px; background:white; padding:8px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); margin-bottom:8px;">
-                    <div style="width:24px; height:24px; border-radius:50%; background:var(--accent-soft); display:flex; justify-content:center; align-items:center; font-weight:800; color:var(--accent); font-size: 0.65rem;">M</div>
-                    <div>
-                      <strong style="font-weight: 700;">Mom (🏠 Home)</strong>
-                      <p style="color:#666; font-size: 0.6rem; margin-top: 1px;">Arrived at Central Grocery • 8:12 AM</p>
-                    </div>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:8px; background:white; padding:8px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); margin-bottom:8px;">
-                    <div style="width:24px; height:24px; border-radius:50%; background:rgba(25, 118, 210, 0.1); display:flex; justify-content:center; align-items:center; font-weight:800; color:var(--blue); font-size: 0.65rem;">D</div>
-                    <div>
-                      <strong style="font-weight: 700;">Dad (🚗 Commute)</strong>
-                      <p style="color:#666; font-size: 0.6rem; margin-top: 1px;">On Highway 98 East • 8:25 AM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Phone Navigation Tabs -->
-              <div style="border-top: 1px solid #eaeaea; background: #fff; display: flex; justify-content: space-around; padding: 8px 4px; font-size: 0.6rem; font-weight: 700; border-bottom-left-radius: 28px; border-bottom-right-radius: 28px;">
-                <button type="button" id="mockTabFeed" style="background:none; border:none; color: var(--accent); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                  <span>📰</span>
-                  <span>Feed</span>
-                </button>
-                <button type="button" id="mockTabMap" style="background:none; border:none; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                  <span>📍</span>
-                  <span>Map</span>
-                </button>
-                <button type="button" id="mockTabSafety" style="background:none; border:none; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                  <span>👥</span>
-                  <span>Circle</span>
-                </button>
-              </div>
-            </div>
+      <section class="mobile-app-promo" id="mobile-app" aria-labelledby="promo-title">
+        <div class="promo-card">
+          <div class="promo-badge">Mobile-Friendly Option</div>
+          <h2 id="promo-title">📱 Switch to NearNow Mobile Web App</h2>
+          <p class="promo-text">
+            On a phone or tablet? Use the lightweight NearNow Circle web app, built specifically for touch interfaces. It includes neighborhood threads, real-time family safety tracking on an interactive map, and modern offline support.
+          </p>
+          <div class="promo-actions">
+            <a class='btn-promo-primary' href='/app'>Open Mobile App</a>
+            <span class="promo-info">⚡ Runs instantly in your browser • No installation required</span>
           </div>
         </div>
       </section>
@@ -534,6 +361,16 @@
             <button class="feed-chip" type="button" data-category="community" role="tab" aria-selected="false">Community</button>
             <button class="feed-chip" type="button" data-category="events" role="tab" aria-selected="false">Events</button>
             <button class="feed-chip" type="button" data-category="emergency" role="tab" aria-selected="false">Emergency</button>
+          </div>
+          <div class="proximity-controls" aria-label="Alert proximity filtering">
+            <label for="radiusSelect">Radius</label>
+            <select id="radiusSelect">
+              <option value="5">within 5 mi</option>
+              <option value="10" selected>within 10 mi</option>
+              <option value="25">within 25 mi</option>
+              <option value="all">all nearby alerts</option>
+            </select>
+            <button class="soft-button" type="button" id="useMyLocation">Use my location</button>
           </div>
           <button class="soft-button" type="button" id="refreshFeed">Refresh</button>
         </div>
@@ -605,9 +442,8 @@
           <p class="eyebrow">Safety Alerts</p>
           <h2 id="safety-title">Crime, AMBER, and weather alerts from sources people recognize.</h2>
           <p>
-            NearNow keeps urgent public-safety information separate from ordinary news,
-            shows the source on every alert, and makes it obvious when something needs your
-            immediate attention.
+            NearNow should separate urgent public-safety information from ordinary news,
+            show the source, and make it obvious when an alert needs immediate attention.
           </p>
         </div>
         <div class="safety-grid">
@@ -659,9 +495,9 @@
           <p class="eyebrow">Big Stuff Notifications</p>
           <h2 id="notification-title">Turn on alerts for the counties you care about.</h2>
           <p>
-            Pick the counties you care about and turn on browser notifications for major
-            weather, AMBER, crime, traffic, and breaking local alerts. Your area choices are
-            saved on this device.
+            NearNow can ask your browser for notification permission and save your area
+            choices. For production, these preferences connect to official alert feeds and
+            push notifications.
           </p>
         </div>
         <div class="notification-panel">
@@ -691,8 +527,8 @@
           <p class="eyebrow">Real Local News</p>
           <h2 id="news-title">Choose your Gulf Coast area and open trusted local coverage.</h2>
           <p>
-            Your morning scan in one place &mdash; trusted local sources grouped by area for
-            Baldwin County, Mobile County, Escambia County, West Mobile, and
+            NearNow should make the morning scan easier by grouping real local sources
+            for Baldwin County, Mobile County, Escambia County, West Mobile, and
             Pascagoula, Mississippi.
           </p>
         </div>
@@ -738,10 +574,10 @@
       <section class="places-section" id="places" aria-labelledby="places-title">
         <div class="section-heading">
           <p class="eyebrow">Places To Visit</p>
-          <h2 id="places-title">Find something worth doing nearby today.</h2>
+          <h2 id="places-title">Give people useful ideas after they check the alerts.</h2>
           <p>
-            After you check the alerts, NearNow answers the next question: what's worth
-            doing nearby today.
+            The daily habit gets stronger when NearNow also answers, "What can we do nearby
+            today?" These picks can later become weather-aware and event-aware.
           </p>
         </div>
         <div class="places-layout">
@@ -758,7 +594,7 @@
 
       <section class="trust-section" id="trust" aria-labelledby="trust-title">
         <div class="section-heading">
-          <p class="eyebrow">Why you can trust it</p>
+          <p class="eyebrow">Phase 2: Build Trust</p>
           <h2 id="trust-title">Every alert shows why people should believe it.</h2>
         </div>
         <div class="trust-grid">
@@ -863,14 +699,74 @@
         </div>
       </section>
 
+      <section class="local-pages-section" id="local-pages" aria-labelledby="local-pages-title">
+        <div class="section-heading">
+          <p class="eyebrow">Hyperlocal pages</p>
+          <h2 id="local-pages-title">City, neighborhood, and ZIP pages built for local search.</h2>
+          <p>Each page can carry live alerts, weather, events, and community discussions for one exact place.</p>
+        </div>
+        <div class="local-page-grid">
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Downtown Mobile</h3>
+            <p>Live alerts, port traffic, events, public safety, restaurants, and civic updates.</p>
+          </article>
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Fairhope</h3>
+            <p>Bayfront weather, school updates, local events, community posts, and downtown alerts.</p>
+          </article>
+          <article class="local-page-card">
+            <span>City page</span>
+            <h3>Daphne</h3>
+            <p>Causeway traffic, severe weather, local meetings, high school events, and safety reports.</p>
+          </article>
+          <article class="local-page-card">
+            <span>Neighborhood page</span>
+            <h3>Spanish Fort</h3>
+            <p>Eastern Shore road conditions, shopping-area traffic, local business posts, and events.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="business-section" id="businesses" aria-labelledby="business-title">
+        <div class="section-heading">
+          <p class="eyebrow">Local business partnerships</p>
+          <h2 id="business-title">Free business profiles create useful local updates and future revenue.</h2>
+          <p>Businesses can post specials, events, closings, hiring notices, and announcements that belong in the local feed.</p>
+        </div>
+        <div class="business-grid">
+          <article class="business-card">
+            <span>Coffee shop</span>
+            <h3>Morning special</h3>
+            <p>Post breakfast deals, storm-hour changes, and community board announcements.</p>
+          </article>
+          <article class="business-card">
+            <span>Restaurant</span>
+            <h3>Tonight's event</h3>
+            <p>Share live music, fundraiser nights, pop-ups, and weather-related patio updates.</p>
+          </article>
+          <article class="business-card">
+            <span>Barber</span>
+            <h3>Open slots</h3>
+            <p>Publish same-day appointments, holiday hours, and neighborhood promotions.</p>
+          </article>
+          <article class="business-card">
+            <span>Local store</span>
+            <h3>Announcement</h3>
+            <p>Post sales, lost-and-found notices, school drives, and emergency supply availability.</p>
+          </article>
+        </div>
+      </section>
+
       <section class="community-section" aria-labelledby="community-title">
         <div>
-          <p class="eyebrow">Community reports</p>
-          <h2 id="community-title">See something? Report it in seconds.</h2>
+          <p class="eyebrow">Phase 1: Get Users</p>
+          <h2 id="community-title">Make the free version worth checking every day.</h2>
           <p>
-            Flag a road hazard, weather damage, a school update, or a lost pet in seconds.
-            Every report posts to the live feed marked Unverified until a trusted source or
-            moderator confirms it.
+            NearNow should earn habits before monetization. The homepage leads with utility,
+            then gives residents a simple way to save their area, open trusted sources, and
+            submit reports for review before anything is marked verified.
           </p>
         </div>
         <form class="report-panel" aria-label="Submit a community report">
@@ -934,6 +830,82 @@
           </article>
         </div>
       </section>
+
+      <section class="rewards-section" id="rewards" aria-labelledby="rewards-title">
+        <div class="section-heading">
+          <p class="eyebrow">Gamify participation</p>
+          <h2 id="rewards-title">Reward people for helping their neighbors.</h2>
+        </div>
+        <div class="badge-ladder">
+          <article class="reward-card bronze">
+            <div class="reward-badge-icon bronze">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6" fill="#cd7f32" stroke="#a05a2c"/>
+                <path d="M15.47 13.39 19 21l-7-2-7 2 3.53-7.61" stroke-width="2"/>
+                <text x="12" y="10.5" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">3</text>
+              </svg>
+            </div>
+            <span>Bronze Reporter</span>
+            <p>Submit 3 helpful reports.</p>
+          </article>
+          <article class="reward-card silver">
+            <div class="reward-badge-icon silver">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6" fill="#c0c0c0" stroke="#708090"/>
+                <path d="M15.47 13.39 19 21l-7-2-7 2 3.53-7.61" stroke-width="2"/>
+                <text x="12" y="10.5" font-size="6" font-weight="900" fill="#fff" text-anchor="middle">10</text>
+              </svg>
+            </div>
+            <span>Silver Reporter</span>
+            <p>Verify 10 local posts.</p>
+          </article>
+          <article class="reward-card gold">
+            <div class="reward-badge-icon gold">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6" fill="#ffd700" stroke="#b8860b"/>
+                <path d="M15.47 13.39 19 21l-7-2-7 2 3.53-7.61" stroke-width="2"/>
+                <text x="12" y="10.5" font-size="6" font-weight="900" fill="#fff" text-anchor="middle">90+</text>
+              </svg>
+            </div>
+            <span>Gold Reporter</span>
+            <p>Keep a 90+ reputation score.</p>
+          </article>
+          <article class="reward-card hero-badge">
+            <div class="reward-badge-icon hero">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#0ea5e9" stroke="#0369a1"/>
+                <path d="M12 7l1.5 3.5h3.5l-2.8 2.2 1 3.8-3.2-2.5-3.2 2.5 1-3.8-2.8-2.2h3.5z" fill="#fff" stroke="none"/>
+              </svg>
+            </div>
+            <span>Community Hero</span>
+            <p>Help neighbors during emergency mode.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="growth-section" id="growth" aria-labelledby="growth-title">
+        <div class="section-heading">
+          <p class="eyebrow">Simple growth path</p>
+          <h2 id="growth-title">Build daily value before charging for anything.</h2>
+        </div>
+        <div class="milestones" aria-label="User growth milestones">
+          <article class="milestone active">
+            <span>1</span>
+            <h3>First 100 users</h3>
+            <p>Launch a clear morning brief, shareable alerts, and neighborhood onboarding.</p>
+          </article>
+          <article class="milestone">
+            <span>2</span>
+            <h3>Then 500 users</h3>
+            <p>Add saved locations, event reminders, reporting reputation, and source history.</p>
+          </article>
+          <article class="milestone">
+            <span>3</span>
+            <h3>Then 1,000 users</h3>
+            <p>Expand verified community coverage and deepen personalization by commute and school routes.</p>
+          </article>
+        </div>
+      </section>
     </main>
 
     <footer class="footer">
@@ -941,7 +913,7 @@
     </footer>
 
     <!-- Auth overlay -->
-    <div class="auth-overlay" id="authOverlay" hidden>
+    <div class="auth-overlay" id="authOverlay">
       <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
         <h2 id="authTitle">Sign in to see what is going on</h2>
         <p id="authSubtitle">NearNow local alerts, daily briefs, family circles, reports, and live feeds are available after you sign in.</p>
@@ -995,44 +967,6 @@
       </div>
     </div>
 
-    <!-- Bottom Mobile Navigation Bar for Site-wide Mobile First Mode -->
-    <nav class="site-mobile-tabs" aria-label="Site sections" role="tablist" style="display: none;">
-      <button class="tab-btn active" data-tab="home" role="tab" aria-selected="true" aria-controls="homeTabContent">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-        <span>Home</span>
-      </button>
-      <button class="tab-btn" data-tab="brief" role="tab" aria-selected="false" aria-controls="briefTabContent">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-          <path d="M6 6h10"/>
-          <path d="M6 10h10"/>
-        </svg>
-        <span>Brief</span>
-      </button>
-      <button class="tab-btn" data-tab="feed" role="tab" aria-selected="false" aria-controls="feedTabContent">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span>Feed</span>
-      </button>
-      <button class="tab-btn" data-tab="safety" role="tab" aria-selected="false" aria-controls="safetyTabContent">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-        <span>Safety</span>
-      </button>
-      <button class="tab-btn" data-tab="places" role="tab" aria-selected="false" aria-controls="placesTabContent">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
-        </svg>
-        <span>Places</span>
-      </button>
-    </nav>
-
     <script src="./home.js"></script>
     <script type="module">
       import { oauthLogin, login, logout, getUser, handleAuthCallback, onAuthChange, AUTH_EVENTS } from '@netlify/identity';
@@ -1074,7 +1008,10 @@
           homepageAuthBtn.style.background = 'var(--red)';
           homepageAuthBtn.style.borderColor = 'var(--red)';
         } else {
+          document.body.classList.add('auth-locked');
           document.body.classList.remove('auth-ready');
+          home.setAttribute('aria-hidden', 'true');
+          showAuthModal();
           homepageAuthBtn.innerHTML = '<span>Sign In / Sign Up</span>';
           homepageAuthBtn.style.background = 'var(--green)';
           homepageAuthBtn.style.borderColor = 'var(--green)';
@@ -1163,16 +1100,21 @@
           currentUser = null;
           updateAuthUI();
         } else {
-          showAuthModal();
+          try {
+            await startGoogleAuth();
+          } catch (error) {
+            showAuthModal();
+            setAuthMessage(error?.message || 'Google sign-in needs to be enabled in Netlify Identity.', 'error');
+          }
         }
       });
 
       authOverlay.addEventListener('click', (e) => {
-        if (e.target === authOverlay) hideAuthModal();
+        if (e.target === authOverlay && currentUser) hideAuthModal();
       });
 
       authOverlay.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && currentUser) {
           hideAuthModal();
         }
       });
@@ -1259,8 +1201,7 @@
             updateAuthUI();
             if (callbackResult.type === 'oauth' || sessionStorage.getItem('nearnow-google-auth-started') === '1') {
               sessionStorage.removeItem('nearnow-google-auth-started');
-              // Users sign up without verification codes
-              // showVerificationSent(currentUser);
+              showVerificationSent(currentUser);
             }
           }
         } catch { /* no callback */ }
@@ -1275,37 +1216,5 @@
 
       init();
     </script>
-  <script>
-// --- Verification badges + reputation ---
-const verifiedUserBadge = v =>
-  v ? '<span class="nn-badge nn-badge--user" title="Verified resident">✓ Verified</span>' : '';
-const verifiedBusinessBadge = v =>
-  v ? '<span class="nn-badge nn-badge--biz" title="Verified business">✓ Verified business</span>' : '';
-const reputationLabel = p =>
-  '<span class="nn-rep" title="Community reputation">★ ' + (p ?? 0) + '</span>';
-
-// --- Report misinformation button ---
-const reportButton = (type, id) =>
-  '<button class="nn-report-btn" data-type="' + type + '" data-id="' + id + '">⚐ Report</button>';
-
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('.nn-report-btn');
-  if (!btn) return;
-  const u = window.netlifyIdentity?.currentUser();
-  if (!u) { window.netlifyIdentity?.open(); return; }
-  const reason = prompt('Why is this misleading? (optional)') || '';
-  btn.disabled = true;
-  try {
-    const token = await u.jwt();
-    const res = await fetch('/api/misinformation', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', Authorization: 'Bearer ' + token },
-      body: JSON.stringify({ targetType: btn.dataset.type, targetId: btn.dataset.id, reason }),
-    });
-    const data = await res.json();
-    btn.textContent = data.flagged ? '⚐ Flagged for review' : '⚐ Reported — thank you';
-    if (data.flagged) btn.classList.add('flagged');
-  } catch { btn.textContent = '⚐ Try again'; btn.disabled = false; }
-});
-</script></body>
+  </body>
 </html>

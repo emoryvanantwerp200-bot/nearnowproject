@@ -1,185 +1,208 @@
-import { db } from "../../db/index.js";
-import { feedItems } from "../../db/schema.js";
-import { eq, and, desc } from "drizzle-orm";
 import type { Config } from "@netlify/functions";
+
+type FeedItem = {
+  title: string;
+  body: string;
+  category: string;
+  area: string;
+  trust: "official" | "community" | "unverified" | "reviewed";
+  source: string;
+  sourceUrl?: string;
+  createdAt: string;
+  lat: number;
+  lng: number;
+  distanceMiles?: number;
+};
 
 const now = () => new Date().toISOString();
 
-const baseItems = [
+const baseItems: FeedItem[] = [
   {
+    title: "NWS Mobile morning weather scan",
+    body: "Monitor coastal rain chances, heat index changes, and commute-time alerts from official weather sources.",
     category: "weather",
-    title: "Dense fog advisory through 9 AM",
-    body: "Reduced visibility on low-lying roads and near the river. Slow down on the west-side commute.",
     area: "mobile",
+    trust: "official",
+    source: "NWS Mobile",
+    sourceUrl: "https://www.weather.gov/mob/",
+    createdAt: now(),
+    lat: 30.6954,
+    lng: -88.0399,
+  },
+  {
+    title: "I-10 and Airport Boulevard commute watch",
+    body: "NearNow is watching recurring traffic pressure around key Mobile routes and bridge approaches.",
+    category: "traffic",
+    area: "mobile",
+    trust: "official",
+    source: "ALDOT 511 traffic feeds",
+    sourceUrl: "https://algotraffic.com/",
+    createdAt: now(),
+    lat: 30.675,
+    lng: -88.09,
+  },
+  {
+    title: "Mobile County public safety source check",
+    body: "Verified local public-safety links are grouped for fast morning review.",
+    category: "emergency",
+    area: "mobile",
+    trust: "official",
+    source: "Mobile County Sheriff",
+    sourceUrl: "https://www.mobileso.com/",
+    createdAt: now(),
+    lat: 30.6815,
+    lng: -88.0832,
+  },
+  {
+    title: "Baldwin beach and county update scan",
+    body: "Coastal communities, school notices, roads, weather, and city notices are grouped for Baldwin County.",
+    category: "news",
+    area: "baldwin",
+    trust: "official",
+    source: "Baldwin County Sheriff",
+    sourceUrl: "https://sheriff.baldwincountyal.gov/",
+    createdAt: now(),
+    lat: 30.5229,
+    lng: -87.9033,
+  },
+  {
+    title: "Pensacola and Escambia severe-weather watch",
+    body: "Escambia County coverage includes weather, traffic, and public-safety sources around Pensacola.",
+    category: "weather",
+    area: "escambia",
+    trust: "official",
     source: "NWS Mobile/Pensacola",
     sourceUrl: "https://www.weather.gov/mob/",
-    trust: "official"
+    createdAt: now(),
+    lat: 30.4213,
+    lng: -87.2169,
   },
   {
+    title: "West Mobile school and commute scan",
+    body: "Airport Boulevard, Schillinger Road, Dawes, Tanner Williams, and nearby neighborhoods are grouped.",
     category: "traffic",
-    title: "Main St lane closure between 3rd and 5th",
-    body: "Expect roughly 12 minute delays until mid-morning while crews clear a stalled vehicle.",
-    area: "mobile",
-    source: "Alabama 511",
-    sourceUrl: "https://algotraffic.com/",
-    trust: "official"
+    area: "westmobile",
+    trust: "unverified",
+    source: "NearNow local scan",
+    sourceUrl: "https://www.near-now.com/",
+    createdAt: now(),
+    lat: 30.684,
+    lng: -88.208,
   },
   {
-    category: "events",
-    title: "Fairhope evening market",
-    body: "Downtown vendors open at 5 PM with food, music, and family activities near the pier.",
-    area: "baldwin",
-    source: "Community calendar",
-    sourceUrl: null,
-    trust: "community"
-  },
-  {
-    category: "community",
-    title: "Tree blocking the right lane on Pine near 7th",
-    body: "Resident report - crews not yet on scene. Use the left lane if heading north.",
-    area: "mobile",
-    source: "Community report",
-    sourceUrl: null,
-    trust: "unverified"
-  },
-  {
+    title: "Pascagoula coast and port conditions",
+    body: "Pascagoula coverage watches Jackson County alerts, coast weather, river conditions, and city notices.",
     category: "news",
-    title: "Baldwin County school board meets tonight",
-    body: "Agenda includes transportation updates and facilities planning.",
-    area: "baldwin",
-    source: "Verified local news",
-    sourceUrl: "https://gulfcoastmedia.com/",
-    trust: "official"
-  },
-  {
-    category: "emergency",
-    title: "No active emergency mode",
-    body: "NearNow will surface shelters, closures, and official emergency contacts during major incidents.",
-    area: "mobile",
-    source: "NearNow status",
-    sourceUrl: null,
-    trust: "official"
-  },
-  {
-    category: "weather",
-    title: "Coast storms possible after 3 PM",
-    body: "Pascagoula and Jackson County should watch for pop-up storms later today.",
     area: "pascagoula",
-    source: "NWS New Orleans/Baton Rouge",
-    sourceUrl: "https://www.weather.gov/lix/",
-    trust: "official"
+    trust: "official",
+    source: "Mississippi DPS",
+    sourceUrl: "https://www.dps.ms.gov/investigation/amber-alert",
+    createdAt: now(),
+    lat: 30.3658,
+    lng: -88.5561,
   },
   {
-    category: "news",
-    title: "North Escambia community update",
-    body: "Local organizations have weekend events and public-meeting notices posted.",
-    area: "escambia",
-    source: "NorthEscambia.com",
-    sourceUrl: "https://www.northescambia.com/",
-    trust: "official"
-  }
+    title: "Community event picks for the Gulf Coast",
+    body: "Local family events and public meetings can be filtered into the same briefing flow.",
+    category: "events",
+    area: "mobile",
+    trust: "community",
+    source: "NearNow community",
+    sourceUrl: "https://www.near-now.com/",
+    createdAt: now(),
+    lat: 30.688,
+    lng: -88.0431,
+  },
 ];
 
-const headers = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Cache-Control": "no-store",
-  "Content-Type": "application/json; charset=utf-8"
-};
+const officialSourceTerms = [
+  "nws",
+  "aldot",
+  "511",
+  "sheriff",
+  "police",
+  "dps",
+  "city of",
+  "county",
+  "weather.gov",
+  "algotraffic",
+];
+
+function normalizeTrust(item: FeedItem): FeedItem["trust"] {
+  const sourceText = `${item.source} ${item.sourceUrl || ""}`.toLowerCase();
+  if (officialSourceTerms.some((term) => sourceText.includes(term))) return "official";
+  if (item.trust === "reviewed" || item.trust === "community") return item.trust;
+  return "unverified";
+}
+
+function toRadians(value: number) {
+  return (value * Math.PI) / 180;
+}
+
+function distanceMiles(aLat: number, aLng: number, bLat: number, bLng: number) {
+  const earthRadiusMiles = 3958.8;
+  const dLat = toRadians(bLat - aLat);
+  const dLng = toRadians(bLng - aLng);
+  const lat1 = toRadians(aLat);
+  const lat2 = toRadians(bLat);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * earthRadiusMiles * Math.asin(Math.sqrt(a));
+}
+
+function withTrustAndDistance(item: FeedItem, lat: number, lng: number): FeedItem {
+  return {
+    ...item,
+    trust: normalizeTrust(item),
+    distanceMiles: Number(distanceMiles(lat, lng, item.lat, item.lng).toFixed(1)),
+  };
+}
 
 export default async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("", { headers });
-  }
-
-  // Ensure database is seeded with baseItems if empty
-  try {
-    const existing = await db.select().from(feedItems).limit(1);
-    if (existing.length === 0) {
-      await db.insert(feedItems).values(
-        baseItems.map((item) => ({
-          category: item.category,
-          title: item.title,
-          body: item.body,
-          area: item.area,
-          source: item.source,
-          sourceUrl: item.sourceUrl,
-          trust: item.trust,
-          status: "published",
-        }))
-      );
-    }
-  } catch (err) {
-    console.error("Seeding feedItems failed:", err);
-  }
-
   if (req.method === "POST") {
-    try {
-      const body = await req.json();
-      const title = String(body.title || "").trim();
-      if (!title) {
-        return new Response(JSON.stringify({ error: "Report title is required." }), { status: 400, headers });
-      }
-
-      const item = {
-        category: String(body.category || "community"),
-        title: title.slice(0, 180),
-        body: String(body.body || "Submitted by a NearNow visitor.").slice(0, 500),
-        area: String(body.area || "mobile"),
-        source: String(body.source || "Community report").slice(0, 150),
-        sourceUrl: body.sourceUrl ? String(body.sourceUrl) : null,
-        trust: body.trust || "unverified",
-        status: "published",
-        latitude: body.latitude ? Number(body.latitude) : null,
-        longitude: body.longitude ? Number(body.longitude) : null,
-      };
-
-      const [inserted] = await db.insert(feedItems).values(item).returning();
-
-      return new Response(JSON.stringify({
-        message: "Report submitted successfully.",
-        item: inserted
-      }), { headers });
-    } catch (err) {
-      return new Response(JSON.stringify({ error: "Invalid report data." }), { status: 400, headers });
+    const body = await req.json().catch(() => ({}));
+    const title = String(body.title || "").trim();
+    if (!title) {
+      return Response.json({ error: "Report title is required." }, { status: 400 });
     }
-  }
-
-  if (req.method !== "GET") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers });
+    const item: FeedItem = {
+      title,
+      body: String(body.body || ""),
+      category: String(body.category || "community"),
+      area: String(body.area || "mobile"),
+      trust: "unverified",
+      source: "Community report",
+      createdAt: now(),
+      lat: Number(body.lat || body.latitude || 30.6954),
+      lng: Number(body.lng || body.longitude || -88.0399),
+    };
+    return Response.json({
+      message: "Report submitted for verification.",
+      item: withTrustAndDistance(item, item.lat, item.lng),
+    });
   }
 
   const url = new URL(req.url);
   const area = url.searchParams.get("area") || "mobile";
   const category = url.searchParams.get("category") || "all";
+  const radius = url.searchParams.get("radius") || "10";
+  const lat = Number(url.searchParams.get("lat") || 30.6954);
+  const lng = Number(url.searchParams.get("lng") || -88.0399);
 
-  try {
-    let query = db.select().from(feedItems).orderBy(desc(feedItems.createdAt));
-    const allItems = await query;
+  const filtered = baseItems
+    .filter((item) => (area === "all" ? true : item.area === area))
+    .filter((item) => category === "all" || item.category === category)
+    .map((item) => withTrustAndDistance(item, lat, lng))
+    .filter((item) => radius === "all" || item.distanceMiles! <= Number(radius))
+    .sort((a, b) => a.distanceMiles! - b.distanceMiles! || Date.parse(b.createdAt) - Date.parse(a.createdAt));
 
-    const filteredItems = allItems.filter((item) => {
-      const areaMatch = item.area === area || area === "all";
-      const categoryMatch = category === "all" || item.category === category;
-      return areaMatch && categoryMatch;
-    }).slice(0, 18);
+  const fallback = baseItems
+    .filter((item) => category === "all" || item.category === category)
+    .map((item) => withTrustAndDistance(item, lat, lng))
+    .sort((a, b) => a.distanceMiles! - b.distanceMiles!);
 
-    return new Response(JSON.stringify({ area, category, items: filteredItems }), { headers });
-  } catch (err) {
-    // Fail-safe local fallback if database is completely unavailable
-    const filtered = baseItems.filter((item) => {
-      const areaMatch = item.area === area || area === "all";
-      const categoryMatch = category === "all" || item.category === category;
-      return areaMatch && categoryMatch;
-    }).map((item, index) => ({
-      id: index + 1000,
-      ...item,
-      status: "published",
-      createdAt: now()
-    })).slice(0, 12);
-
-    return new Response(JSON.stringify({ area, category, items: filtered, error: "Database fallback active" }), { headers });
-  }
+  return Response.json({ items: filtered.length ? filtered : fallback });
 };
 
 export const config: Config = {

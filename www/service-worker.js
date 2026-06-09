@@ -3,23 +3,58 @@ const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/app.html',
-  '/styles.css',
-  '/feeds.js',
-  '/app.js',
   '/manifest.json',
-  '/favicon.png',
+  '/home.css',
+  '/home.js',
+  '/feed.xml',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js'
 ];
 
 // Install: pre-cache core assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => Promise.allSettled(
-        PRECACHE_URLS.map((url) => cache.add(url))
-      ))
+      .then((cache) => cache.addAll(PRECACHE_URLS))
       .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { body: event.data?.text() };
+  }
+
+  const title = payload.title || 'NearNow urgent alert';
+  const options = {
+    body: payload.body || 'A verified alert is happening near your selected area.',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    tag: payload.tag || 'nearnow-alert',
+    data: {
+      url: payload.url || '/app.html?app=1'
+    }
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/app.html?app=1';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      const existing = clientList.find((client) => client.url.includes('/app.html'));
+      if (existing) return existing.focus();
+      return clients.openWindow(url);
+    })
   );
 });
 
