@@ -93,7 +93,17 @@
       }
     }
     </script>
-  </head>
+  <style>
+.nn-badge { display:inline-flex; align-items:center; gap:.2rem; font-size:.72rem;
+  font-weight:600; padding:.1rem .45rem; border-radius:999px; vertical-align:middle; }
+.nn-badge--user { background:#e0f2fe; color:#0369a1; }
+.nn-badge--biz  { background:#dcfce7; color:#15803d; }
+.nn-rep { font-weight:600; color:#b45309; }
+.nn-report-btn { background:none; border:none; color:#9ca3af; cursor:pointer;
+  font-size:.78rem; padding:.15rem .35rem; }
+.nn-report-btn:hover { color:#dc2626; }
+.nn-report-btn.flagged { color:#dc2626; font-weight:600; }
+</style></head>
   <body>
     <header class="topbar" aria-label="NearNow navigation">
       <a class="brand" href="#home" aria-label="NearNow home">
@@ -1265,5 +1275,37 @@
 
       init();
     </script>
-  </body>
+  <script>
+// --- Verification badges + reputation ---
+const verifiedUserBadge = v =>
+  v ? '<span class="nn-badge nn-badge--user" title="Verified resident">✓ Verified</span>' : '';
+const verifiedBusinessBadge = v =>
+  v ? '<span class="nn-badge nn-badge--biz" title="Verified business">✓ Verified business</span>' : '';
+const reputationLabel = p =>
+  '<span class="nn-rep" title="Community reputation">★ ' + (p ?? 0) + '</span>';
+
+// --- Report misinformation button ---
+const reportButton = (type, id) =>
+  '<button class="nn-report-btn" data-type="' + type + '" data-id="' + id + '">⚐ Report</button>';
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.nn-report-btn');
+  if (!btn) return;
+  const u = window.netlifyIdentity?.currentUser();
+  if (!u) { window.netlifyIdentity?.open(); return; }
+  const reason = prompt('Why is this misleading? (optional)') || '';
+  btn.disabled = true;
+  try {
+    const token = await u.jwt();
+    const res = await fetch('/api/misinformation', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ targetType: btn.dataset.type, targetId: btn.dataset.id, reason }),
+    });
+    const data = await res.json();
+    btn.textContent = data.flagged ? '⚐ Flagged for review' : '⚐ Reported — thank you';
+    if (data.flagged) btn.classList.add('flagged');
+  } catch { btn.textContent = '⚐ Try again'; btn.disabled = false; }
+});
+</script></body>
 </html>
