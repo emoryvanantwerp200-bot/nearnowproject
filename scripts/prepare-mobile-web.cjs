@@ -9,21 +9,16 @@ const staticEntries = [
   "app",
   "app.html",
   "favicon.png",
-  "favicon.svg",
   "feed.xml",
-  "feeds",
+  "home.css",
+  "home.js",
   "index.html",
   "manifest.json",
   "nearnow-banner.svg",
   "service-worker.js",
   "icons",
   "netlify",
-  "vendor",
-  "styles.css",
-  "app.js",
-  "feeds.js",
-  "home.css",
-  "home.js"
+  "vendor"
 ];
 
 function rmIfExists(targetPath) {
